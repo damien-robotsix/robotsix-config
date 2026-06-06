@@ -35,7 +35,10 @@ pydantic-settings — so it can be consumed by any configuration backend.
 
 ## Development
 
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full contributor workflow.
+In short:
+
 ```sh
-pip install -e '.[dev]'
-pytest
+uv sync --extra dev
+uv run pytest
 ```
