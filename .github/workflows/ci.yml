@@ -19,6 +19,9 @@ jobs:
       - name: Install dependencies
         run: uv sync --extra dev
 
+      - name: pip-audit
+        run: uvx pip-audit --vulnerability-service osv --strict
+
       - name: deptry
         run: uvx deptry src
 
