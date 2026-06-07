@@ -25,6 +25,9 @@ jobs:
       - name: deptry
         run: uvx deptry src
 
+      - name: bandit
+        run: uvx bandit -c pyproject.toml -r src/
+
       - name: ruff check
         run: uv run ruff check .
 

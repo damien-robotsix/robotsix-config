@@ -30,6 +30,9 @@ line-length = 88
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
 
+[tool.bandit]
+exclude_dirs = ["tests"]
+
 [tool.deptry.per_rule_ignores]
 # Dev-only tooling (formatter/linter/type-checker/test framework + stubs) is
 # invoked as CLI commands and not imported from src/, so deptry's DEP002
