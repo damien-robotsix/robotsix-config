@@ -42,6 +42,8 @@ def read_yaml_file(path: Path) -> dict:
     try:
         with open(path, encoding="utf-8") as fh:
             data = yaml.safe_load(fh)
+    except OSError as exc:
+        raise YamlConfigError(f"Failed to read {path}: {exc}") from exc
     except yaml.YAMLError as exc:
         raise YamlConfigError(f"YAML parse error in {path}: {exc}") from exc
     if data is None:
