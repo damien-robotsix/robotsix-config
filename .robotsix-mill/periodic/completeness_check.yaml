@@ -1,0 +1,16 @@
+# Per-repo periodic workflow: presence enables completeness_check for
+# this repo.  Scans the repo for wiring gaps: public exports that don't
+# resolve, internal helpers that are never called, config paths
+# declared but unconsumed, and reachable stubs.  Files draft tickets.
+# Repo-agnostic — this file partial-merges over the built-in
+# completeness_check definition (lives in robotsix-mill:
+# agent_definitions/periodic/completeness_check.yaml).
+#
+# robotsix-yaml-config is a shared library consumed by robotsix-mill
+# and robotsix-auto-mail through a stable public API: YamlConfigError,
+# deep_merge, read_yaml_file, load_yaml_cascade, flatten_config,
+# overlay_env_vars (exported from src/robotsix_yaml_config/__init__.py).
+# A completeness check is valuable here because the library forms the
+# config foundation for multiple consumers — catching wiring gaps
+# early prevents silent breakage downstream.
+name: completeness_check
