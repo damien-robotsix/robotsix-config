@@ -1,0 +1,16 @@
+* text=auto
+*.py text eol=lf diff=python
+*.pyi text eol=lf diff=python
+*.md text eol=lf
+*.toml text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.json text eol=lf
+*.sh text eol=lf
+.gitattributes text
+LICENSE text eol=lf
+
+# Binary artefacts
+*.png binary
+*.jpg binary
+*.whl binary
