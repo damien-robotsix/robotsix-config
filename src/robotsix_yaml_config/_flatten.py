@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 
-def flatten_config(nested: dict, alias_map: dict[str, str]) -> dict[str, Any]:
+def flatten_config(nested: dict[str, Any], alias_map: dict[str, str]) -> dict[str, Any]:
     """Flatten *nested* into a flat ``{alias: value}`` dict.
 
     Walks *nested* building dotted-path keys (``"a.b.c"``).  For each
@@ -18,7 +18,7 @@ def flatten_config(nested: dict, alias_map: dict[str, str]) -> dict[str, Any]:
     """
     result: dict[str, Any] = {}
 
-    def _walk(d: dict, prefix: str = "") -> None:
+    def _walk(d: dict[str, Any], prefix: str = "") -> None:
         for key, value in d.items():
             full_key = f"{prefix}.{key}" if prefix else key
             alias = alias_map.get(full_key)

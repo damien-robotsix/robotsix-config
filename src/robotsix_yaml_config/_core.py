@@ -9,13 +9,14 @@ from __future__ import annotations
 from collections.abc import Sequence
 from copy import deepcopy
 from pathlib import Path
+from typing import Any
 
 import yaml
 
 from ._errors import YamlConfigError
 
 
-def deep_merge(base: dict, overlay: dict) -> dict:
+def deep_merge(base: dict[str, Any], overlay: dict[str, Any]) -> dict[str, Any]:
     """Recursively merge *overlay* into *base* (mutates *base*).
 
     For each key in *overlay*: if it already exists in *base* and both
@@ -31,7 +32,7 @@ def deep_merge(base: dict, overlay: dict) -> dict:
     return base
 
 
-def read_yaml_file(path: Path) -> dict:
+def read_yaml_file(path: Path) -> dict[str, Any]:
     """Read and parse a single YAML file, returning a dict.
 
     Returns an empty dict for non-existent files.  Raises
@@ -55,7 +56,7 @@ def read_yaml_file(path: Path) -> dict:
     return data
 
 
-def load_yaml_cascade(layers: Sequence[tuple[Path, bool]]) -> dict:
+def load_yaml_cascade(layers: Sequence[tuple[Path, bool]]) -> dict[str, Any]:
     """Load and deep-merge YAML files in order; later layers win.
 
     Each layer is a ``(path, required)`` tuple.  A required layer whose
@@ -63,7 +64,7 @@ def load_yaml_cascade(layers: Sequence[tuple[Path, bool]]) -> dict:
     layers whose files are missing are skipped.  Returns the fully merged
     dict (starting from an empty dict).
     """
-    merged: dict = {}
+    merged: dict[str, Any] = {}
     for path, required in layers:
         if not path.exists():
             if required:
