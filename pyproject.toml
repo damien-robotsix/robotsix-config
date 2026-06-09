@@ -55,3 +55,15 @@ DEP002 = ["pytest", "pytest-cov", "ruff", "mypy", "types-PyYAML"]
 # The distribution is named "pyyaml" but imports as "yaml" — map it so
 # deptry resolves the `import yaml` in src/ to the declared dependency.
 pyyaml = "yaml"
+
+[tool.mypy]
+warn_unused_ignores = true
+warn_redundant_casts = true
+disallow_any_generics = true
+no_implicit_reexport = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
