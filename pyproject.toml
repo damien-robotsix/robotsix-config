@@ -27,7 +27,7 @@ Repository = "https://github.com/damien-robotsix/robotsix-yaml-config"
 Issues = "https://github.com/damien-robotsix/robotsix-yaml-config/issues"
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "pytest-cov>=5", "ruff>=0.6", "mypy>=1.11", "types-PyYAML>=6"]
+dev = ["pytest>=8", "pytest-cov>=5", "ruff>=0.6", "mypy>=1.11", "types-PyYAML>=6", "hypothesis>=6"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/robotsix_yaml_config"]
@@ -49,7 +49,7 @@ exclude_dirs = ["tests"]
 # Dev-only tooling (formatter/linter/type-checker/test framework + stubs) is
 # invoked as CLI commands and not imported from src/, so deptry's DEP002
 # ("defined but not used") is expected and intentional for these.
-DEP002 = ["pytest", "pytest-cov", "ruff", "mypy", "types-PyYAML"]
+DEP002 = ["pytest", "pytest-cov", "ruff", "mypy", "types-PyYAML", "hypothesis"]
 
 [tool.deptry.package_module_name_map]
 # The distribution is named "pyyaml" but imports as "yaml" — map it so
