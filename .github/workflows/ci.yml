@@ -29,7 +29,7 @@ jobs:
         run: uvx deptry src
 
       - name: bandit
-        run: uvx bandit -c pyproject.toml -r src/ -f sarif -o bandit-results.sarif
+        run: uvx --from 'bandit[sarif]' bandit -c pyproject.toml -r src/ -f sarif -o bandit-results.sarif
 
       - name: Upload bandit SARIF
         if: always()
