@@ -92,7 +92,14 @@ aborted; review and commit the mechanical fixups before committing again.
 
 ## Releasing
 
-The package version lives in `pyproject.toml` (the `version` field).
-Releases are cut by maintainers. There is currently no automated PyPI
-publish workflow — the only GitHub Actions workflow is `ci.yml`, which
-runs the checks described above and does not publish the package.
+Releases are automated via GitHub Actions:
+
+1. **Semantic versioning:** The repository uses [release-please](https://github.com/googleapis/release-please-action) to automatically create release PRs based on [conventional commits](https://www.conventionalcommits.org/).
+   - Commit messages like `feat: ...`, `fix: ...`, `BREAKING CHANGE: ...` trigger version bumps.
+   - Release-please opens a PR with the new version, CHANGELOG updates, and tags.
+
+2. **Publishing:** When a release is created (via release-please or manually), the `publish` workflow:
+   - Builds source distribution (sdist) and wheel artifacts.
+   - Publishes to PyPI using [OpenID Connect (OIDC) trusted publishing](https://docs.pypi.org/trusted-publishers/), eliminating the need for API tokens.
+
+Maintainers must ensure conventional commits are used so release-please correctly identifies version bumps.
