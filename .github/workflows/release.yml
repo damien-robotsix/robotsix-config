@@ -30,7 +30,7 @@ jobs:
     environment: pypi
     permissions:
       id-token: write
-      contents: read
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
@@ -42,6 +42,19 @@ jobs:
 
       - name: Build sdist and wheel
         run: uv build
+
+      - name: Generate CycloneDX SBOM
+        run: |
+          uv sync
+          uvx --from cyclonedx-bom cyclonedx-py environment "$(uv python find)" \
+            --pyproject pyproject.toml \
+            --output-format JSON \
+            --output-file cyclonedx.json
+
+      - name: Attach SBOM to GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "${{ needs.release-please.outputs.tag_name }}" cyclonedx.json --clobber
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
