@@ -15,10 +15,14 @@ pydantic-settings — so it can be consumed by any configuration backend.
 
 | Symbol | Behaviour |
 |---|---|
-| `YamlConfigError(Exception)` | Raised for missing required files, YAML parse errors, non-dict top-level mappings. |
+| `YamlConfigError(Exception)` | Base exception for cascade failures; all other exceptions inherit from this. |
+| `MissingConfigError(YamlConfigError, FileNotFoundError)` | Raised when a required config file is not found. Also catchable as `FileNotFoundError`. |
+| `YamlReadError(YamlConfigError)` | Raised on OS-level errors while reading a config file. |
+| `YamlParseError(YamlConfigError)` | Raised on YAML syntax errors. |
+| `InvalidConfigStructureError(YamlConfigError)` | Raised when the YAML top level is not a mapping. |
 | `deep_merge(base, overlay) -> dict` | Recursively merge `overlay` into `base` (mutates `base`). Scalars overwrite; nested dicts recurse; lists/other are replaced wholesale via `deepcopy`. Returns `base`. |
-| `read_yaml_file(path) -> dict` | Read & parse one YAML file. Missing file → `{}`. Parse error or non-dict top level → `YamlConfigError`. |
-| `load_yaml_cascade(layers) -> dict` | Load & deep-merge `(path, required)` layers in order. A required-but-missing layer raises `YamlConfigError`. Later layers win. |
+| `read_yaml_file(path) -> dict` | Read & parse one YAML file. Missing file → `{}`. Raises `YamlReadError`, `YamlParseError`, or `InvalidConfigStructureError` on errors (all subclasses of `YamlConfigError`). |
+| `load_yaml_cascade(layers) -> dict` | Load & deep-merge `(path, required)` layers in order. A required-but-missing layer raises `MissingConfigError`. Later layers win. |
 | `flatten_config(nested, alias_map) -> dict` | Walk a nested dict, map each dotted path through `alias_map`, return a flat `{alias: value}` dict. Unknown paths dropped; dict-valued aliases emitted as-is. |
 | `overlay_env_vars(config, prefix, type_hints=None) -> dict` | Overlay `{PREFIX}_{KEY.upper()}` env vars onto existing keys with type coercion. Mutates and returns `config`. |
 
