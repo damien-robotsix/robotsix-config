@@ -11,6 +11,20 @@ Backend-agnostic primitives for a layered YAML configuration cascade:
 The package operates on plain dicts only — no pydantic, no
 pydantic-settings — so it can be consumed by any configuration backend.
 
+## Installation
+
+This package is published to PyPI:
+
+```bash
+# Using pip
+pip install robotsix-yaml-config
+
+# Using uv (recommended for development)
+uv add robotsix-yaml-config
+```
+
+**Python version:** requires Python 3.14 or later.
+
 ## Public API
 
 | Symbol | Behaviour |
