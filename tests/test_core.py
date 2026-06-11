@@ -5,7 +5,11 @@ from __future__ import annotations
 import pytest
 
 from robotsix_yaml_config import (
+    InvalidConfigStructureError,
+    MissingConfigError,
     YamlConfigError,
+    YamlParseError,
+    YamlReadError,
     deep_merge,
     load_yaml_cascade,
     read_yaml_file,
@@ -85,28 +89,28 @@ def test_read_yaml_file_basic_mapping(tmp_path):
 def test_read_yaml_file_parse_error(tmp_path):
     p = tmp_path / "bad.yaml"
     p.write_text("a: [1, 2\n", encoding="utf-8")
-    with pytest.raises(YamlConfigError, match="YAML parse error"):
+    with pytest.raises(YamlParseError, match="YAML parse error"):
         read_yaml_file(p)
 
 
 def test_read_yaml_file_non_dict_list(tmp_path):
     p = tmp_path / "list.yaml"
     p.write_text("- 1\n- 2\n", encoding="utf-8")
-    with pytest.raises(YamlConfigError, match="Expected a mapping"):
+    with pytest.raises(InvalidConfigStructureError, match="Expected a mapping"):
         read_yaml_file(p)
 
 
 def test_read_yaml_file_non_dict_scalar(tmp_path):
     p = tmp_path / "scalar.yaml"
     p.write_text("42\n", encoding="utf-8")
-    with pytest.raises(YamlConfigError, match="Expected a mapping"):
+    with pytest.raises(InvalidConfigStructureError, match="Expected a mapping"):
         read_yaml_file(p)
 
 
 def test_read_yaml_file_oserror(tmp_path):
     p = tmp_path / "adir"
     p.mkdir()
-    with pytest.raises(YamlConfigError, match="Failed to read"):
+    with pytest.raises(YamlReadError, match="Failed to read"):
         read_yaml_file(p)
 
 
@@ -116,7 +120,7 @@ def test_read_yaml_file_oserror(tmp_path):
 
 
 def test_cascade_required_missing_raises(tmp_path):
-    with pytest.raises(YamlConfigError, match="Required config file not found"):
+    with pytest.raises(MissingConfigError, match="Required config file not found"):
         load_yaml_cascade([(tmp_path / "missing.yaml", True)])
 
 
@@ -143,3 +147,44 @@ def test_cascade_merge_order_later_wins(tmp_path):
 
 def test_cascade_empty_layers_returns_empty():
     assert load_yaml_cascade([]) == {}
+
+
+# ---------------------------------------------------------------------------
+#  exception hierarchy / backward compatibility
+# ---------------------------------------------------------------------------
+
+
+def test_parse_error_still_catchable_as_base(tmp_path):
+    p = tmp_path / "bad.yaml"
+    p.write_text("a: [1, 2\n", encoding="utf-8")
+    with pytest.raises(YamlConfigError, match="YAML parse error"):
+        read_yaml_file(p)
+
+
+def test_oserror_still_catchable_as_base(tmp_path):
+    p = tmp_path / "adir"
+    p.mkdir()
+    with pytest.raises(YamlConfigError, match="Failed to read"):
+        read_yaml_file(p)
+
+
+def test_non_dict_still_catchable_as_base(tmp_path):
+    p = tmp_path / "list.yaml"
+    p.write_text("- 1\n- 2\n", encoding="utf-8")
+    with pytest.raises(YamlConfigError, match="Expected a mapping"):
+        read_yaml_file(p)
+
+
+def test_missing_required_still_catchable_as_base(tmp_path):
+    with pytest.raises(YamlConfigError, match="Required config file not found"):
+        load_yaml_cascade([(tmp_path / "missing.yaml", True)])
+
+
+def test_missing_required_catchable_as_file_not_found(tmp_path):
+    with pytest.raises(FileNotFoundError):
+        load_yaml_cascade([(tmp_path / "missing.yaml", True)])
+
+
+def test_missing_config_error_lineage():
+    assert issubclass(MissingConfigError, FileNotFoundError)
+    assert issubclass(MissingConfigError, YamlConfigError)

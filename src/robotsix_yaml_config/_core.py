@@ -13,7 +13,12 @@ from typing import Any
 
 import yaml
 
-from ._errors import YamlConfigError
+from ._errors import (
+    InvalidConfigStructureError,
+    MissingConfigError,
+    YamlParseError,
+    YamlReadError,
+)
 
 
 def deep_merge(base: dict[str, Any], overlay: dict[str, Any]) -> dict[str, Any]:
@@ -36,7 +41,9 @@ def read_yaml_file(path: Path) -> dict[str, Any]:
     """Read and parse a single YAML file, returning a dict.
 
     Returns an empty dict for non-existent files.  Raises
-    ``YamlConfigError`` on parse failures or a non-dict top level.
+    ``YamlReadError`` on OS-level read failures, ``YamlParseError`` on
+    parse failures, and ``InvalidConfigStructureError`` for a non-dict
+    top level (all subclasses of ``YamlConfigError``).
     """
     if not path.exists():
         return {}
@@ -44,13 +51,13 @@ def read_yaml_file(path: Path) -> dict[str, Any]:
         with open(path, encoding="utf-8") as fh:
             data = yaml.safe_load(fh)
     except OSError as exc:
-        raise YamlConfigError(f"Failed to read {path}: {exc}") from exc
+        raise YamlReadError(f"Failed to read {path}: {exc}") from exc
     except yaml.YAMLError as exc:
-        raise YamlConfigError(f"YAML parse error in {path}: {exc}") from exc
+        raise YamlParseError(f"YAML parse error in {path}: {exc}") from exc
     if data is None:
         return {}
     if not isinstance(data, dict):
-        raise YamlConfigError(
+        raise InvalidConfigStructureError(
             f"Expected a mapping at top level of {path}, got {type(data).__name__}"
         )
     return data
@@ -60,7 +67,8 @@ def load_yaml_cascade(layers: Sequence[tuple[Path, bool]]) -> dict[str, Any]:
     """Load and deep-merge YAML files in order; later layers win.
 
     Each layer is a ``(path, required)`` tuple.  A required layer whose
-    file is missing raises ``YamlConfigError`` naming the file.  Optional
+    file is missing raises ``MissingConfigError`` (a subclass of
+    ``YamlConfigError``) naming the file.  Optional
     layers whose files are missing are skipped.  Returns the fully merged
     dict (starting from an empty dict).
     """
@@ -68,7 +76,7 @@ def load_yaml_cascade(layers: Sequence[tuple[Path, bool]]) -> dict[str, Any]:
     for path, required in layers:
         if not path.exists():
             if required:
-                raise YamlConfigError(f"Required config file not found: {path}.")
+                raise MissingConfigError(f"Required config file not found: {path}.")
             continue
         deep_merge(merged, read_yaml_file(path))
     return merged
