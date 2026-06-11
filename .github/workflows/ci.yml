@@ -5,7 +5,20 @@ on:
   pull_request:
 
 jobs:
-  checks:
+  ci:
+    uses: damien-robotsix/robotsix-mill/.github/workflows/python-ci.yml@main
+    with:
+      python-version: "3.14"
+      install-extras: "dev"
+      cov-package: robotsix_yaml_config
+      coverage-threshold: "90"
+      run-deptry: true
+      run-bandit: true
+
+  # The reusable spine runs bandit as a gate but does not emit a SARIF file or
+  # upload it, so the code-scanning integration is preserved as a dedicated job
+  # that regenerates the SARIF report and uploads it.
+  bandit-sarif:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -19,15 +32,6 @@ jobs:
       - name: Set up Python
         run: uv python install 3.14
 
-      - name: Install dependencies
-        run: uv sync --extra dev
-
-      - name: pip-audit
-        run: uvx pip-audit --vulnerability-service osv --strict
-
-      - name: deptry
-        run: uvx deptry src
-
       - name: bandit
         run: uvx --from 'bandit[sarif]' bandit -c pyproject.toml -r src/ -f sarif -o bandit-results.sarif
 
@@ -38,14 +42,22 @@ jobs:
           sarif_file: bandit-results.sarif
           category: bandit
 
-      - name: ruff check
-        run: uv run ruff check .
+  # The reusable spine runs pytest with coverage but only emits term-missing
+  # output (no coverage.xml artifact), so the Codecov integration is preserved
+  # as a dedicated job that regenerates the XML report and uploads it.
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-      - name: ruff format --check
-        run: uv run ruff format --check .
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
 
-      - name: mypy
-        run: uv run mypy src tests
+      - name: Set up Python
+        run: uv python install 3.14
+
+      - name: Install dependencies
+        run: uv sync --extra dev
 
       - name: pytest
         run: uv run pytest --cov=src --cov-report=xml --cov-report=term-missing
