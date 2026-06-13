@@ -41,7 +41,13 @@ target-version = "py314"
 line-length = 88
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "UP", "B"]
+select = ["E", "F", "I", "UP", "B", "S"]
+
+[tool.ruff.lint.per-file-ignores]
+# Security (S) rules target production code; tests legitimately use
+# `assert` (S101) and temp paths (S108). Mirror Bandit's
+# `exclude_dirs = ["tests"]` so the S rule set stays green in CI.
+"tests/**" = ["S"]
 
 [tool.bandit]
 exclude_dirs = ["tests"]
