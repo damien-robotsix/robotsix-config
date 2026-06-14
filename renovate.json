@@ -8,7 +8,9 @@
       "matchManagers": ["pep621"],
       "matchPackageNames": ["ruff", "mypy", "pytest*", "types-*"],
       "matchUpdateTypes": ["minor", "patch"],
-      "groupName": "development"
+      "matchCurrentVersion": "!/^0/",
+      "groupName": "development",
+      "automerge": true
     }
   ]
 }
