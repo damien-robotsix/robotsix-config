@@ -1,0 +1,12 @@
+# Per-repo periodic workflow: presence enables board_cleanup for
+# this repo.  Reviews snapshots of recent tickets and proposes
+# close / transition / relabel actions for stale or duplicate items.
+# Repo-agnostic — this file partial-merges over the built-in
+# board_cleanup definition (lives in robotsix-mill:
+# agent_definitions/periodic/board_cleanup.yaml).
+#
+# robotsix-yaml-config has 13+ proposals in recent history and 8
+# periodic workflows.  Like sibling libs robotsix-modules and
+# robotsix-llmio, it sees steady ticket traffic but lacks automated
+# board hygiene — board_cleanup closes that gap.
+name: board_cleanup
