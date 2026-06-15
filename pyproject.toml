@@ -28,7 +28,7 @@ Repository = "https://github.com/damien-robotsix/robotsix-yaml-config"
 Issues = "https://github.com/damien-robotsix/robotsix-yaml-config/issues"
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "pytest-cov>=5", "ruff>=0.6", "mypy>=1.11", "types-PyYAML>=6", "hypothesis>=6", "mkdocs-material>=9", "mkdocstrings[python]>=0.25"]
+dev = ["pytest>=8", "pytest-cov>=5", "ruff>=0.6", "mypy>=1.11", "types-PyYAML>=6", "vulture", "hypothesis>=6", "mkdocs-material>=9", "mkdocstrings[python]>=0.25"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/robotsix_yaml_config"]
@@ -44,6 +44,7 @@ line-length = 88
 select = ["E", "F", "I", "UP", "B", "S"]
 
 [tool.ruff.lint.per-file-ignores]
+"vulture_whitelist.py" = ["B018"]
 # Security (S) rules target production code; tests legitimately use
 # `assert` (S101) and temp paths (S108). Mirror Bandit's
 # `exclude_dirs = ["tests"]` so the S rule set stays green in CI.

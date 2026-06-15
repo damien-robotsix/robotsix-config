@@ -33,3 +33,11 @@ repos:
         args: []
         additional_dependencies:
           - types-PyYAML
+
+  - repo: local
+    hooks:
+      - id: vulture
+        name: vulture
+        entry: vulture src/ vulture_whitelist.py
+        language: system
+        pass_filenames: false
