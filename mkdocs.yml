@@ -6,7 +6,9 @@ nav:
   - Home: index.md
   - Core: _core/index.md
   - Flatten: _flatten/index.md
-  - API Reference: api.md
+  - API Reference:
+      - Overview: api.md
+      - Environment: _env/index.md
   - Contributing: contributing.md
 
 theme:
