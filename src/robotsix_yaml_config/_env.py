@@ -7,8 +7,8 @@ from typing import Any
 
 # Case-insensitive truthy/falsy spellings for bool coercion.  A raw
 # ``bool(value)`` is WRONG because ``bool("false")`` is ``True``.
-_TRUE_VALUES = {"1", "true", "yes", "on"}
-_FALSE_VALUES = {"0", "false", "no", "off", ""}
+_TRUE_VALUES = frozenset({"1", "true", "yes", "on"})
+_FALSE_VALUES = frozenset({"0", "false", "no", "off", ""})
 
 
 def _coerce(value: str, hint: type) -> Any:
