@@ -1,0 +1,5 @@
+# Per-repo periodic workflow: presence enables copy_paste for this repo.
+# Detects copy-paste duplication (jscpd-based) within the repository.
+# Repo-agnostic — this file partial-merges over the built-in copy_paste
+# definition in robotsix-mill.
+name: copy_paste
