@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "robotsix-yaml-config"
+description: "Backend-agnostic YAML configuration cascade primitives: deep-merge, layered file loading, env-var overlay, and dotted-path flattening."
+authors:
+  - given-names: Damien
+    family-names: Robotsix
+version: 0.1.0
+date-released: "2026-07-17"
+license: MIT
+url: "https://github.com/damien-robotsix/robotsix-yaml-config"
