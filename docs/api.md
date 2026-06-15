@@ -1,9 +1,5 @@
 # API Reference
 
-## Core
-
-::: robotsix_yaml_config._core
-
 ## Environment
 
 ::: robotsix_yaml_config._env
