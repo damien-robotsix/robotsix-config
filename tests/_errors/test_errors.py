@@ -19,11 +19,9 @@ def test_parse_error_still_catchable_as_base(tmp_path):
         read_yaml_file(p)
 
 
-def test_oserror_still_catchable_as_base(tmp_path):
-    p = tmp_path / "adir"
-    p.mkdir()
+def test_oserror_still_catchable_as_base(non_file_path):
     with pytest.raises(YamlConfigError, match="Failed to read"):
-        read_yaml_file(p)
+        read_yaml_file(non_file_path)
 
 
 def test_non_dict_still_catchable_as_base(tmp_path):
