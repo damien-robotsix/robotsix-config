@@ -85,18 +85,14 @@ def test_read_yaml_file_basic_mapping(tmp_path):
     assert read_yaml_file(p) == {"a": 1, "b": {"c": 2}}
 
 
-def test_read_yaml_file_parse_error(tmp_path):
-    p = tmp_path / "bad.yaml"
-    p.write_text("a: [1, 2\n", encoding="utf-8")
+def test_read_yaml_file_parse_error(bad_yaml_file):
     with pytest.raises(YamlParseError, match="YAML parse error"):
-        read_yaml_file(p)
+        read_yaml_file(bad_yaml_file)
 
 
-def test_read_yaml_file_non_dict_list(tmp_path):
-    p = tmp_path / "list.yaml"
-    p.write_text("- 1\n- 2\n", encoding="utf-8")
+def test_read_yaml_file_non_dict_list(list_yaml_file):
     with pytest.raises(InvalidConfigStructureError, match="Expected a mapping"):
-        read_yaml_file(p)
+        read_yaml_file(list_yaml_file)
 
 
 def test_read_yaml_file_non_dict_scalar(tmp_path):
@@ -106,11 +102,9 @@ def test_read_yaml_file_non_dict_scalar(tmp_path):
         read_yaml_file(p)
 
 
-def test_read_yaml_file_oserror(tmp_path):
-    p = tmp_path / "adir"
-    p.mkdir()
+def test_read_yaml_file_oserror(non_file_path):
     with pytest.raises(YamlReadError, match="Failed to read"):
-        read_yaml_file(p)
+        read_yaml_file(non_file_path)
 
 
 # ---------------------------------------------------------------------------

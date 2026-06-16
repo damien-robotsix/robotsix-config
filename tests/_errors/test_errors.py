@@ -12,25 +12,19 @@ from robotsix_yaml_config import (
 )
 
 
-def test_parse_error_still_catchable_as_base(tmp_path):
-    p = tmp_path / "bad.yaml"
-    p.write_text("a: [1, 2\n", encoding="utf-8")
+def test_parse_error_still_catchable_as_base(bad_yaml_file):
     with pytest.raises(YamlConfigError, match="YAML parse error"):
-        read_yaml_file(p)
+        read_yaml_file(bad_yaml_file)
 
 
-def test_oserror_still_catchable_as_base(tmp_path):
-    p = tmp_path / "adir"
-    p.mkdir()
+def test_oserror_still_catchable_as_base(non_file_path):
     with pytest.raises(YamlConfigError, match="Failed to read"):
-        read_yaml_file(p)
+        read_yaml_file(non_file_path)
 
 
-def test_non_dict_still_catchable_as_base(tmp_path):
-    p = tmp_path / "list.yaml"
-    p.write_text("- 1\n- 2\n", encoding="utf-8")
+def test_non_dict_still_catchable_as_base(list_yaml_file):
     with pytest.raises(YamlConfigError, match="Expected a mapping"):
-        read_yaml_file(p)
+        read_yaml_file(list_yaml_file)
 
 
 def test_missing_required_still_catchable_as_base(tmp_path):
