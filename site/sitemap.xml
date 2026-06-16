@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>https://damien-robotsix.github.io/robotsix-yaml-config/</loc>
+         <lastmod>2026-06-16</lastmod>
+    </url>
+    <url>
+         <loc>https://damien-robotsix.github.io/robotsix-yaml-config/api/</loc>
+         <lastmod>2026-06-16</lastmod>
+    </url>
+    <url>
+         <loc>https://damien-robotsix.github.io/robotsix-yaml-config/contributing/</loc>
+         <lastmod>2026-06-16</lastmod>
+    </url>
+    <url>
+         <loc>https://damien-robotsix.github.io/robotsix-yaml-config/_core/</loc>
+         <lastmod>2026-06-16</lastmod>
+    </url>
+    <url>
+         <loc>https://damien-robotsix.github.io/robotsix-yaml-config/_env/</loc>
+         <lastmod>2026-06-16</lastmod>
+    </url>
+    <url>
+         <loc>https://damien-robotsix.github.io/robotsix-yaml-config/_errors/</loc>
+         <lastmod>2026-06-16</lastmod>
+    </url>
+    <url>
+         <loc>https://damien-robotsix.github.io/robotsix-yaml-config/_flatten/</loc>
+         <lastmod>2026-06-16</lastmod>
+    </url>
+</urlset>

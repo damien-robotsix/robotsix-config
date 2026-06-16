@@ -1,0 +1,19 @@
+- name: __init__
+  path: src/robotsix_yaml_config/__init__.py
+  description: Public API — re-exports all symbols and defines __all__.
+
+- name: _core
+  path: src/robotsix_yaml_config/_core.py
+  description: Core YAML cascade primitives (deep_merge, read_yaml_file, load_yaml_cascade).
+
+- name: _env
+  path: src/robotsix_yaml_config/_env.py
+  description: Overlay typed environment-variable values onto a flat config dict.
+
+- name: _errors
+  path: src/robotsix_yaml_config/_errors.py
+  description: Error types for the YAML configuration cascade.
+
+- name: _flatten
+  path: src/robotsix_yaml_config/_flatten.py
+  description: Flatten a nested config dict into a {alias: value} dict via a path map.
