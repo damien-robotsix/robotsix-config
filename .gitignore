@@ -11,3 +11,4 @@ dist/
 venv/
 coverage.xml
 .coverage
+site/
