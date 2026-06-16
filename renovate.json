@@ -11,6 +11,12 @@
       "matchCurrentVersion": "!/^0/",
       "groupName": "development",
       "automerge": true
+    },
+    {
+      "matchManagers": ["pre-commit"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "pre-commit hooks",
+      "automerge": true
     }
   ]
 }
