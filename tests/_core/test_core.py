@@ -146,6 +146,3 @@ def test_cascade_merge_order_later_wins(tmp_path):
 
 def test_cascade_empty_layers_returns_empty():
     assert load_yaml_cascade([]) == {}
-
-
-
