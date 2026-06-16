@@ -5,6 +5,7 @@ repo_url: https://github.com/damien-robotsix/robotsix-yaml-config
 nav:
   - Home: index.md
   - Core: _core/index.md
+  - Errors: _errors/index.md
   - Flatten: _flatten/index.md
   - API Reference:
       - Overview: api.md
