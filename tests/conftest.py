@@ -30,7 +30,7 @@ def non_file_path(tmp_path):
 @pytest.fixture
 def app_env(monkeypatch):
     """Helper to set multiple APP_* env vars in one call."""
-    def _set(**vars):
-        for k, v in vars.items():
+    def _set(**env_vars):
+        for k, v in env_vars.items():
             monkeypatch.setenv(f"APP_{k.upper()}", v)
     return _set

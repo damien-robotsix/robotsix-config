@@ -102,11 +102,9 @@ def test_read_yaml_file_non_dict_scalar(tmp_path):
         read_yaml_file(p)
 
 
-def test_read_yaml_file_oserror(tmp_path):
-    p = tmp_path / "adir"
-    p.mkdir()
+def test_read_yaml_file_oserror(non_file_path):
     with pytest.raises(YamlReadError, match="Failed to read"):
-        read_yaml_file(p)
+        read_yaml_file(non_file_path)
 
 
 # ---------------------------------------------------------------------------
