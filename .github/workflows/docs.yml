@@ -1,4 +1,4 @@
-name: docs
+name: Docs
 on:
   push:
     branches: [main]
@@ -15,18 +15,7 @@ concurrency:
 
 jobs:
   deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - uses: astral-sh/setup-uv@v5
-      - run: uv sync --extra dev
-      - run: uv run mkdocs build --strict
-      - uses: actions/configure-pages@v6
-      - uses: actions/upload-pages-artifact@v5
-        with:
-          path: site
-      - id: deployment
-        uses: actions/deploy-pages@v5
+    uses: damien-robotsix/robotsix-mill/.github/workflows/python-docs.yml@a063c729739539138db80ce72c82a35e38eb76f9
+    with:
+      docs-install-args: "--extra dev"
+    secrets: inherit
