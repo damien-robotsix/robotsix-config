@@ -6,7 +6,8 @@
       "package-name": "robotsix-yaml-config",
       "changelog-path": "CHANGELOG.md",
       "include-component-in-tag": false,
-      "bump-minor-pre-major": true
+      "bump-minor-pre-major": true,
+      "extra-files": ["CITATION.cff"]
     }
   }
 }
