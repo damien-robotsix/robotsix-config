@@ -9,7 +9,7 @@ jobs:
     permissions:
       contents: read
       security-events: write
-    uses: damien-robotsix/robotsix-mill/.github/workflows/python-ci.yml@main
+    uses: damien-robotsix/robotsix-mill/.github/workflows/python-ci.yml@a317d51ad25be89194d55f220164819807d549f1
     with:
       python-version: "3.14"
       install-extras: "dev"
