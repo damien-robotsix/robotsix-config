@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from robotsix_yaml_config import overlay_env_vars
-from robotsix_yaml_config._env import _TRUE_VALUES, _FALSE_VALUES
+from robotsix_yaml_config._env import _FALSE_VALUES, _TRUE_VALUES
 
 
 def test_overlay_prefix_lookup_hits(app_env):
