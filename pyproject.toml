@@ -59,7 +59,7 @@ exclude_dirs = ["tests"]
 # Dev-only tooling (formatter/linter/type-checker/test framework + stubs +
 # docs site generator) is invoked as CLI commands and not imported from src/,
 # so deptry's DEP002 ("defined but not used") is expected and intentional.
-DEP002 = ["pytest", "pytest-cov", "ruff", "mypy", "types-PyYAML", "hypothesis", "mkdocs-material", "mkdocstrings", "vulture"]
+DEP002 = ["pytest", "pytest-cov", "pytest-xdist", "ruff", "mypy", "types-PyYAML", "hypothesis", "mkdocs-material", "mkdocstrings", "vulture"]
 
 [tool.deptry.package_module_name_map]
 # The distribution is named "pyyaml" but imports as "yaml" — map it so
