@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from robotsix_yaml_config import overlay_env_vars
+from robotsix_yaml_config._env import _TRUE_VALUES, _FALSE_VALUES
 
 
 def test_overlay_prefix_lookup_hits(app_env):
@@ -43,7 +44,7 @@ def test_overlay_bool_false_string(app_env):
 
 
 def test_overlay_bool_truthy_spellings(app_env):
-    for raw in ("1", "true", "TRUE", "yes", "on", "On"):
+    for raw in _TRUE_VALUES | {"TRUE", "On"}:
         app_env(flag=raw)
         config = {"flag": False}
         result = overlay_env_vars(config, "APP", {"flag": bool})
@@ -51,7 +52,7 @@ def test_overlay_bool_truthy_spellings(app_env):
 
 
 def test_overlay_bool_falsy_spellings(app_env):
-    for raw in ("0", "false", "FALSE", "no", "off", ""):
+    for raw in _FALSE_VALUES | {"FALSE"}:
         app_env(flag=raw)
         config = {"flag": True}
         result = overlay_env_vars(config, "APP", {"flag": bool})
