@@ -67,6 +67,12 @@ uvx pip-audit --vulnerability-service osv --strict
 uvx deptry src
 ```
 
+Dead code:
+
+```sh
+uv run vulture src/ vulture_whitelist.py
+```
+
 ## Pre-commit
 
 This repo ships a `.pre-commit-config.yaml`. Install the git hook with:
