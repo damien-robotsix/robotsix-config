@@ -1,5 +1,12 @@
 # robotsix-yaml-config
 
+[![PyPI - Version](https://img.shields.io/pypi/v/robotsix-yaml-config.svg)](https://pypi.org/project/robotsix-yaml-config/)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/robotsix-yaml-config.svg)](https://pypi.org/project/robotsix-yaml-config/)
+[![CI](https://img.shields.io/github/actions/workflow/status/damien-robotsix/robotsix-yaml-config/ci.yml?branch=main&label=CI)](https://github.com/damien-robotsix/robotsix-yaml-config/actions/workflows/ci.yml)
+[![Docs](https://img.shields.io/github/actions/workflow/status/damien-robotsix/robotsix-yaml-config/docs.yml?branch=main&label=Docs)](https://github.com/damien-robotsix/robotsix-yaml-config/actions/workflows/docs.yml)
+[![codecov](https://codecov.io/gh/damien-robotsix/robotsix-yaml-config/branch/main/graph/badge.svg)](https://codecov.io/gh/damien-robotsix/robotsix-yaml-config)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 Backend-agnostic primitives for a layered YAML configuration cascade:
 start from code defaults, deep-merge YAML files, overlay environment
 variables, and flatten into keyword arguments — all operating on plain
