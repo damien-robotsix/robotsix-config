@@ -20,6 +20,8 @@ jobs:
       mypy-advisory: false
 
   vulture:
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -67,6 +69,8 @@ jobs:
   # output (no coverage.xml artifact), so the Codecov integration is preserved
   # as a dedicated job that regenerates the XML report and uploads it.
   coverage:
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
