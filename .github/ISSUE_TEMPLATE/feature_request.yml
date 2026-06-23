@@ -1,0 +1,30 @@
+name: Feature request
+description: Suggest an idea for this project
+title: ''
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem_statement
+    attributes:
+      label: Problem statement / use case
+      description: |
+        A clear and concise description of the problem this would solve.
+        What use case is currently not supported?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed_solution
+    attributes:
+      label: Proposed solution
+      description: Describe the feature or change you'd like to see.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives_considered
+    attributes:
+      label: Alternatives considered
+      description: Have you considered any workarounds or alternative approaches?
+    validations:
+      required: false
