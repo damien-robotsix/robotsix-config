@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added `Documentation` and `Changelog` URLs to `[project.urls]` in `pyproject.toml`
+  for PyPI sidebar discoverability (PEP 753 well-known labels).
+
 ### Changed
 
 ### Deprecated
