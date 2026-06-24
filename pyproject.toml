@@ -40,6 +40,15 @@ packages = ["src/robotsix_yaml_config"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 
+[tool.coverage.run]
+source = ["robotsix_yaml_config"]
+branch = true
+relative_files = true
+
+[tool.coverage.report]
+exclude_lines = ["pragma: no cover", "if TYPE_CHECKING:"]
+fail_under = 90  # align with CI coverage-threshold
+
 [tool.ruff]
 target-version = "py314"
 line-length = 88
