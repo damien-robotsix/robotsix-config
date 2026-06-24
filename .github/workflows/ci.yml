@@ -19,15 +19,16 @@ jobs:
       run-bandit: true
       mypy-advisory: false
 
+
   vulture:
     permissions:
       contents: read
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86  # v5
 
       - name: Set up Python
         run: uv python install 3.14
@@ -38,19 +39,41 @@ jobs:
       - name: vulture
         run: uv run vulture src/ vulture_whitelist.py
 
+  docs-build:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86  # v5
+
+      - name: Set up Python 3.13 (mkdocs does not support 3.14)
+        run: uv python install 3.13
+
+      - name: Create virtual environment
+        run: uv venv --python 3.13
+
+      - name: Install docs dependencies
+        run: uv pip install mkdocs-material 'mkdocstrings[python]'
+
+      - name: Build docs (strict mode)
+        run: PYTHONPATH=src .venv/bin/mkdocs build --strict
+
   # The reusable spine runs bandit as a gate but does not emit a SARIF file or
   # upload it, so the code-scanning integration is preserved as a dedicated job
   # that regenerates the SARIF report and uploads it.
   bandit-sarif:
-    runs-on: ubuntu-latest
     permissions:
       contents: read
       security-events: write
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86  # v5
 
       - name: Set up Python
         run: uv python install 3.14
@@ -60,7 +83,7 @@ jobs:
 
       - name: Upload bandit SARIF
         if: always()
-        uses: github/codeql-action/upload-sarif@v4
+        uses: github/codeql-action/upload-sarif@8aad20d150bbac5944a9f9d289da16a4b0d87c1e  # v4
         with:
           sarif_file: bandit-results.sarif
           category: bandit
@@ -73,10 +96,10 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86  # v5
 
       - name: Set up Python
         run: uv python install 3.14
@@ -88,7 +111,7 @@ jobs:
         run: uv run pytest -n auto --cov=src --cov-report=xml --cov-report=term-missing
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v7
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f  # v7
         with:
           files: ./coverage.xml
           fail_ci_if_error: false
