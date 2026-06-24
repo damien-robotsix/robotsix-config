@@ -56,7 +56,7 @@ jobs:
         run: uv venv --python 3.13
 
       - name: Install docs dependencies
-        run: uv pip install --python 3.13 mkdocs-material 'mkdocstrings[python]'
+        run: uv pip install mkdocs-material 'mkdocstrings[python]'
 
       - name: Build docs (strict mode)
         run: .venv/bin/mkdocs build --strict
