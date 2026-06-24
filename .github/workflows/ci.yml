@@ -58,11 +58,8 @@ jobs:
       - name: Install docs dependencies
         run: uv pip install mkdocs-material 'mkdocstrings[python]'
 
-      - name: Install project (editable, for mkdocstrings)
-        run: uv pip install -e .
-
       - name: Build docs (strict mode)
-        run: .venv/bin/mkdocs build --strict
+        run: PYTHONPATH=src .venv/bin/mkdocs build --strict
 
   # The reusable spine runs bandit as a gate but does not emit a SARIF file or
   # upload it, so the code-scanning integration is preserved as a dedicated job
