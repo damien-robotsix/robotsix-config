@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   for PyPI sidebar discoverability (PEP 753 well-known labels).
 - Added `docs-build` CI job that runs `mkdocs build --strict` on Python 3.13
   on every push and pull request to catch broken documentation before merge.
+- Added `[tool.coverage.run]` and `[tool.coverage.report]` sections to
+  `pyproject.toml`, enforcing `fail_under = 90` (aligned with CI threshold)
+  and standard fleet settings (`branch = true`, `relative_files = true`,
+  `source = ["robotsix_yaml_config"]`).
 
 ### Changed
 
