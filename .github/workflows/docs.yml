@@ -18,4 +18,4 @@ jobs:
     uses: damien-robotsix/robotsix-mill/.github/workflows/python-docs.yml@a063c729739539138db80ce72c82a35e38eb76f9
     with:
       docs-install-args: "--extra dev"
-    secrets: inherit
+    secrets: {}
