@@ -19,6 +19,7 @@ jobs:
       run-bandit: true
       mypy-advisory: false
 
+
   vulture:
     permissions:
       contents: read
@@ -38,14 +39,33 @@ jobs:
       - name: vulture
         run: uv run vulture src/ vulture_whitelist.py
 
+  docs-build:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Set up Python 3.13 (mkdocs does not support 3.14)
+        run: uv python install 3.13
+
+      - name: Install dependencies
+        run: uv sync --extra dev
+
+      - name: Build docs (strict mode)
+        run: uv run mkdocs build --strict
+
   # The reusable spine runs bandit as a gate but does not emit a SARIF file or
   # upload it, so the code-scanning integration is preserved as a dedicated job
   # that regenerates the SARIF report and uploads it.
   bandit-sarif:
-    runs-on: ubuntu-latest
     permissions:
       contents: read
       security-events: write
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
 

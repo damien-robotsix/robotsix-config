@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added `Documentation` and `Changelog` URLs to `[project.urls]` in `pyproject.toml`
   for PyPI sidebar discoverability (PEP 753 well-known labels).
+- Added `docs-build` CI job that runs `mkdocs build --strict` on Python 3.13
+  on every push and pull request to catch broken documentation before merge.
 
 ### Changed
 
