@@ -52,11 +52,11 @@ jobs:
       - name: Set up Python 3.13 (mkdocs does not support 3.14)
         run: uv python install 3.13
 
-      - name: Install dependencies
-        run: uv sync --extra dev
+      - name: Install docs dependencies
+        run: uv pip install --python 3.13 mkdocs-material 'mkdocstrings[python]'
 
       - name: Build docs (strict mode)
-        run: uv run mkdocs build --strict
+        run: uv run --python 3.13 mkdocs build --strict
 
   # The reusable spine runs bandit as a gate but does not emit a SARIF file or
   # upload it, so the code-scanning integration is preserved as a dedicated job
