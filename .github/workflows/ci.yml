@@ -52,6 +52,9 @@ jobs:
       - name: Set up Python 3.13 (mkdocs does not support 3.14)
         run: uv python install 3.13
 
+      - name: Create virtual environment
+        run: uv venv --python 3.13
+
       - name: Install docs dependencies
         run: uv pip install --python 3.13 mkdocs-material 'mkdocstrings[python]'
 
