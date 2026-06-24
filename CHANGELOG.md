@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `pyproject.toml`, enforcing `fail_under = 90` (aligned with CI threshold)
   and standard fleet settings (`branch = true`, `relative_files = true`,
   `source = ["robotsix_yaml_config"]`).
+- Added `Security` page to the mkdocs documentation site, sourcing content
+  from the repo-root `SECURITY.md` via `pymdownx.snippets`.
 
 ### Changed
 
