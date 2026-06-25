@@ -21,6 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   from the repo-root `SECURITY.md` via `pymdownx.snippets`.
 
 ### Changed
+- Added `--locked` flag to all `uv sync` calls in `.github/workflows/ci.yml` so CI
+  validates the lockfile instead of silently re-resolving dependencies when it is stale.
 
 ### Deprecated
 
