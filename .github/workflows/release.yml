@@ -45,8 +45,8 @@ jobs:
 
       - name: Generate CycloneDX SBOM
         run: |
-          uv sync --locked
-          uvx --from cyclonedx-bom cyclonedx-py environment "$(uv python find)" \
+          uv sync
+          uvx --from 'cyclonedx-bom>=4,<5' cyclonedx-py environment "$(uv python find)" \
             --pyproject pyproject.toml \
             --output-format JSON \
             --output-file cyclonedx.json
