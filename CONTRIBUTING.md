@@ -63,7 +63,7 @@ uv run mypy src tests
 CI also runs supply-chain and dependency checks:
 
 ```sh
-uvx pip-audit --vulnerability-service osv --strict
+uv audit --frozen
 uvx deptry src
 ```
 
