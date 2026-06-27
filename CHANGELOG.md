@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Updated `CONTRIBUTING.md` supply-chain check example from `pip-audit` to `uv audit --frozen`,
+  matching the actual CI pipeline.
+
 ### Added
 - Add `dependency-audit` job to CI that runs `uv audit --frozen` to scan for known vulnerabilities in dependencies.
 
