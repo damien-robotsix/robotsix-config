@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Add `dependency-audit` job to CI that runs `uv audit --frozen` to scan for known vulnerabilities in dependencies.
 
 - Pinned all GitHub Actions in `.github/workflows/release.yml` to commit SHAs
   (`release-please-action`, `checkout`, `setup-uv`, `pypi-publish`) to close
