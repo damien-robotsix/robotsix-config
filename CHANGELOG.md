@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Add `validate-pyproject` pre-commit hook (with `validate-pyproject-schema-store[all]`) to validate `pyproject.toml` schema including tool-specific tables (ruff, mypy, pytest, coverage, etc.).
-
+- Add `zizmor` pre-commit hook to audit GitHub Actions workflow files for security issues.
 - Add `dependency-audit` job to CI that runs `uv audit --frozen` to scan for known vulnerabilities in dependencies.
 
 - Pinned all GitHub Actions in `.github/workflows/release.yml` to commit SHAs
