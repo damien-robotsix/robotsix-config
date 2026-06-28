@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import string
 
 import pytest
 
@@ -13,10 +14,14 @@ given = hypothesis.given
 settings = hypothesis.settings
 st = pytest.importorskip("hypothesis.strategies")
 
+# Valid env-var-name characters (POSIX: [A-Za-z_][A-Za-z0-9_]*).
+# Keys must be safe to use in env var names like f"APP_{k.upper()}".
+_ENV_SAFE_ALPHABET = string.ascii_letters + string.digits + "_"
+
 # A strategy producing flat (non-nested) dicts with string values —
 # overlay_env_vars does not recurse into nested dicts.
 flat_configs = st.dictionaries(
-    keys=st.text(min_size=1, max_size=8),
+    keys=st.text(alphabet=_ENV_SAFE_ALPHABET, min_size=1, max_size=8),
     values=(
         st.integers()
         | st.text(max_size=10)
