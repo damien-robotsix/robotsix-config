@@ -1,0 +1,24 @@
+modules:
+  - id: robotsix_yaml_config
+    paths:
+      - src/robotsix_yaml_config/__init__.py
+      - src/robotsix_yaml_config/_core.py
+      - src/robotsix_yaml_config/_env.py
+      - src/robotsix_yaml_config/_errors.py
+      - src/robotsix_yaml_config/_flatten.py
+      - src/robotsix_yaml_config/py.typed
+  - id: tests
+    paths:
+      - tests/__init__.py
+      - tests/conftest.py
+      - tests/_core/__init__.py
+      - tests/_core/test_core.py
+      - tests/_core/test_properties.py
+      - tests/_core/test_yaml_edge_cases.py
+      - tests/_env/__init__.py
+      - tests/_env/test_env.py
+      - tests/_env/test_properties.py
+      - tests/_errors/__init__.py
+      - tests/_errors/test_errors.py
+      - tests/_flatten/__init__.py
+      - tests/_flatten/test_flatten.py
