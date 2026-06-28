@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- Update `docs-build` CI job to use Python 3.14 and `uv sync --locked --extra dev` instead of
+  a Python 3.13 workaround with bare `uv pip install`, aligning it with all other CI jobs.
 - Updated `CONTRIBUTING.md` supply-chain check example from `pip-audit` to `uv audit --frozen`,
   matching the actual CI pipeline.
 

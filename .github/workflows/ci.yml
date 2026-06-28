@@ -55,17 +55,14 @@ jobs:
           enable-cache: true
           cache-python: true
 
-      - name: Set up Python 3.13 (mkdocs does not support 3.14)
-        run: uv python install 3.13
+      - name: Set up Python
+        run: uv python install 3.14
 
-      - name: Create virtual environment
-        run: uv venv --python 3.13
-
-      - name: Install docs dependencies
-        run: uv pip install mkdocs-material 'mkdocstrings[python]'
+      - name: Install dependencies
+        run: uv sync --locked --extra dev
 
       - name: Build docs (strict mode)
-        run: PYTHONPATH=src .venv/bin/mkdocs build --strict
+        run: PYTHONPATH=src uv run mkdocs build --strict
 
   # The reusable spine runs bandit as a gate but does not emit a SARIF file or
   # upload it, so the code-scanning integration is preserved as a dedicated job
