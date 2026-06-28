@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Add `validate-pyproject` pre-commit hook (with `validate-pyproject-schema-store[all]`) to validate `pyproject.toml` schema including tool-specific tables (ruff, mypy, pytest, coverage, etc.).
+- Register project-level documentation files (`docs/api.md`, `docs/contributing.md`, `docs/index.md`, `docs/modules.yaml`, `docs/security.md`) in `docs/modules.yaml` under the `robotsix_yaml_config` module.
 - Add `zizmor` pre-commit hook to audit GitHub Actions workflow files for security issues.
 - Add `dependency-audit` job to CI that runs `uv audit --frozen` to scan for known vulnerabilities in dependencies.
 
