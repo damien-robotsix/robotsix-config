@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   deploy:
-    uses: damien-robotsix/robotsix-mill/.github/workflows/python-docs.yml@a063c729739539138db80ce72c82a35e38eb76f9
+    uses: damien-robotsix/robotsix-github-workflows/.github/workflows/python-docs.yml@5cd8c1facb02299da618979e7a55f1953f9c075a
     with:
       docs-install-args: "--extra dev"
     secrets: {}
