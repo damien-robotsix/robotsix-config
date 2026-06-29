@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Register project-level documentation files (`docs/api.md`, `docs/contributing.md`, `docs/index.md`, `docs/modules.yaml`, `docs/security.md`) in `docs/modules.yaml` under the `robotsix_yaml_config` module.
 - Add `zizmor` pre-commit hook to audit GitHub Actions workflow files for security issues.
 - Add `dependency-audit` job to CI that runs `uv audit --frozen` to scan for known vulnerabilities in dependencies.
+- Add `watch` key to `mkdocs.yml` (watching `src/robotsix_yaml_config`) so `mkdocs serve` auto-rebuilds on source/docstring changes.
 
 - Pinned all GitHub Actions in `.github/workflows/release.yml` to commit SHAs
   (`release-please-action`, `checkout`, `setup-uv`, `pypi-publish`) to close
