@@ -2,6 +2,9 @@ site_name: robotsix-yaml-config
 site_url: https://damien-robotsix.github.io/robotsix-yaml-config
 repo_url: https://github.com/damien-robotsix/robotsix-yaml-config
 
+watch:
+  - src/robotsix_yaml_config
+
 nav:
   - Home: index.md
   - Core: _core/index.md
