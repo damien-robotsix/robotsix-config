@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Enable `content.code.copy` in mkdocs-material theme features for copy-to-clipboard on code blocks.
+
 ### Changed
 - Update `docs-build` CI job to use Python 3.14 and `uv sync --locked --extra dev` instead of
   a Python 3.13 workaround with bare `uv pip install`, aligning it with all other CI jobs.
