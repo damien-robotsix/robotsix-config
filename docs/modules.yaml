@@ -15,6 +15,7 @@ modules:
       - tests/_core/__init__.py
       - tests/_core/test_core.py
       - tests/_core/test_properties.py
+      - tests/_core/test_filesystem_edge_cases.py
       - tests/_core/test_yaml_edge_cases.py
   - id: _env
     paths:
