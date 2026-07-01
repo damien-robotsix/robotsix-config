@@ -10,7 +10,7 @@ modules:
       - docs/security.md
   - id: _core
     paths:
-      - src/robotsix_yaml_config/_core.py
+      - src/robotsix_yaml_config/_core/__init__.py
       - docs/_core/index.md
       - tests/_core/__init__.py
       - tests/_core/test_core.py
