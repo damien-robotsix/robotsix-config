@@ -1,5 +1,9 @@
 ## 0.0.0 (unreleased)
 
+- Add property-based hypothesis tests for ``flatten_config`` covering
+  result-key correctness, empty alias maps, dict-valued stopping rule,
+  identity-alias-map idempotence, reachable-key appearance, and
+  unreachable-key silent drop.
 - Added CodeQL SAST job to CI workflow for inter-procedural taint tracking (Python).
 # Changelog
 

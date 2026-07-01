@@ -36,6 +36,7 @@ modules:
       - docs/_flatten/index.md
       - tests/_flatten/__init__.py
       - tests/_flatten/test_flatten.py
+      - tests/_flatten/test_properties.py
   - id: tests
     paths:
       - tests/__init__.py
