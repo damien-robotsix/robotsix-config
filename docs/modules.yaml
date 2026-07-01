@@ -19,7 +19,7 @@ modules:
       - tests/_core/test_yaml_edge_cases.py
   - id: _env
     paths:
-      - src/robotsix_yaml_config/_env.py
+      - src/robotsix_yaml_config/_env/__init__.py
       - docs/_env/index.md
       - tests/_env/__init__.py
       - tests/_env/test_env.py
