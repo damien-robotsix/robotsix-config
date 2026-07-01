@@ -26,7 +26,7 @@ modules:
       - tests/_env/test_properties.py
   - id: _errors
     paths:
-      - src/robotsix_yaml_config/_errors.py
+      - src/robotsix_yaml_config/_errors/__init__.py
       - docs/_errors/index.md
       - tests/_errors/__init__.py
       - tests/_errors/test_errors.py
