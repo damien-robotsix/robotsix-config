@@ -1,3 +1,6 @@
+## 0.0.0 (unreleased)
+
+- Added CodeQL SAST job to CI workflow for inter-procedural taint tracking (Python).
 # Changelog
 
 All notable changes to this project will be documented in this file.
