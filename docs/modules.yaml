@@ -32,7 +32,7 @@ modules:
       - tests/_errors/test_errors.py
   - id: _flatten
     paths:
-      - src/robotsix_yaml_config/_flatten.py
+      - src/robotsix_yaml_config/_flatten/__init__.py
       - docs/_flatten/index.md
       - tests/_flatten/__init__.py
       - tests/_flatten/test_flatten.py

@@ -1,6 +1,7 @@
 ## 0.0.0 (unreleased)
 
 - Convert `_core` module from flat file to sub-package (`_core.py` → `_core/__init__.py`).
+- Convert `_flatten` from flat `.py` file to sub-package (`_flatten.py` → `_flatten/__init__.py`).
 - Move `_env` module source from flat `.py` file to package directory (`src/robotsix_yaml_config/_env.py` → `src/robotsix_yaml_config/_env/__init__.py`), aligning with the per-module layout already used by its docs and tests.
 - Add property-based hypothesis tests for ``flatten_config`` covering
   result-key correctness, empty alias maps, dict-valued stopping rule,
