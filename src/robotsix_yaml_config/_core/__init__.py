@@ -13,7 +13,7 @@ from typing import Any
 
 import yaml
 
-from ._errors import (
+from .._errors import (
     InvalidConfigStructureError,
     MissingConfigError,
     YamlParseError,
