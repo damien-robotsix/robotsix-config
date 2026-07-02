@@ -5,7 +5,7 @@ description: "Backend-agnostic YAML configuration cascade primitives: deep-merge
 authors:
   - given-names: Damien
     family-names: Robotsix
-version: 0.1.0  # x-release-please-version
+version: 0.1.1  # x-release-please-version
 date-released: "2026-07-17"
 license: MIT
 url: "https://github.com/damien-robotsix/robotsix-yaml-config"
