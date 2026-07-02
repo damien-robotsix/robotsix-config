@@ -70,6 +70,10 @@ For the full quick-start example — code defaults, deep-merged YAML files,
 env-var overlay, and flatten — see the
 **[documentation](https://damien-robotsix.github.io/robotsix-yaml-config)**.
 
+## Standards
+
+This repo follows the [robotsix stack standards](https://github.com/damien-robotsix/robotsix-standards).
+
 ## Development
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the full contributor workflow.
