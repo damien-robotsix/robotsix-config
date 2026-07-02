@@ -1,3 +1,3 @@
 # Errors
 
-::: robotsix_yaml_config._errors
+::: robotsix_config._errors

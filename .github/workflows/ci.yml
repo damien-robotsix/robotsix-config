@@ -20,7 +20,7 @@ jobs:
     with:
       python-version: "3.14"
       install-extras: "dev"
-      cov-package: robotsix_yaml_config
+      cov-package: robotsix_config
       coverage-threshold: "90"
       run-deptry: true
       run-bandit: true
@@ -72,7 +72,7 @@ jobs:
         run: uv sync --locked --extra dev
 
       - name: vulture
-        run: uv run vulture src/ vulture_whitelist.py
+        run: uv run vulture src/
 
   docs-build:
     permissions:
