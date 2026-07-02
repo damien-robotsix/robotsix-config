@@ -37,6 +37,21 @@ Requires Python 3.14 or later.
 | `load_yaml_cascade(layers) -> dict` | Load & deep-merge `(path, required)` layers in order. A required-but-missing layer raises `MissingConfigError`. Later layers win. |
 | `flatten_config(nested, alias_map) -> dict` | Walk a nested dict, map each dotted path through `alias_map`, return a flat `{alias: value}` dict. Unknown paths dropped; dict-valued aliases emitted as-is. |
 | `overlay_env_vars(config, prefix, type_hints=None) -> dict` | Overlay `{PREFIX}_{KEY.upper()}` env vars onto existing keys with type coercion. Mutates and returns `config`. |
+| `overlay_env_nested(config, prefix, *, delimiter="__") -> dict` | Overlay `{PREFIX}_{A}__{B}` env vars as a **nested** structure (values stay strings; coerce downstream). Mutates and returns `config`. |
+| `write_config_file(path, data) -> Path` | Write `data` as YAML with `0600` file / `0700` dir permissions (for config holding secrets). |
+| `resolve_config_path() -> Path` | The `ROBOTSIX_CONFIG_FILE` env var, or `config/config.yaml` by default. Also `CONFIG_FILE_ENV`, `DEFAULT_CONFIG_PATH`. |
+
+### Schema layer — optional `[pydantic]` extra
+
+`robotsix_yaml_config.schema` (installed via `uv add "robotsix-yaml-config[pydantic]"`)
+adds the robotsix stack config *conventions* on top of the dict primitives, for
+services that want a typed, validated model. The core stays backend-agnostic
+(PyYAML only); pydantic is pulled only by this extra.
+
+| Symbol | Behaviour |
+|---|---|
+| `load_config(model_cls, *, env_prefix, config_file=None, defaults=None, overrides=None) -> model` | Run the cascade and validate into a pydantic model. Precedence: `defaults < config.yaml < {env_prefix} env overlay < overrides`. File located via `ROBOTSIX_CONFIG_FILE`. |
+| `emit_deploy_template(model_cls) -> str` | Generate the central-deploy `config/config.yaml` template from the model; `SecretStr` fields become empty secret slots. |
 
 ### `overlay_env_vars` coercion
 

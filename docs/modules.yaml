@@ -23,7 +23,26 @@ modules:
       - docs/_env/index.md
       - tests/_env/__init__.py
       - tests/_env/test_env.py
+      - tests/_env/test_env_nested.py
       - tests/_env/test_properties.py
+  - id: _paths
+    paths:
+      - src/robotsix_yaml_config/_paths/__init__.py
+      - docs/_paths/index.md
+      - tests/_paths/__init__.py
+      - tests/_paths/test_paths.py
+  - id: _io
+    paths:
+      - src/robotsix_yaml_config/_io/__init__.py
+      - docs/_io/index.md
+      - tests/_io/__init__.py
+      - tests/_io/test_io.py
+  - id: schema
+    paths:
+      - src/robotsix_yaml_config/schema/__init__.py
+      - docs/schema/index.md
+      - tests/schema/__init__.py
+      - tests/schema/test_schema.py
   - id: _errors
     paths:
       - src/robotsix_yaml_config/_errors/__init__.py
