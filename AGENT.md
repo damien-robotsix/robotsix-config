@@ -1,3 +1,7 @@
+## Standards
+
+This repo follows the [robotsix stack standards](https://github.com/damien-robotsix/robotsix-standards).
+
 ## Type Distribution
 
 Type-aware packages must include a `py.typed` marker per PEP 561 to
