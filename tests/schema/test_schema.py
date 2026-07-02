@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from enum import StrEnum
-from typing import Optional
+from typing import Any, Optional
 
 import pytest
 import yaml
@@ -150,3 +150,44 @@ def test_template_defaults_and_secret_slots():
     assert data["log_level"] == "info"  # enum default rendered as its value
     assert data["password"] == ""  # secret slot
     assert data["imap"] == {"host": "localhost", "port": 993}
+
+
+class _Nested(BaseModel):
+    x: int = 1
+
+
+class _AllRequired(BaseModel):
+    name: str  # required str -> ""
+    count: int  # required int -> 0
+    ratio: float  # required float -> 0.0
+    flag: bool  # required bool -> False
+    tags: list[str]  # required list -> []
+    meta: dict[str, str]  # required dict -> {}
+    either: int | str  # required union -> first arg's placeholder
+    maybe: Optional[_Nested] = None  # noqa: UP045 -- optional nested model
+
+
+def test_template_required_placeholders_and_optional_nested():
+    data = yaml.safe_load(emit_deploy_template(_AllRequired))
+    assert data["name"] == ""
+    assert data["count"] == 0
+    assert data["ratio"] == 0.0
+    assert data["flag"] is False
+    assert data["tags"] == []
+    assert data["meta"] == {}
+    assert data["either"] == 0
+    # Optional[_Nested] is still rendered as the nested model's template.
+    assert data["maybe"] == {"x": 1}
+
+
+class _ModelDefault(BaseModel):
+    # Annotation the model-detector ignores, but the default is a model / secret,
+    # exercising the recursive default-coercion branches.
+    blob: Any = _Nested()
+    token: Any = SecretStr("s3cr3t")
+
+
+def test_template_coerces_model_and_secret_defaults():
+    data = yaml.safe_load(emit_deploy_template(_ModelDefault))
+    assert data["blob"] == {"x": 1}  # BaseModel default -> nested dict
+    assert data["token"] == ""  # SecretStr default -> empty slot
