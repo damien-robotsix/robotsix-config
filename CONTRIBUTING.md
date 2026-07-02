@@ -1,4 +1,4 @@
-# Contributing to robotsix-yaml-config
+# Contributing to robotsix-config
 
 Thanks for your interest in contributing! This document describes how to
 set up a development environment and run the same checks CI runs, so that
@@ -93,7 +93,7 @@ aborted; review and commit the mechanical fixups before committing again.
 - Keep changes focused and scoped to a single concern.
 - Make sure all of the CI checks above pass locally before opening a PR.
 - The public API surface is backward-compatibility sensitive: changes to
-  `__all__` in `src/robotsix_yaml_config/__init__.py` need care, since
+  `__all__` in `src/robotsix_config/__init__.py` need care, since
   consumers rely on these exported symbols.
 
 ## Releasing

@@ -1,21 +1,16 @@
-site_name: robotsix-yaml-config
-site_url: https://damien-robotsix.github.io/robotsix-yaml-config
-repo_url: https://github.com/damien-robotsix/robotsix-yaml-config
+site_name: robotsix-config
+site_url: https://damien-robotsix.github.io/robotsix-config
+repo_url: https://github.com/damien-robotsix/robotsix-config
 
 watch:
-  - src/robotsix_yaml_config
+  - src/robotsix_config
 
 nav:
   - Home: index.md
-  - Core: _core/index.md
-  - Errors: _errors/index.md
-  - Flatten: _flatten/index.md
   - API Reference:
       - Overview: api.md
-      - Environment: _env/index.md
-      - Config path: _paths/index.md
-      - Config file writer: _io/index.md
-      - Schema (pydantic): schema/index.md
+      - Config: config/index.md
+      - Errors: _errors/index.md
   - Contributing: contributing.md
   - Security: security.md
 

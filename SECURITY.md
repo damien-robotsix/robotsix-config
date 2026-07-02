@@ -68,10 +68,10 @@ communicate if that is the case.
 
 ## Scope
 
-This security policy covers the **`robotsix-yaml-config` library**
+This security policy covers the **`robotsix-config` library**
 itself — the code and data that ship in the package.
 
 Vulnerabilities in downstream consumers (applications that happen to
 use this library) should be reported to those projects directly, even
-if the root cause traces back to `robotsix-yaml-config`. If you are
+if the root cause traces back to `robotsix-config`. If you are
 unsure, report here and the maintainer will redirect as appropriate.

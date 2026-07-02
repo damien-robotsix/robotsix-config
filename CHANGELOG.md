@@ -1,5 +1,16 @@
 ## 0.0.0 (unreleased)
 
+- **Renamed `robotsix-yaml-config` → `robotsix-config` and rewritten clean
+  (breaking; no backward compatibility).** The library is now a typed-config
+  library built on **pydantic + JSON**, with **no YAML**: define one pydantic
+  model, load it from **one JSON file** (`config/config.json` or
+  `ROBOTSIX_CONFIG_FILE`), and emit a JSON Schema for the deploy UI. New API:
+  `load_config`, `dump_config` (0600 JSON, secrets in cleartext),
+  `config_schema` / `config_schema_json`, `resolve_config_path`, and
+  `ConfigError` / `MissingConfigError` / `InvalidConfigError`. All YAML cascade
+  primitives (`deep_merge`, `read_yaml_file`, `load_yaml_cascade`,
+  `flatten_config`, `overlay_env_vars`) and the previous `schema` extra are
+  **removed**; `pydantic` is now a core dependency and `pyyaml` is dropped.
 - Add robotsix stack standards link to `README.md` and `AGENT.md`.
 - Convert `_core` module from flat file to sub-package (`_core.py` → `_core/__init__.py`).
 - Convert `_flatten` from flat `.py` file to sub-package (`_flatten.py` → `_flatten/__init__.py`).

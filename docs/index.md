@@ -1,65 +1,46 @@
-# robotsix-yaml-config
+# robotsix-config
 
-Backend-agnostic primitives for a layered YAML configuration cascade:
+Typed configuration for the robotsix stack. Define your configuration as a
+**pydantic model**, load it from **one JSON file**, and emit a **JSON Schema**
+so a deploy UI can render typed, validated inputs and so config is type-checked.
 
-1. Start from code-defined defaults.
-2. Deep-merge one or more YAML config files in precedence order.
-3. Overlay environment variables field-by-field (highest priority).
-4. Flatten the nested dict into flat keyword arguments via a
-   dotted-path alias map.
-
-The package operates on plain dicts only — no pydantic, no
-pydantic-settings — so it can be consumed by any configuration backend.
-
-## Installation
-
-This package is published to PyPI:
-
-```bash
-# Using pip
-pip install robotsix-yaml-config
-
-# Using uv (recommended for development)
-uv add robotsix-yaml-config
-```
-
-**Python version:** requires Python 3.14 or later.
+No YAML, no environment overlay, no cascade — **one file is the single source of
+config values**, and the model's own field defaults fill the gaps.
 
 ## Quick start
 
-The four pipeline stages — code defaults, deep-merged YAML files, env
-overlay, and flatten — compose like this:
-
 ```python
-from pathlib import Path
-from robotsix_yaml_config import (
-    deep_merge,
-    load_yaml_cascade,
-    overlay_env_vars,
-    flatten_config,
-)
+from pydantic import BaseModel, SecretStr
+from robotsix_config import load_config, dump_config, config_schema_json
 
-# 1. Code-defined defaults.
-config = {"host": "localhost", "port": 5432, "debug": False}
 
-# 2. Deep-merge YAML files in precedence order (later layers win).
-#    Each layer is a (path, required) tuple: required-but-missing -> YamlConfigError;
-#    optional-but-missing -> skipped.
-file_config = load_yaml_cascade([
-    (Path("defaults.yaml"), False),  # optional layer
-    (Path("config.yaml"), True),     # required layer
-])
-deep_merge(config, file_config)      # mutates `config` in place, returns it
+class Config(BaseModel):
+    host: str = "localhost"
+    port: int = 8080
+    api_key: SecretStr = SecretStr("")
 
-# 3. Overlay env vars onto existing top-level keys (highest priority).
-#    Reads APP_HOST / APP_PORT / APP_DEBUG; coerces with type_hints.
-#    e.g. `export APP_PORT=6543` -> config["port"] == 6543 (int)
-overlay_env_vars(config, prefix="APP", type_hints={"port": int, "debug": bool})
 
-# 4. Flatten into keyword arguments via a dotted-path alias map.
-flat = flatten_config(config, alias_map={"host": "db_host", "port": "db_port"})
-# flat == {"db_host": "localhost", "db_port": 6543}
+# Load the one file (ROBOTSIX_CONFIG_FILE or config/config.json) into the model.
+cfg = load_config(Config)
+
+# Emit the typed schema the deploy UI renders (commit as config/config.schema.json):
+schema = config_schema_json(Config)
+
+# Persist config back to the 0600 JSON file (secrets in cleartext for read-back):
+dump_config(cfg)
 ```
 
-See the [API Reference](api.md) for full documentation of every
-public symbol.
+## Model
+
+- **One file.** `load_config` reads exactly one JSON file — `ROBOTSIX_CONFIG_FILE`
+  or `config/config.json`. That variable only *locates* the file; it carries no
+  values. No env overlay, no CLI-merge.
+- **Defaults live in the model.** A missing file means "all defaults"; the file
+  overrides only what it sets.
+- **Typed schema.** `config_schema` / `config_schema_json` emit the model's JSON
+  Schema (types, required, enums, defaults, secret marking) for the deploy UI.
+- **Secrets.** Declare with `pydantic.SecretStr`: masked on read, written in
+  cleartext into the `0600` file by `dump_config`, and marked in the schema as
+  `{"type": "string", "format": "password", "writeOnly": true}`.
+
+See the [API reference](api.md).

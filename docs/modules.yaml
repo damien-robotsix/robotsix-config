@@ -1,61 +1,25 @@
 modules:
-  - id: robotsix_yaml_config
+  - id: robotsix_config
     paths:
-      - src/robotsix_yaml_config/__init__.py
-      - src/robotsix_yaml_config/py.typed
+      - src/robotsix_config/__init__.py
+      - src/robotsix_config/py.typed
       - docs/api.md
       - docs/contributing.md
       - docs/index.md
       - docs/modules.yaml
       - docs/security.md
-  - id: _core
+  - id: config
     paths:
-      - src/robotsix_yaml_config/_core/__init__.py
-      - docs/_core/index.md
-      - tests/_core/__init__.py
-      - tests/_core/test_core.py
-      - tests/_core/test_properties.py
-      - tests/_core/test_filesystem_edge_cases.py
-      - tests/_core/test_yaml_edge_cases.py
-  - id: _env
-    paths:
-      - src/robotsix_yaml_config/_env/__init__.py
-      - docs/_env/index.md
-      - tests/_env/__init__.py
-      - tests/_env/test_env.py
-      - tests/_env/test_properties.py
-  - id: _paths
-    paths:
-      - src/robotsix_yaml_config/_paths/__init__.py
-      - docs/_paths/index.md
-      - tests/_paths/__init__.py
-      - tests/_paths/test_paths.py
-  - id: _io
-    paths:
-      - src/robotsix_yaml_config/_io/__init__.py
-      - docs/_io/index.md
-      - tests/_io/__init__.py
-      - tests/_io/test_io.py
-  - id: schema
-    paths:
-      - src/robotsix_yaml_config/schema/__init__.py
-      - docs/schema/index.md
-      - tests/schema/__init__.py
-      - tests/schema/test_schema.py
-      - tests/schema/test_properties.py
+      - src/robotsix_config/config/__init__.py
+      - docs/config/index.md
+      - tests/config/__init__.py
+      - tests/config/test_config.py
   - id: _errors
     paths:
-      - src/robotsix_yaml_config/_errors/__init__.py
+      - src/robotsix_config/_errors/__init__.py
       - docs/_errors/index.md
       - tests/_errors/__init__.py
       - tests/_errors/test_errors.py
-  - id: _flatten
-    paths:
-      - src/robotsix_yaml_config/_flatten/__init__.py
-      - docs/_flatten/index.md
-      - tests/_flatten/__init__.py
-      - tests/_flatten/test_flatten.py
-      - tests/_flatten/test_properties.py
   - id: tests
     paths:
       - tests/__init__.py
