@@ -23,7 +23,6 @@ modules:
       - docs/_env/index.md
       - tests/_env/__init__.py
       - tests/_env/test_env.py
-      - tests/_env/test_env_nested.py
       - tests/_env/test_properties.py
   - id: _paths
     paths:

@@ -36,8 +36,7 @@ Requires Python 3.14 or later.
 | `read_yaml_file(path) -> dict` | Read & parse one YAML file. Missing file → `{}`. Raises `YamlReadError`, `YamlParseError`, or `InvalidConfigStructureError` on errors (all subclasses of `YamlConfigError`). |
 | `load_yaml_cascade(layers) -> dict` | Load & deep-merge `(path, required)` layers in order. A required-but-missing layer raises `MissingConfigError`. Later layers win. |
 | `flatten_config(nested, alias_map) -> dict` | Walk a nested dict, map each dotted path through `alias_map`, return a flat `{alias: value}` dict. Unknown paths dropped; dict-valued aliases emitted as-is. |
-| `overlay_env_vars(config, prefix, type_hints=None) -> dict` | Overlay `{PREFIX}_{KEY.upper()}` env vars onto existing keys with type coercion. Mutates and returns `config`. |
-| `overlay_env_nested(config, prefix, *, delimiter="__") -> dict` | Overlay `{PREFIX}_{A}__{B}` env vars as a **nested** structure (values stay strings; coerce downstream). Mutates and returns `config`. |
+| `overlay_env_vars(config, prefix, type_hints=None) -> dict` | Overlay `{PREFIX}_{KEY.upper()}` env vars onto existing keys with type coercion. Mutates and returns `config`. Standalone primitive — the config standard does **not** use an env overlay. |
 | `write_config_file(path, data) -> Path` | Write `data` as YAML with `0600` file / `0700` dir permissions (for config holding secrets). |
 | `resolve_config_path() -> Path` | The `ROBOTSIX_CONFIG_FILE` env var, or `config/config.yaml` by default. Also `CONFIG_FILE_ENV`, `DEFAULT_CONFIG_PATH`. |
 
@@ -50,8 +49,10 @@ services that want a typed, validated model. The core stays backend-agnostic
 
 | Symbol | Behaviour |
 |---|---|
-| `load_config(model_cls, *, env_prefix, config_file=None, defaults=None, overrides=None) -> model` | Run the cascade and validate into a pydantic model. Precedence: `defaults < config.yaml < {env_prefix} env overlay < overrides`. File located via `ROBOTSIX_CONFIG_FILE`. |
-| `emit_deploy_template(model_cls) -> str` | Generate the central-deploy `config/config.yaml` template from the model; `SecretStr` fields become empty secret slots. |
+| `load_config(model_cls, config_file=None) -> model` | Load **the one** YAML config file and validate it into a pydantic model. A single file is the only source of config values — **no env overlay, no CLI-merge**; the model's field defaults fill the gaps. File located via `config_file` or `ROBOTSIX_CONFIG_FILE` (which only locates, never carries values). |
+| `emit_deploy_schema(model_cls) -> dict` | The model's **JSON Schema** (types, required, enums, defaults, `SecretStr` → `format: password` / `writeOnly`) for a deploy UI to render typed, validated inputs. Commit as `config/config.schema.json`. |
+| `emit_deploy_schema_json(model_cls, *, indent=2) -> str` | `emit_deploy_schema` serialized to a JSON string (trailing newline). |
+| `emit_deploy_template(model_cls) -> str` | A starter `config/config.yaml` from the model; `SecretStr` fields become empty secret slots. |
 
 ### `overlay_env_vars` coercion
 
