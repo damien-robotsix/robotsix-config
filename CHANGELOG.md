@@ -1,5 +1,6 @@
 ## 0.0.0 (unreleased)
 
+- Remove the PyPI publish/release workflow — the stack is uv-git-source only, with no package index (see robotsix-standards).
 - **Renamed `robotsix-yaml-config` → `robotsix-config` and rewritten clean
   (breaking; no backward compatibility).** The library is now a typed-config
   library built on **pydantic + JSON**, with **no YAML**: define one pydantic
