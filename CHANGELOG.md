@@ -19,6 +19,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Config-file location** (`_paths`): `resolve_config_path()`, `CONFIG_FILE_ENV`
+  (`ROBOTSIX_CONFIG_FILE`), and `DEFAULT_CONFIG_PATH` — one standard config-file
+  variable for the whole stack.
+- **`0600` config writer** (`_io`): `write_config_file(path, data)` writes YAML
+  with `0600` file / `0700` directory permissions for config holding secrets.
+- **Nested env overlay** (`_env`): `overlay_env_nested(config, prefix)` builds a
+  nested overlay from `{PREFIX}_{A}__{B}` variables (values stay strings for a
+  downstream validator). The existing top-level `overlay_env_vars` is unchanged.
+- **Schema layer** (optional `[pydantic]` extra, `robotsix_yaml_config.schema`):
+  `load_config(model_cls, *, env_prefix, ...)` runs the cascade
+  (`defaults < config.yaml < env < overrides`) and validates into a pydantic
+  model; `emit_deploy_template(model_cls)` generates the central-deploy config
+  template with `SecretStr` fields as empty secret slots. The core stays
+  backend-agnostic (PyYAML only); pydantic is pulled only by this extra.
 - Enable `content.code.copy` in mkdocs-material theme features for copy-to-clipboard on code blocks.
 
 ### Changed
