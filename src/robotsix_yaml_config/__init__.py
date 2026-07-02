@@ -13,20 +13,20 @@ Public API:
 - ``load_yaml_cascade`` — load & merge layered YAML files in order.
 - ``flatten_config`` — flatten a nested dict via a dotted-path alias map.
 - ``overlay_env_vars`` — overlay typed env-var values onto a flat dict.
-- ``overlay_env_nested`` — overlay ``{PREFIX}_{A}__{B}`` env vars as a nested dict.
 - ``write_config_file`` — write a dict as YAML with ``0600``/``0700`` perms.
 - ``resolve_config_path`` / ``CONFIG_FILE_ENV`` / ``DEFAULT_CONFIG_PATH`` —
   the standard ``ROBOTSIX_CONFIG_FILE`` config-file location.
 
 The optional ``[pydantic]`` extra adds ``robotsix_yaml_config.schema`` with
-``load_config`` and ``emit_deploy_template`` (see that module). The core has no
-framework dependency beyond PyYAML.
+``load_config`` (single-file, no env overlay), ``emit_deploy_schema`` (typed
+JSON Schema for a deploy UI), and ``emit_deploy_template`` (see that module).
+The core has no framework dependency beyond PyYAML.
 """
 
 from __future__ import annotations
 
 from ._core import deep_merge, load_yaml_cascade, read_yaml_file
-from ._env import overlay_env_nested, overlay_env_vars
+from ._env import overlay_env_vars
 from ._errors import (
     InvalidConfigStructureError,
     MissingConfigError,
@@ -49,7 +49,6 @@ __all__ = [
     "load_yaml_cascade",
     "flatten_config",
     "overlay_env_vars",
-    "overlay_env_nested",
     "write_config_file",
     "resolve_config_path",
     "CONFIG_FILE_ENV",
