@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ## 0.0.0 (unreleased)
 
+- Add `security`, `auto-release`, and `baseline-check` reusable workflow jobs to CI, pinned to `damien-robotsix/robotsix-github-workflows` at current main HEAD
 - Pin all pre-commit hook `rev:` values to immutable commit SHAs (markdownlint-cli, zizmor, mirrors-mypy). Add missing fleet-standard hooks: `check-added-large-files`, `check-case-conflict`, `check-json`, `detect-private-key`, `actionlint`.
 - Replace Renovate with Dependabot for dependency update automation (`.github/dependabot.yml` with pip, github-actions, and pre-commit ecosystems)
 - Set up towncrier for changelog management: add `towncrier` dev dependency, `[tool.towncrier]` config with five fragment types (`feature`, `bugfix`, `doc`, `removal`, `misc`), and `changelog.d/` directory for per-change newsfragments.

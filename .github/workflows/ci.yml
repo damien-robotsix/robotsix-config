@@ -26,6 +26,29 @@ jobs:
       run-bandit: true
       mypy-advisory: false
 
+  security:
+    permissions:
+      contents: read
+    uses: damien-robotsix/robotsix-github-workflows/.github/workflows/python-security.yml@5fdc956e980cfb70ea36e33bc670a0376750dec6  # main 2026-07-03
+    with:
+      python-version: "3.14"
+      install-extras: "dev"
+    secrets: inherit
+
+  auto-release:
+    permissions:
+      contents: write
+    uses: damien-robotsix/robotsix-github-workflows/.github/workflows/auto-release.yml@5fdc956e980cfb70ea36e33bc670a0376750dec6  # main 2026-07-03
+    with:
+      python-version: "3.14"
+    secrets: inherit
+
+  baseline-check:
+    permissions:
+      contents: read
+    uses: damien-robotsix/robotsix-github-workflows/.github/workflows/baseline-check.yml@5fdc956e980cfb70ea36e33bc670a0376750dec6  # main 2026-07-03
+    with: {}
+    secrets: inherit
 
   ruff:
     permissions:
