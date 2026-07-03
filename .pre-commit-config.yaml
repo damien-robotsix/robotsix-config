@@ -6,7 +6,11 @@ repos:
       - id: end-of-file-fixer
       - id: check-yaml
       - id: check-toml
+      - id: check-added-large-files
+      - id: check-case-conflict
+      - id: check-json
       - id: check-merge-conflict
+      - id: detect-private-key
       - id: debug-statements
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: 3b3f7c3f57fe9925356faf5fe6230835138be230  # frozen: v0.15.17  # pragma: allowlist secret
@@ -20,7 +24,7 @@ repos:
       - id: validate-pyproject
         additional_dependencies: ["validate-pyproject-schema-store[all]"]
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.44.0
+    rev: 586c3ea3f51230da42bab657c6a32e9e66c364f0  # v0.44.0
     hooks:
       - id: markdownlint
   - repo: https://github.com/PyCQA/bandit
@@ -36,11 +40,15 @@ repos:
       - id: detect-secrets
         args: ["--baseline", ".secrets.baseline"]
   - repo: https://github.com/zizmorcore/zizmor-pre-commit
-    rev: v1.23.1
+    rev: ea2eb407b4cbce87cf0d502f36578950494f5ac9  # v1.23.1
     hooks:
       - id: zizmor
+  - repo: https://github.com/rhysd/actionlint
+    rev: 03d0035246f3e81f36aed592ffb4bebf33a03106  # v1.7.7
+    hooks:
+      - id: actionlint
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.19.1
+    rev: a66e98df7b4aeeb3724184b332785976d062b92e  # v1.19.1
     hooks:
       - id: mypy
         args: []
