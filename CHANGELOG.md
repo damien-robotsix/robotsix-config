@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ## 0.0.0 (unreleased)
 
+- Enable changelog autofill periodic workflow to automate CHANGELOG.md entries from PR titles.
 - Upgrade `actions/dependency-review-action` from v4.0.0 to v5.0.0 and tighten `fail-on-severity` from `high` to `moderate` to catch more vulnerabilities.
 - Inline the Docs deployment workflow to fix GitHub Pages deployment failures caused by insufficient permissions in the reusable `python-docs.yml` workflow
 - Add `scripts/check_schema_freshness.py` and a `check-schema` CI job to
