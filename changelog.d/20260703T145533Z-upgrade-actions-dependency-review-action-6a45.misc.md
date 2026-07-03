@@ -1,0 +1,1 @@
+Upgrade actions/dependency-review-action from v4.0.0 to v5.0.0

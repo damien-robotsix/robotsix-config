@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ## 0.0.0 (unreleased)
 
+- Upgrade `actions/dependency-review-action` from v4.0.0 to v5.0.0 and tighten `fail-on-severity` from `high` to `moderate` to catch more vulnerabilities.
 - Add `scripts/check_schema_freshness.py` and a `check-schema` CI job to
   enforce that committed JSON Schema files stay in sync with their
   Pydantic models.
