@@ -32,19 +32,7 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39  # v8.2.0
-        with:
-          enable-cache: true
-          cache-python: true
-
-      - name: Set up Python
-        run: uv python install 3.14
-
-      - name: Install dependencies
-        run: uv sync --locked --extra dev
+      - uses: ./.github/actions/setup
 
       - name: ruff check
         run: uv run ruff check .
@@ -57,19 +45,7 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39  # v8.2.0
-        with:
-          enable-cache: true
-          cache-python: true
-
-      - name: Set up Python
-        run: uv python install 3.14
-
-      - name: Install dependencies
-        run: uv sync --locked --extra dev
+      - uses: ./.github/actions/setup
 
       - name: vulture
         run: uv run vulture src/
@@ -79,19 +55,7 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39  # v8.2.0
-        with:
-          enable-cache: true
-          cache-python: true
-
-      - name: Set up Python
-        run: uv python install 3.14
-
-      - name: Install dependencies
-        run: uv sync --locked --extra dev
+      - uses: ./.github/actions/setup
 
       - name: Build docs (strict mode)
         run: PYTHONPATH=src uv run mkdocs build --strict
@@ -105,16 +69,7 @@ jobs:
       security-events: write
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39  # v8.2.0
-        with:
-          enable-cache: true
-          cache-python: true
-
-      - name: Set up Python
-        run: uv python install 3.14
+      - uses: ./.github/actions/setup
 
       - name: bandit
         run: uvx --from 'bandit[sarif]' bandit -c pyproject.toml -r src/ -f sarif -o bandit-results.sarif
@@ -146,19 +101,7 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39  # v8.2.0
-        with:
-          enable-cache: true
-          cache-python: true
-
-      - name: Set up Python
-        run: uv python install 3.14
-
-      - name: Install dependencies
-        run: uv sync --locked --extra dev
+      - uses: ./.github/actions/setup
 
       - name: pytest
         run: uv run pytest -n auto --cov=src --cov-report=xml --cov-report=term-missing
@@ -187,16 +130,7 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39  # v8.2.0
-        with:
-          enable-cache: true
-          cache-python: true
-
-      - name: Set up Python
-        run: uv python install 3.14
+      - uses: ./.github/actions/setup
 
       - name: Audit dependencies for known vulnerabilities
         run: uv audit --frozen
