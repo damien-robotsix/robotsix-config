@@ -1,6 +1,7 @@
 ## 0.0.0 (unreleased)
 
 - Fix `release-please-config.json` package-name from `robotsix-yaml-config` to `robotsix-config` to match `pyproject.toml`.
+- Removed `MissingConfigError` — it was never raised in source code and was dead API surface.
 - Remove the PyPI publish/release workflow — the stack is uv-git-source only, with no package index (see robotsix-standards).
 - **Renamed `robotsix-yaml-config` → `robotsix-config` and rewritten clean
   (breaking; no backward compatibility).** The library is now a typed-config
