@@ -15,7 +15,7 @@ Public API:
   JSON Schema for a deploy UI.
 - ``resolve_config_path()`` / ``CONFIG_FILE_ENV`` / ``DEFAULT_CONFIG_PATH`` — the
   one file's location (``ROBOTSIX_CONFIG_FILE`` or ``config/config.json``).
-- ``ConfigError`` / ``MissingConfigError`` / ``InvalidConfigError`` — error types.
+- ``ConfigError`` / ``InvalidConfigError`` — error types.
 
 Secrets are declared with :class:`pydantic.SecretStr`: masked on read, written
 in cleartext into the ``0600`` file, and marked in the JSON Schema as
@@ -24,7 +24,7 @@ in cleartext into the ``0600`` file, and marked in the JSON Schema as
 
 from __future__ import annotations
 
-from ._errors import ConfigError, InvalidConfigError, MissingConfigError
+from ._errors import ConfigError, InvalidConfigError
 from .config import (
     CONFIG_FILE_ENV,
     DEFAULT_CONFIG_PATH,
@@ -37,7 +37,6 @@ from .config import (
 
 __all__ = [
     "ConfigError",
-    "MissingConfigError",
     "InvalidConfigError",
     "load_config",
     "dump_config",
