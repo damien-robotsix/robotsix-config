@@ -1,0 +1,50 @@
+{
+  "$defs": {
+    "Imap": {
+      "properties": {
+        "host": {
+          "default": "localhost",
+          "title": "Host",
+          "type": "string"
+        },
+        "port": {
+          "default": 993,
+          "title": "Port",
+          "type": "integer"
+        }
+      },
+      "title": "Imap",
+      "type": "object"
+    },
+    "LogLevel": {
+      "enum": [
+        "info",
+        "debug"
+      ],
+      "title": "LogLevel",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "log_level": {
+      "$ref": "#/$defs/LogLevel",
+      "default": "info"
+    },
+    "password": {
+      "default": "",
+      "format": "password",
+      "title": "Password",
+      "type": "string",
+      "writeOnly": true
+    },
+    "imap": {
+      "$ref": "#/$defs/Imap",
+      "default": {
+        "host": "localhost",
+        "port": 993
+      }
+    }
+  },
+  "title": "MailConfig",
+  "type": "object"
+}

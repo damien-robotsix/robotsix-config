@@ -1,0 +1,1 @@
+ci: add JSON schema freshness check to keep config/schema.json in sync with the model
