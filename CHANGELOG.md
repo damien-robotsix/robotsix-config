@@ -1,5 +1,6 @@
 ## 0.0.0 (unreleased)
 
+- Replace Renovate with Dependabot for dependency update automation (`.github/dependabot.yml` with pip, github-actions, and pre-commit ecosystems)
 - Fix `release-please-config.json` package-name from `robotsix-yaml-config` to `robotsix-config` to match `pyproject.toml`.
 - Remove the PyPI publish/release workflow — the stack is uv-git-source only, with no package index (see robotsix-standards).
 - **Renamed `robotsix-yaml-config` → `robotsix-config` and rewritten clean
