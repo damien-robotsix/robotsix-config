@@ -28,14 +28,11 @@ jobs:
 
 
   ruff:
-  actionlint:
     permissions:
       contents: read
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6
-      - name: Run actionlint
-        uses: rhysd/actionlint@7fdc9630cc93b5a5b0c8e7e4e9c9596c0d2e2c6  # v1.7.7
 
       - uses: ./.github/actions/setup
 
@@ -44,6 +41,15 @@ jobs:
 
       - name: ruff format check
         run: uv run ruff format --check .
+
+  actionlint:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6
+      - name: Run actionlint
+        uses: rhysd/actionlint@7fdc9630cc93b5a5b0c8e7e4e9c9596c0d2e2c6  # v1.7.7
 
   vulture:
     permissions:
