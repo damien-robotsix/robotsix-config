@@ -1,0 +1,1 @@
+Add actionlint to CI workflow for workflow syntax and security validation
