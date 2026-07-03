@@ -1,7 +1,14 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+<!-- towncrier release notes start -->
+
 ## 0.0.0 (unreleased)
 
 - Pin all pre-commit hook `rev:` values to immutable commit SHAs (markdownlint-cli, zizmor, mirrors-mypy). Add missing fleet-standard hooks: `check-added-large-files`, `check-case-conflict`, `check-json`, `detect-private-key`, `actionlint`.
 - Replace Renovate with Dependabot for dependency update automation (`.github/dependabot.yml` with pip, github-actions, and pre-commit ecosystems)
+- Set up towncrier for changelog management: add `towncrier` dev dependency, `[tool.towncrier]` config with five fragment types (`feature`, `bugfix`, `doc`, `removal`, `misc`), and `changelog.d/` directory for per-change newsfragments.
 - Fix `release-please-config.json` package-name from `robotsix-yaml-config` to `robotsix-config` to match `pyproject.toml`.
 - Removed `MissingConfigError` — it was never raised in source code and was dead API surface.
 - Remove the PyPI publish/release workflow — the stack is uv-git-source only, with no package index (see robotsix-standards).
