@@ -1,0 +1,1 @@
+ci_fix: out-of-scope CI failure — lint / zizmor (excessive-permissions + undocumented-permissions) in .github/workflows/codeql.yml — replace top-level `permissions: read-all` with specific permissions and add explanatory comments to job-level security-events: write
