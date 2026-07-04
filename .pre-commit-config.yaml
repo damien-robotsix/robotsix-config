@@ -59,6 +59,6 @@ repos:
     hooks:
       - id: vulture
         name: vulture
-        entry: vulture src/ vulture_whitelist.py
+        entry: vulture src/
         language: system
         pass_filenames: false
