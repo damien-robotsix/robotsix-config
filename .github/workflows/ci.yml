@@ -9,13 +9,13 @@ concurrency:
     ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
-permissions: read-all
+permissions: {}
 
 jobs:
   ci:
     permissions:
       contents: read
-      security-events: write
+      security-events: write  # needed for SARIF upload
     uses: damien-robotsix/robotsix-github-workflows/.github/workflows/python-ci.yml@5cd8c1facb02299da618979e7a55f1953f9c075a
     with:
       python-version: "3.14"
@@ -33,29 +33,30 @@ jobs:
     with:
       python-version: "3.14"
       install-extras: "dev"
-    secrets: inherit
 
   auto-release:
     permissions:
-      contents: write
+      contents: write  # needed for creating GitHub releases
     uses: damien-robotsix/robotsix-github-workflows/.github/workflows/auto-release.yml@5fdc956e980cfb70ea36e33bc670a0376750dec6  # main 2026-07-03
     with:
       python-version: "3.14"
-    secrets: inherit
+    secrets: inherit  # needed for PyPI publishing token  # zizmor: ignore[secrets-inherit]
 
   baseline-check:
     permissions:
       contents: read
     uses: damien-robotsix/robotsix-github-workflows/.github/workflows/baseline-check.yml@5fdc956e980cfb70ea36e33bc670a0376750dec6  # main 2026-07-03
     with: {}
-    secrets: inherit
 
   ruff:
+    name: Ruff lint & format
     permissions:
       contents: read
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6
+        with:
+          persist-credentials: false
 
       - uses: ./.github/actions/setup
 
@@ -66,20 +67,26 @@ jobs:
         run: uv run ruff format --check .
 
   actionlint:
+    name: Actionlint
     permissions:
       contents: read
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6
+        with:
+          persist-credentials: false
       - name: Run actionlint
         uses: rhysd/actionlint@03d0035246f3e81f36aed592ffb4bebf33a03106  # v1.7.7
 
   vulture:
+    name: Vulture dead code check
     permissions:
       contents: read
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6
+        with:
+          persist-credentials: false
 
       - uses: ./.github/actions/setup
 
@@ -87,11 +94,14 @@ jobs:
         run: uv run vulture src/
 
   check-schema:
+    name: Check schema freshness
     permissions:
       contents: read
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6
+        with:
+          persist-credentials: false
 
       - uses: ./.github/actions/setup
 
@@ -99,11 +109,14 @@ jobs:
         run: PYTHONPATH=src:. python scripts/check_schema_freshness.py --model tests.config.test_config.MailConfig --output tests/config/test_config.schema.json
 
   docs-build:
+    name: Build docs
     permissions:
       contents: read
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6
+        with:
+          persist-credentials: false
 
       - uses: ./.github/actions/setup
 
@@ -114,12 +127,15 @@ jobs:
   # upload it, so the code-scanning integration is preserved as a dedicated job
   # that regenerates the SARIF report and uploads it.
   bandit-sarif:
+    name: Bandit SARIF upload
     permissions:
       contents: read
-      security-events: write
+      security-events: write  # needed for SARIF upload
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6
+        with:
+          persist-credentials: false
 
       - uses: ./.github/actions/setup
 
@@ -134,12 +150,15 @@ jobs:
           category: bandit
 
   codeql-sast:
+    name: CodeQL analysis
     permissions:
       contents: read
-      security-events: write
+      security-events: write  # needed for SARIF upload
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6
+        with:
+          persist-credentials: false
       - uses: github/codeql-action/init@8aad20d150bbac5944a9f9d289da16a4b0d87c1e  # v4
         with:
           languages: python
@@ -149,11 +168,14 @@ jobs:
   # output (no coverage.xml artifact), so the Codecov integration is preserved
   # as a dedicated job that regenerates the XML report and uploads it.
   coverage:
+    name: Coverage & Codecov upload
     permissions:
       contents: read
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6
+        with:
+          persist-credentials: false
 
       - uses: ./.github/actions/setup
 
@@ -169,22 +191,28 @@ jobs:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   dependency-review:
+    name: Dependency review
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6
+        with:
+          persist-credentials: false
       - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294  # v5.0.0
         with:
           fail-on-severity: moderate
 
   dependency-audit:
+    name: Dependency audit
     permissions:
       contents: read
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6
+        with:
+          persist-credentials: false
 
       - uses: ./.github/actions/setup
 
