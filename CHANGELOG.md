@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ## 0.0.0 (unreleased)
 
+- Add `.github/workflows/lint-workflows.yml` using shared reusable workflow from `damien-robotsix/robotsix-github-workflows` pinned to commit `7314c9b6c2b536ca81023e8841f272b72733262e`, with `run-actionlint: true` and `run-zizmor: true` enabled.
 - Enable changelog autofill periodic workflow to automate CHANGELOG.md entries from PR titles.
 - Upgrade `actions/dependency-review-action` from v4.0.0 to v5.0.0 and tighten `fail-on-severity` from `high` to `moderate` to catch more vulnerabilities.
 - Inline the Docs deployment workflow to fix GitHub Pages deployment failures caused by insufficient permissions in the reusable `python-docs.yml` workflow
