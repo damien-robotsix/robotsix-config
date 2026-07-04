@@ -70,7 +70,7 @@ uvx deptry src
 Dead code:
 
 ```sh
-uv run vulture src/ vulture_whitelist.py
+uv run vulture src/
 ```
 
 ## Pre-commit
