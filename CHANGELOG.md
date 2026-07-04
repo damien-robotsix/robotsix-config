@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ## 0.0.0 (unreleased)
 
+- Remove content duplicated between `README.md` and `docs/index.md` — the docs landing page is now the canonical source for the description and quick-start example; `README.md` retains a minimal tagline + install + link to the full documentation.
 - Added `docs` optional-dependencies group with mkdocs-material and mkdocstrings, fixing the docs workflow's `--extra docs` reference.
 - Add `.github/workflows/lint-workflows.yml` using shared reusable workflow from `damien-robotsix/robotsix-github-workflows` pinned to commit `7314c9b6c2b536ca81023e8841f272b72733262e`, with `run-actionlint: true` and `run-zizmor: true` enabled.
 - Enable changelog autofill periodic workflow to automate CHANGELOG.md entries from PR titles.
