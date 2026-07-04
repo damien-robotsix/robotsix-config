@@ -1,0 +1,1 @@
+README.md and docs/index.md have substantial content duplication
