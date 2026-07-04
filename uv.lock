@@ -740,11 +740,17 @@ dev = [
     { name = "towncrier" },
     { name = "vulture" },
 ]
+docs = [
+    { name = "mkdocs-material" },
+    { name = "mkdocstrings", extra = ["python"] },
+]
 
 [package.metadata]
 requires-dist = [
     { name = "mkdocs-material", marker = "extra == 'dev'", specifier = ">=9" },
+    { name = "mkdocs-material", marker = "extra == 'docs'", specifier = ">=9" },
     { name = "mkdocstrings", extras = ["python"], marker = "extra == 'dev'", specifier = ">=0.25" },
+    { name = "mkdocstrings", extras = ["python"], marker = "extra == 'docs'", specifier = ">=0.25" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.11" },
     { name = "pydantic", specifier = ">=2" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8" },
@@ -754,7 +760,7 @@ requires-dist = [
     { name = "towncrier", marker = "extra == 'dev'" },
     { name = "vulture", marker = "extra == 'dev'", specifier = ">=2.16" },
 ]
-provides-extras = ["dev"]
+provides-extras = ["dev", "docs"]
 
 [[package]]
 name = "ruff"
