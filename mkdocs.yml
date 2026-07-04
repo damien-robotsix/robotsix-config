@@ -6,13 +6,13 @@ watch:
   - src/robotsix_config
 
 nav:
-  - Home: index.md
+  - Home: robotsix_config/index.md
   - API Reference:
-      - Overview: api.md
+      - Overview: robotsix_config/api.md
       - Config: config/index.md
       - Errors: _errors/index.md
-  - Contributing: contributing.md
-  - Security: security.md
+  - Contributing: robotsix_config/contributing.md
+  - Security: robotsix_config/security.md
 
 theme:
   name: material

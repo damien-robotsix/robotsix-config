@@ -3,11 +3,11 @@ modules:
     paths:
       - src/robotsix_config/__init__.py
       - src/robotsix_config/py.typed
-      - docs/api.md
-      - docs/contributing.md
-      - docs/index.md
-      - docs/modules.yaml
-      - docs/security.md
+      - docs/robotsix_config/api.md
+      - docs/robotsix_config/contributing.md
+      - docs/robotsix_config/index.md
+      - docs/robotsix_config/modules.yaml
+      - docs/robotsix_config/security.md
   - id: config
     paths:
       - src/robotsix_config/config/__init__.py

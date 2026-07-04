@@ -1,0 +1,1 @@
+Reorganize module robotsix_config: align to per-module layout (src/docs/tests)
