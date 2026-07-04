@@ -1,0 +1,1 @@
+ci_fix: out-of-scope CI failure — lint / zizmor (zizmor --persona=pedantic) in .github/workflows/ci.yml and .github/workflows/docs.yml — both need zizmor findings addressed (artipacked, excessive-permissions, undocumented-permissions, secrets-inherit, anonymous-definition)
