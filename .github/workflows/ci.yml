@@ -149,21 +149,6 @@ jobs:
           sarif_file: bandit-results.sarif
           category: bandit
 
-  codeql-sast:
-    name: CodeQL analysis
-    permissions:
-      contents: read
-      security-events: write  # needed for SARIF upload
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6
-        with:
-          persist-credentials: false
-      - uses: github/codeql-action/init@8aad20d150bbac5944a9f9d289da16a4b0d87c1e  # v4
-        with:
-          languages: python
-      - uses: github/codeql-action/analyze@8aad20d150bbac5944a9f9d289da16a4b0d87c1e  # v4
-
   # The reusable spine runs pytest with coverage but only emits term-missing
   # output (no coverage.xml artifact), so the Codecov integration is preserved
   # as a dedicated job that regenerates the XML report and uploads it.
