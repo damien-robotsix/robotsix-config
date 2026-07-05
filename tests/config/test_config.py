@@ -80,18 +80,18 @@ def test_env_is_not_a_config_source(monkeypatch, tmp_path, write_config):
     assert cfg.imap.host == "file"
 
 
+def _write(path, data):
+    path.write_text(json.dumps(data), encoding="utf-8")
+
+
+
 @pytest.mark.parametrize(
     "payload_factory,error_match",
     [
         (lambda p: p.write_text("{not json", encoding="utf-8"), "Invalid JSON"),
+        (lambda p: _write(p, [1, 2]), "must be a JSON object"),
         (
-            lambda p: p.write_text(json.dumps([1, 2]), encoding="utf-8"),
-            "must be a JSON object",
-        ),
-        (
-            lambda p: p.write_text(
-                json.dumps({"imap": {"port": "not-an-int"}}), encoding="utf-8"
-            ),
+            lambda p: _write(p, {"imap": {"port": "not-an-int"}}),
             "is invalid",
         ),
         (lambda p: p.mkdir(parents=True), "Cannot read"),
