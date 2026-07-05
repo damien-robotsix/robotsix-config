@@ -83,12 +83,19 @@ def load_config[ModelT: BaseModel](
 
 
 def _reveal(obj: Any) -> Any:
-    """Recursively replace :class:`SecretStr` with its cleartext value."""
+    """Recursively replace SecretStr with its cleartext value."""
+def _reveal(obj: Any) -> Any:
     if isinstance(obj, SecretStr):
         return obj.get_secret_value()
     if isinstance(obj, dict):
         return {k: _reveal(v) for k, v in obj.items()}
     if isinstance(obj, (list, tuple)):
+        return [_reveal(v) for v in obj]
+    if isinstance(obj, (set, frozenset)):
+        return [_reveal(v) for v in obj]
+    return obj
+    return obj
+    if isinstance(obj, (set, frozenset)):
         return [_reveal(v) for v in obj]
     return obj
 

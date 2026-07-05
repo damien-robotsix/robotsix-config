@@ -1,0 +1,1 @@
+Add set/frozenset handling to _reveal() and test dump_config with set[SecretStr]
