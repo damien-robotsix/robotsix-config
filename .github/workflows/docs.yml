@@ -4,6 +4,8 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions: {}
+
 concurrency:
   group: pages
   cancel-in-progress: false
@@ -12,8 +14,8 @@ jobs:
   docs:
     permissions:
       contents: read
-      pages: write
-      id-token: write
+      pages: write  # needed to deploy to GitHub Pages
+      id-token: write  # needed for OIDC token to authenticate Pages deployment
     uses: damien-robotsix/robotsix-github-workflows/.github/workflows/python-docs.yml@7314c9b6c2b536ca81023e8841f272b72733262e  # main
     with:
       docs-install-args: "--extra docs"
