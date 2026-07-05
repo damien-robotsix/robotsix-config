@@ -63,7 +63,9 @@ def test_defaults_when_file_missing(monkeypatch, tmp_path):
 
 
 def test_file_supplies_values(tmp_path, write_config):
-    p = write_config(tmp_path / "c.json", {"log_level": "debug", "imap": {"host": "mx"}})
+    p = write_config(
+        tmp_path / "c.json", {"log_level": "debug", "imap": {"host": "mx"}}
+    )
     cfg = load_config(MailConfig, p)
     assert cfg.log_level is LogLevel.debug
     assert cfg.imap.host == "mx"
@@ -82,9 +84,14 @@ def test_env_is_not_a_config_source(monkeypatch, tmp_path, write_config):
     "payload_factory,error_match",
     [
         (lambda p: p.write_text("{not json", encoding="utf-8"), "Invalid JSON"),
-        (lambda p: p.write_text(json.dumps([1, 2]), encoding="utf-8"), "must be a JSON object"),
         (
-            lambda p: p.write_text(json.dumps({"imap": {"port": "not-an-int"}}), encoding="utf-8"),
+            lambda p: p.write_text(json.dumps([1, 2]), encoding="utf-8"),
+            "must be a JSON object",
+        ),
+        (
+            lambda p: p.write_text(
+                json.dumps({"imap": {"port": "not-an-int"}}), encoding="utf-8"
+            ),
             "is invalid",
         ),
         (lambda p: p.mkdir(parents=True), "Cannot read"),
