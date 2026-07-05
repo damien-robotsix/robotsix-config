@@ -38,11 +38,6 @@ class MailConfig(BaseModel):
     imap: Imap = Imap()
 
 
-def _write(path, obj):
-    path.write_text(json.dumps(obj), encoding="utf-8")
-    return path
-
-
 # -- resolve_config_path ------------------------------------------------------
 
 
@@ -67,46 +62,46 @@ def test_defaults_when_file_missing(monkeypatch, tmp_path):
     assert cfg.imap == Imap()
 
 
-def test_file_supplies_values(tmp_path):
-    p = _write(tmp_path / "c.json", {"log_level": "debug", "imap": {"host": "mx"}})
+def test_file_supplies_values(tmp_path, write_config):
+    p = write_config(
+        tmp_path / "c.json", {"log_level": "debug", "imap": {"host": "mx"}}
+    )
     cfg = load_config(MailConfig, p)
     assert cfg.log_level is LogLevel.debug
     assert cfg.imap.host == "mx"
     assert cfg.imap.port == 993  # untouched default
 
 
-def test_env_is_not_a_config_source(monkeypatch, tmp_path):
-    p = _write(tmp_path / "c.json", {"imap": {"host": "file"}})
+def test_env_is_not_a_config_source(monkeypatch, tmp_path, write_config):
+    p = write_config(tmp_path / "c.json", {"imap": {"host": "file"}})
     monkeypatch.setenv(CONFIG_FILE_ENV, str(p))
     monkeypatch.setenv("ROBOTSIX_MAIL_IMAP__HOST", "env")  # must be ignored
     cfg = load_config(MailConfig)
     assert cfg.imap.host == "file"
 
 
-def test_bad_json_raises(tmp_path):
-    p = tmp_path / "c.json"
-    p.write_text("{not json", encoding="utf-8")
-    with pytest.raises(InvalidConfigError, match="Invalid JSON"):
-        load_config(MailConfig, p)
+def _write(path, data):
+    path.write_text(json.dumps(data), encoding="utf-8")
 
 
-def test_non_object_top_level_raises(tmp_path):
-    p = _write(tmp_path / "c.json", [1, 2])
-    with pytest.raises(InvalidConfigError, match="must be a JSON object"):
-        load_config(MailConfig, p)
 
-
-def test_validation_error_wrapped(tmp_path):
-    p = _write(tmp_path / "c.json", {"imap": {"port": "not-an-int"}})
-    with pytest.raises(InvalidConfigError, match="is invalid"):
-        load_config(MailConfig, p)
-
-
-def test_unreadable_path_raises(tmp_path):
-    d = tmp_path / "adir"
-    d.mkdir()  # a directory, not a file
-    with pytest.raises(InvalidConfigError, match="Cannot read"):
-        load_config(MailConfig, d)
+@pytest.mark.parametrize(
+    "payload_factory,error_match",
+    [
+        (lambda p: p.write_text("{not json", encoding="utf-8"), "Invalid JSON"),
+        (lambda p: _write(p, [1, 2]), "must be a JSON object"),
+        (
+            lambda p: _write(p, {"imap": {"port": "not-an-int"}}),
+            "is invalid",
+        ),
+        (lambda p: p.mkdir(parents=True), "Cannot read"),
+    ],
+)
+def test_invalid_config_raises(payload_factory, error_match, tmp_path):
+    target = tmp_path / "config.json"
+    payload_factory(target)
+    with pytest.raises(InvalidConfigError, match=error_match):
+        load_config(MailConfig, target)
 
 
 # -- dump_config: JSON, 0600, secrets revealed, round-trips -------------------
