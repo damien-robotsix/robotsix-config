@@ -100,6 +100,7 @@ def _reveal(obj: Any) -> Any:
     return obj
 
 
+
 def dump_config(
     model: BaseModel,
     path: str | os.PathLike[str] | None = None,
