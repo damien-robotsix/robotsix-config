@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ## 0.0.0 (unreleased)
 
+- Add `triage_boilerplate` periodic workflow via `.robotsix-mill/periodic/triage_boilerplate.yaml` presence file, enabling the built-in triage boilerplate scanner to propose response templates for recurring triage patterns.
 - Reorganize module documentation under `docs/robotsix_config/` — move `api.md`, `contributing.md`, `index.md`, `modules.yaml`, and `security.md` into the per-module subdirectory, matching the convention used by `config/` and `_errors/`.
 - Parametrize error-path tests in `tests/config/test_config.py` into a single `test_invalid_config_raises` and add `write_config` fixture to `tests/conftest.py`.
 - Remove content duplicated between `README.md` and `docs/index.md` — the docs landing page is now the canonical source for the description and quick-start example; `README.md` retains a minimal tagline + install + link to the full documentation.
