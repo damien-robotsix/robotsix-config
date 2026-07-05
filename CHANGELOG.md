@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ## 0.0.0 (unreleased)
 
+- Updated GitHub issue templates: fixed stale `robotsix-yaml-config` URLs to `robotsix-config`, and replaced removed-component checkboxes with current feature names (load_config, dump_config, config_schema, resolve_config_path, error types).
 - Add Docker 503 infrastructure outage boilerplate response to triage_boilerplate periodic workflow, documenting the pattern so triagers can consistently handle transient Docker Hub / registry unavailability.
 - Add `triage_boilerplate` periodic workflow via `.robotsix-mill/periodic/triage_boilerplate.yaml` presence file, enabling the built-in triage boilerplate scanner to propose response templates for recurring triage patterns.
 - Reorganize module documentation under `docs/robotsix_config/` — move `api.md`, `contributing.md`, `index.md`, `modules.yaml`, and `security.md` into the per-module subdirectory, matching the convention used by `config/` and `_errors/`.
