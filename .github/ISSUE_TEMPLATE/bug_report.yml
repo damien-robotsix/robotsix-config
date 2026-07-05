@@ -7,9 +7,9 @@ body:
     attributes:
       value: |
         Thank you for taking the time to file a bug report! Please search
-        [existing issues](https://github.com/damien-robotsix/robotsix-yaml-config/issues?q=is%3Aissue)
+        [existing issues](https://github.com/damien-robotsix/robotsix-config/issues?q=is%3Aissue)
         to avoid duplicates. If this is a usage question, start a
-        [GitHub Discussions](https://github.com/damien-robotsix/robotsix-yaml-config/discussions)
+        [GitHub Discussions](https://github.com/damien-robotsix/robotsix-config/discussions)
         thread instead.
 
   - type: textarea
@@ -80,10 +80,11 @@ body:
       label: Affected component
       description: Which part of the codebase is affected?
       options:
-        - label: Config merge (deep_merge)
-        - label: YAML loading (load_yaml_cascade / read_yaml_file)
-        - label: Environment variable overlay (overlay_env_vars)
-        - label: Config flattening (flatten_config)
+        - label: Config loading (load_config)
+        - label: Config dumping (dump_config)
+        - label: JSON Schema (config_schema / config_schema_json)
+        - label: Config path resolution (resolve_config_path)
+        - label: Error types (ConfigError / InvalidConfigError)
         - label: Other / not sure
 
   - type: textarea
