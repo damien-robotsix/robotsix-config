@@ -1,0 +1,1 @@
+robotsix-config: Adopt robotsix-modules for module taxonomy validation

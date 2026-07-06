@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 
 ## 0.0.0 (unreleased)
 
+- Adopt `robotsix-modules` for automated module taxonomy validation:
+  added `robotsix-modules>=0.2.0` dev dependency, a `robotsix-modules-validate`
+  pre-commit hook, and a `check-modules` CI job that validates
+  `docs/robotsix_config/modules.yaml` and checks for unregistered files.
 - Deactivate all periodic mill workflows by removing every `.yaml` file under `.robotsix-mill/periodic/`
 - Update `CITATION.cff` title, description, and URL to match the renamed `robotsix-config` project.
 - Updated GitHub issue templates: fixed stale `robotsix-yaml-config` URLs to `robotsix-config`, and replaced removed-component checkboxes with current feature names (load_config, dump_config, config_schema, resolve_config_path, error types).

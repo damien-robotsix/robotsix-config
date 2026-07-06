@@ -62,3 +62,12 @@ repos:
         entry: vulture src/
         language: system
         pass_filenames: false
+
+  - repo: local
+    hooks:
+      - id: robotsix-modules-validate
+        name: robotsix-modules-validate
+        entry: robotsix-modules-validate
+        language: system
+        files: ^docs/robotsix_config/modules\.yaml$
+        pass_filenames: true
