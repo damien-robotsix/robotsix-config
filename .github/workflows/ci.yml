@@ -93,6 +93,24 @@ jobs:
       - name: vulture
         run: uv run vulture src/
 
+  check-modules:
+    name: Check module registration
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup
+
+      - name: Validate module taxonomy
+        run: uv run robotsix-modules validate docs/robotsix_config/modules.yaml
+
+      - name: Check module registration
+        run: uv run robotsix-modules check-registration docs/robotsix_config/modules.yaml --root .
+
   check-schema:
     name: Check schema freshness
     permissions:
