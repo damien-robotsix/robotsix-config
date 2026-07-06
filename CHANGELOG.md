@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ## 0.0.0 (unreleased)
 
+- Remove stale `docs/robotsix_config/modules.yaml` — the module taxonomy file is no longer consumed by any build step.
 - Adopt `robotsix-modules` for automated module taxonomy validation:
   added `robotsix-modules>=0.2.0` dev dependency, a `robotsix-modules-validate`
   pre-commit hook, and a `check-modules` CI job that validates

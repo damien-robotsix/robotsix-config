@@ -1,0 +1,1 @@
+Stale docs/robotsix_config/modules.yaml not referenced by any build tool
