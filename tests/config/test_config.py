@@ -131,8 +131,14 @@ def test_dump_then_load_round_trip(tmp_path):
 def test_dump_reveals_secrets_in_lists(tmp_path):
     class Multi(BaseModel):
         tokens: list[SecretStr] = []
+def test_dump_reveals_secrets_in_sets(tmp_path):
+    class Multi(BaseModel):
+        tokens: set[SecretStr] = set()
 
     p = tmp_path / "c.json"
+    dump_config(Multi(tokens={SecretStr("a"), SecretStr("b")}), p)
+    data = json.loads(p.read_text())
+    assert sorted(data["tokens"]) == ["a", "b"]
     dump_config(Multi(tokens=[SecretStr("a"), SecretStr("b")]), p)
     assert json.loads(p.read_text())["tokens"] == ["a", "b"]
 
