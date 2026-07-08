@@ -84,7 +84,6 @@ def _write(path, data):
     path.write_text(json.dumps(data), encoding="utf-8")
 
 
-
 @pytest.mark.parametrize(
     "payload_factory,error_match",
     [
@@ -128,13 +127,26 @@ def test_dump_then_load_round_trip(tmp_path):
     assert back.password.get_secret_value() == "s3cr3t"
 
 
-def test_dump_reveals_secrets_in_lists(tmp_path):
+def test_dump_reveals_secrets_in_lists():
+    from robotsix_config.config import _reveal
+
     class Multi(BaseModel):
         tokens: list[SecretStr] = []
 
-    p = tmp_path / "c.json"
-    dump_config(Multi(tokens=[SecretStr("a"), SecretStr("b")]), p)
-    assert json.loads(p.read_text())["tokens"] == ["a", "b"]
+    model = Multi(tokens=[SecretStr("a"), SecretStr("b")])
+    revealed = _reveal(model.model_dump(mode="python"))
+    assert revealed["tokens"] == ["a", "b"]
+
+
+def test_dump_reveals_secrets_in_sets():
+    from robotsix_config.config import _reveal
+
+    class Multi(BaseModel):
+        items: set[SecretStr] = set()
+
+    model = Multi(items={SecretStr("x"), SecretStr("y")})
+    revealed = _reveal(model.model_dump(mode="python"))
+    assert revealed["items"] == {"x", "y"}
 
 
 # -- config_schema: typed schema for the deploy UI ----------------------------

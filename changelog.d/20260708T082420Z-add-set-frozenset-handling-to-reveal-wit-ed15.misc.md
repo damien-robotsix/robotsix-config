@@ -1,0 +1,1 @@
+Add set/frozenset handling to _reveal() with proper list+set test coverage (clean redo of #169)
