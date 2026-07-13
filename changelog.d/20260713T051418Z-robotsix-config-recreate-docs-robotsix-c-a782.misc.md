@@ -1,0 +1,1 @@
+robotsix-config: Recreate docs/robotsix_config/modules.yaml to fix regressed modules adoption
