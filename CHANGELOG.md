@@ -6,6 +6,9 @@ All notable changes to this project will be documented in this file.
 
 ## 0.0.0 (unreleased)
 
+- Recreate `docs/robotsix_config/modules.yaml` with the four-module taxonomy
+  (`robotsix_config`, `config`, `_errors`, `tests`) that was validated in
+  PR #174. All 19 paths are current.
 - `_reveal()` now recursively reveals `SecretStr` values inside `set` and `frozenset` containers, matching the existing behaviour for `list`/`tuple`/`dict`.
 - Deactivate all periodic mill workflows by removing every `.yaml` file under `.robotsix-mill/periodic/`.
 - Remove stale `docs/robotsix_config/modules.yaml` — the module taxonomy file is no longer consumed by any build step.
