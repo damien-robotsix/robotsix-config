@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ## 0.0.0 (unreleased)
 
+- Enable baseline periodic workflows (test_gap, bc_check, security_posture) via `.robotsix-mill/periodic/` presence files.
 - Recreate `docs/robotsix_config/modules.yaml` with the four-module taxonomy
   (`robotsix_config`, `config`, `_errors`, `tests`) that was validated in
   PR #174. All 19 paths are current.
