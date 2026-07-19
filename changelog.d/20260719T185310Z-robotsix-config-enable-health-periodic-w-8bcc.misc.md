@@ -1,0 +1,1 @@
+robotsix-config: Enable health periodic workflow
