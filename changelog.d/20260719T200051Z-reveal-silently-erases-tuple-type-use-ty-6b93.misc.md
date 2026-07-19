@@ -1,0 +1,1 @@
+_reveal() silently erases tuple type — use type(obj)(...) like the set/frozenset branch

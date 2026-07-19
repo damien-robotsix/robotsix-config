@@ -138,6 +138,17 @@ def test_dump_reveals_secrets_in_lists():
     assert revealed["tokens"] == ["a", "b"]
 
 
+def test_dump_reveals_secrets_in_tuples():
+    from robotsix_config.config import _reveal
+
+    class Multi(BaseModel):
+        items: tuple[SecretStr, ...] = ()
+
+    model = Multi(items=(SecretStr("a"), SecretStr("b")))
+    revealed = _reveal(model.model_dump(mode="python"))
+    assert revealed["items"] == ("a", "b")
+
+
 def test_dump_reveals_secrets_in_sets():
     from robotsix_config.config import _reveal
 
