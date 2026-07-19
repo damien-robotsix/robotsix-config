@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ## 0.0.0 (unreleased)
 
 - Add `.robotsix-mill/periodic/docstring_coverage.yaml` to enable automated docstring-coverage enforcement on the public API.
+- Enable audit periodic scan for dependency vulnerability checking.
 - Preserve tuple type in `_reveal()`: `tuple[SecretStr, ...]` model fields no longer silently convert to lists during `dump_config()` serialization
 - Add `repo_description_sync` periodic agent configuration to keep forge description in sync with README.
 - Enable baseline periodic workflows (test_gap, bc_check, security_posture) via `.robotsix-mill/periodic/` presence files.
