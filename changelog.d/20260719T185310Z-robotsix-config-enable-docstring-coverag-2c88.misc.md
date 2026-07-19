@@ -1,0 +1,1 @@
+robotsix-config: Enable docstring_coverage periodic workflow
