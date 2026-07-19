@@ -89,7 +89,7 @@ def _reveal(obj: Any) -> Any:
     if isinstance(obj, dict):
         return {k: _reveal(v) for k, v in obj.items()}
     if isinstance(obj, (list, tuple)):
-        return [_reveal(v) for v in obj]
+        return type(obj)(_reveal(v) for v in obj)
     if isinstance(obj, (set, frozenset)):
         return type(obj)(_reveal(v) for v in obj)
     return obj
