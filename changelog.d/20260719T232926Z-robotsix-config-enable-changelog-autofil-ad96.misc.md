@@ -1,0 +1,1 @@
+robotsix-config: Enable changelog_autofill periodic workflow

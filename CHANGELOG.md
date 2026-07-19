@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ## 0.0.0 (unreleased)
 
+- Added `changelog_autofill` periodic agent configuration.
 - Add `.robotsix-mill/periodic/docstring_coverage.yaml` to enable automated docstring-coverage enforcement on the public API.
 - Preserve tuple type in `_reveal()`: `tuple[SecretStr, ...]` model fields no longer silently convert to lists during `dump_config()` serialization
 - Add `repo_description_sync` periodic agent configuration to keep forge description in sync with README.
