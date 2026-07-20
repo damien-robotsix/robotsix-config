@@ -10,11 +10,11 @@ config values**, and the model's own field defaults fill the gaps.
 ## Quick start
 
 ```python
-from pydantic import BaseModel, SecretStr
-from robotsix_config import load_config, dump_config, config_schema_json
+from pydantic import SecretStr
+from robotsix_config import ConfigModel, load_config, dump_config, config_schema_json
 
 
-class Config(BaseModel):
+class Config(ConfigModel):
     host: str = "localhost"
     port: int = 8080
     api_key: SecretStr = SecretStr("")
@@ -32,6 +32,11 @@ dump_config(cfg)
 
 ## Model
 
+- **Subclass `ConfigModel`.** The canonical base class for configuration models —
+  a drop-in replacement for `pydantic.BaseModel` with no extra overhead.
+  Declare secrets as `pydantic.SecretStr` fields: masked on ``repr()``, written
+  in cleartext into the `0600` file by `dump_config`, and marked in the JSON
+  Schema as `{"type": "string", "format": "password", "writeOnly": true}`.
 - **One file.** `load_config` reads exactly one JSON file — `ROBOTSIX_CONFIG_FILE`
   or `config/config.json`. That variable only *locates* the file; it carries no
   values. No env overlay, no CLI-merge.
@@ -39,8 +44,9 @@ dump_config(cfg)
   overrides only what it sets.
 - **Typed schema.** `config_schema` / `config_schema_json` emit the model's JSON
   Schema (types, required, enums, defaults, secret marking) for the deploy UI.
-- **Secrets.** Declare with `pydantic.SecretStr`: masked on read, written in
-  cleartext into the `0600` file by `dump_config`, and marked in the schema as
-  `{"type": "string", "format": "password", "writeOnly": true}`.
+- **`0600`/`0700` enforcement.** `dump_config` writes the config file with
+  `0600` permissions (inside a `0700` directory). On rewrite it corrects
+  existing misconfigured permissions, and the write is atomic
+  (temp file + `os.replace`).
 
 See the [API reference](api.md).

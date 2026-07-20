@@ -15,6 +15,7 @@ from pydantic import BaseModel, SecretStr
 from robotsix_config import (
     CONFIG_FILE_ENV,
     DEFAULT_CONFIG_PATH,
+    ConfigModel,
     InvalidConfigError,
     config_schema,
     config_schema_json,
@@ -167,6 +168,37 @@ def test_dump_atomic_no_leftover_on_new_file_failure(monkeypatch, tmp_path):
     assert not target.exists()
 
 
+def test_dump_creates_0700_directory(tmp_path):
+    """``dump_config`` always ensures the parent directory is mode 0700."""
+    target = tmp_path / "sub" / "config.json"
+    cfg = MailConfig()
+    dump_config(cfg, target)
+    dir_mode = stat.S_IMODE(target.parent.stat().st_mode)
+    assert dir_mode == 0o700
+
+
+def test_dump_corrects_directory_perms_on_rewrite(tmp_path):
+    """``dump_config`` fixes a directory that already exists with wrong perms."""
+    target = tmp_path / "sub" / "config.json"
+    target.parent.mkdir(parents=True)
+    target.parent.chmod(0o755)  # deliberately wrong
+    cfg = MailConfig()
+    dump_config(cfg, target)
+    dir_mode = stat.S_IMODE(target.parent.stat().st_mode)
+    assert dir_mode == 0o700
+
+
+def test_dump_writes_0600_regardless_of_existing_perms(tmp_path, write_config):
+    """``dump_config`` writes 0600 regardless of the existing file's mode."""
+    target = tmp_path / "config.json"
+    write_config(target, {"log_level": "debug"})
+    target.chmod(0o644)
+    cfg = MailConfig(password=SecretStr("s3cr3t"))
+    dump_config(cfg, target)
+    mode = stat.S_IMODE(target.stat().st_mode)
+    assert mode == 0o600
+
+
 def test_dump_reveals_secrets_in_lists():
     from robotsix_config.config import _reveal
 
@@ -234,3 +266,42 @@ def test_schema_json_is_parseable():
     text = config_schema_json(MailConfig)
     assert text.endswith("\n")
     assert json.loads(text)["title"] == "MailConfig"
+
+
+# -- ConfigModel: canonical base class ----------------------------------------
+
+
+class AppConfig(ConfigModel):
+    name: str = "my-app"
+    token: SecretStr = SecretStr("")
+
+
+def test_config_model_is_base_model_subclass():
+    """``ConfigModel`` is a drop-in replacement for ``BaseModel``."""
+    assert issubclass(ConfigModel, BaseModel)
+
+
+def test_config_model_load_and_dump_round_trip(tmp_path):
+    """A ``ConfigModel`` subclass works identically with load/dump."""
+    cfg = AppConfig(name="test-app", token=SecretStr("tok"))
+    p = tmp_path / "config.json"
+    dump_config(cfg, p)
+    back = load_config(AppConfig, p)
+    assert back.name == "test-app"
+    assert back.token.get_secret_value() == "tok"
+
+
+def test_config_model_secret_masked_on_repr():
+    """SecretStr fields on a ``ConfigModel`` subclass are masked in repr."""
+    cfg = AppConfig(token=SecretStr("s3cr3t"))
+    r = repr(cfg)
+    assert "s3cr3t" not in r
+
+
+def test_config_model_secret_writeonly_in_schema():
+    """SecretStr fields on a ``ConfigModel`` subclass are ``writeOnly``."""
+    schema = config_schema(AppConfig)
+    token = schema["properties"]["token"]
+    assert token["type"] == "string"
+    assert token["format"] == "password"
+    assert token["writeOnly"] is True

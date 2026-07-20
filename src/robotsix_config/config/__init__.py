@@ -22,7 +22,6 @@ from __future__ import annotations
 import contextlib
 import json
 import os
-import stat
 import tempfile
 from pathlib import Path
 from typing import Any
@@ -30,6 +29,23 @@ from typing import Any
 from pydantic import BaseModel, SecretStr, ValidationError
 
 from .._errors import InvalidConfigError
+
+
+class ConfigModel(BaseModel):
+    """Canonical base class for typed configuration models.
+
+    Subclass this to define your component's configuration schema::
+
+        class MyConfig(ConfigModel):
+            api_key: SecretStr
+            endpoint: str = "https://api.example.com"
+
+    Secrets declared as :class:`pydantic.SecretStr` are automatically masked
+    on read, written in cleartext into the ``0600`` config file by
+    :func:`dump_config`, and marked ``writeOnly`` in the JSON Schema produced
+    by :func:`config_schema`.
+    """
+
 
 CONFIG_FILE_ENV = "ROBOTSIX_CONFIG_FILE"
 DEFAULT_CONFIG_PATH = Path("config/config.json")
@@ -135,8 +151,7 @@ def dump_config(
             fh.write(text)
             fh.flush()
             os.fsync(fd)
-        mode = stat.S_IMODE(target.stat().st_mode) if target.exists() else 0o600
-        os.chmod(tmp_path, mode)
+        os.chmod(tmp_path, 0o600)
         os.replace(tmp_path, target)
     except BaseException:
         with contextlib.suppress(OSError):
@@ -172,6 +187,7 @@ def config_schema_json(model_cls: type[BaseModel], *, indent: int = 2) -> str:
 __all__ = [
     "CONFIG_FILE_ENV",
     "DEFAULT_CONFIG_PATH",
+    "ConfigModel",
     "resolve_config_path",
     "load_config",
     "dump_config",
