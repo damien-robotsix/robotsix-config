@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ## 0.0.0 (unreleased)
 
+- Add unit tests for ``scripts/check_schema_freshness.py`` covering ``_import_model`` (success, ValueError, AttributeError) and ``main`` (fresh file, missing file, stale file).
 - `dump_config` now writes atomically via a temp file + ``os.replace()``, preventing
   truncated or partially-written config files on crash or power loss.
 - Enabled the `copy_paste` periodic workflow (jscpd-based copy-paste detection) for the repo.  Added `.robotsix-mill/periodic/copy_paste.yaml`.

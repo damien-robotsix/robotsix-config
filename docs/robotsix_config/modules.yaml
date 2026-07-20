@@ -22,6 +22,11 @@ modules:
       - docs/_errors/index.md
       - tests/_errors/__init__.py
       - tests/_errors/test_errors.py
+  - id: scripts
+    paths:
+      - tests/scripts/__init__.py
+      - tests/scripts/_test_models.py
+      - tests/scripts/test_check_schema_freshness.py
   - id: tests
     paths:
       - tests/__init__.py

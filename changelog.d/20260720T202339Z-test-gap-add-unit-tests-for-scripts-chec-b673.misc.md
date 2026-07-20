@@ -1,0 +1,1 @@
+test gap: add unit tests for scripts/check_schema_freshness.py
