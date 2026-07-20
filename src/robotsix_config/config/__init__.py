@@ -22,6 +22,8 @@ from __future__ import annotations
 import contextlib
 import json
 import os
+import stat
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -106,6 +108,12 @@ def dump_config(
     Secrets (:class:`pydantic.SecretStr`) are written in **cleartext** into the
     ``0600`` file (inside a ``0700`` directory) — the same file the app reads
     back with :func:`load_config`. Writes to *path* or :func:`resolve_config_path`.
+
+    The write is atomic: content is written to a temporary file in the same
+    directory, flushed and fsynced, then atomically renamed over the target via
+    ``os.replace``.  On failure the temp file is removed and the target is left
+    unchanged (or absent if it didn't exist).
+
     Returns the path written.
     """
     target = Path(path) if path is not None else resolve_config_path()
@@ -116,9 +124,25 @@ def dump_config(
     parent.mkdir(parents=True, exist_ok=True)
     with contextlib.suppress(OSError):
         parent.chmod(0o700)
-    fd = os.open(target, os.O_CREAT | os.O_WRONLY | os.O_TRUNC, 0o600)
-    with os.fdopen(fd, "w", encoding="utf-8") as fh:
-        fh.write(text)
+
+    fd, tmp_path = tempfile.mkstemp(
+        suffix=".tmp",
+        prefix=target.name + ".",
+        dir=str(parent),
+    )
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as fh:
+            fh.write(text)
+            fh.flush()
+            os.fsync(fd)
+        mode = stat.S_IMODE(target.stat().st_mode) if target.exists() else 0o600
+        os.chmod(tmp_path, mode)
+        os.replace(tmp_path, target)
+    except BaseException:
+        with contextlib.suppress(OSError):
+            os.unlink(tmp_path)
+        raise
+
     with contextlib.suppress(OSError):
         target.chmod(0o600)
     return target
