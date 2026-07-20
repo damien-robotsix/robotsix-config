@@ -1,13 +1,14 @@
 """robotsix-config — typed configuration for the robotsix stack.
 
-Define your configuration as a pydantic model, load it from **one JSON file**,
-and emit a **JSON Schema** so a deploy UI can render typed, validated inputs and
-so config is type-checked. No YAML, no environment overlay, no cascade — one
-file is the single source of config values, and the model's own field defaults
-fill the gaps.
+Define your configuration as a pydantic model (subclass :class:`ConfigModel`),
+load it from **one JSON file**, and emit a **JSON Schema** so a deploy UI can
+render typed, validated inputs and so config is type-checked. No YAML, no
+environment overlay, no cascade — one file is the single source of config values,
+and the model's own field defaults fill the gaps.
 
 Public API:
 
+- ``ConfigModel`` — canonical base class for config models.
 - ``load_config(model_cls, path=None)`` — load the one JSON file into the model.
 - ``dump_config(model, path=None)`` — write the model to the ``0600`` JSON file
   (secrets in cleartext, for the app to read back).
@@ -28,6 +29,7 @@ from ._errors import ConfigError, InvalidConfigError
 from .config import (
     CONFIG_FILE_ENV,
     DEFAULT_CONFIG_PATH,
+    ConfigModel,
     config_schema,
     config_schema_json,
     dump_config,
@@ -38,6 +40,7 @@ from .config import (
 __all__ = [
     "ConfigError",
     "InvalidConfigError",
+    "ConfigModel",
     "load_config",
     "dump_config",
     "config_schema",

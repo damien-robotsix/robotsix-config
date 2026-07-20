@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 
 ## 0.0.0 (unreleased)
 
+- Add ``ConfigModel`` base class — the canonical way to define typed configuration.
+  ``dump_config`` now writes the temp file with ``0600`` directly (instead of
+  inheriting the target's previous mode), and directory ``0700`` permission
+  enforcement is tested.
 - Add unit tests for ``scripts/check_schema_freshness.py`` covering ``_import_model`` (success, ValueError, AttributeError) and ``main`` (fresh file, missing file, stale file).
 - `dump_config` now writes atomically via a temp file + ``os.replace()``, preventing
   truncated or partially-written config files on crash or power loss.

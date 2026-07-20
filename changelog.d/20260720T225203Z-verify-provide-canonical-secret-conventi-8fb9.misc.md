@@ -1,0 +1,1 @@
+Verify/provide canonical secret convention: SecretStr masking + dump_config 0600/0700
