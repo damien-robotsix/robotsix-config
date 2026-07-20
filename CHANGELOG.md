@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
   ``dump_config`` now writes the temp file with ``0600`` directly (instead of
   inheriting the target's previous mode), and directory ``0700`` permission
   enforcement is tested.
+- Add CodeQL suppression for `py/clear-text-storage-sensitive-data` with justification referencing config-standard §3 (clear-text secrets in `config.json` are policy-accepted; mitigated by `SecretStr` masking + `0600`/`0700` file perms).
 - Add unit tests for ``scripts/check_schema_freshness.py`` covering ``_import_model`` (success, ValueError, AttributeError) and ``main`` (fresh file, missing file, stale file).
 - `dump_config` now writes atomically via a temp file + ``os.replace()``, preventing
   truncated or partially-written config files on crash or power loss.

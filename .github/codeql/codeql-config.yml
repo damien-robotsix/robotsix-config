@@ -1,0 +1,23 @@
+# CodeQL configuration for robotsix-config
+#
+# suppress: py/clear-text-storage-sensitive-data
+# justification: robotsix-standards/docs/config-standard.md §3 "One secret convention"
+#   Secrets stay in config.json — no separate secrets file, no EnvStore/env-var
+#   injection for component config.  Clear-text-at-rest is accepted by policy and
+#   mitigated by layered controls:
+#     • pydantic.SecretStr on sensitive fields (masked on read, writeOnly in schema)
+#     • dump_config writes 0600 inside a 0700 directory
+#     • central-deploy redact-on-read / merge
+#   No relocation, no encryption layer.
+#
+# When CodeQL runs in a downstream repo (not this library), the query should
+# similarly be suppressed once the downstream config model uses SecretStr and the
+# shared dump_config loader enforces 0600/0700.
+
+name: "robotsix-config — clear-text secrets are policy-accepted"
+disable-default-queries: false
+queries:
+  - uses: security-and-quality
+query-filters:
+  - exclude:
+      id: py/clear-text-storage-sensitive-data
