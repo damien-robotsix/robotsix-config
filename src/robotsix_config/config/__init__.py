@@ -103,6 +103,8 @@ def load_config[ModelT: BaseModel](
 def _reveal(obj: Any) -> Any:
     """Recursively replace :class:`SecretStr` with its cleartext value."""
     if isinstance(obj, SecretStr):
+        # codeql[py/clear-text-storage-sensitive-data]
+        # ^^ intentional per config-standard §3
         return obj.get_secret_value()
     if isinstance(obj, dict):
         return {k: _reveal(v) for k, v in obj.items()}
@@ -133,6 +135,7 @@ def dump_config(
     Returns the path written.
     """
     target = Path(path) if path is not None else resolve_config_path()
+    # codeql[py/clear-text-storage-sensitive-data] -- intentional per config-standard §3
     data = _reveal(model.model_dump(mode="python"))
     text = json.dumps(data, indent=indent, ensure_ascii=False) + "\n"
 

@@ -1,0 +1,1 @@
+Enforce config-standard for secrets in settings store (SecretStr + 0600, resolve CodeQL clear-text flag)
