@@ -1,0 +1,1 @@
+Merge scripts module into config module in modules.yaml
