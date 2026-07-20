@@ -6,6 +6,8 @@ All notable changes to this project will be documented in this file.
 
 ## 0.0.0 (unreleased)
 
+- `dump_config` now writes atomically via a temp file + ``os.replace()``, preventing
+  truncated or partially-written config files on crash or power loss.
 - Enabled the `copy_paste` periodic workflow (jscpd-based copy-paste detection) for the repo.  Added `.robotsix-mill/periodic/copy_paste.yaml`.
 - Enable `survey` periodic workflow with competitive-analysis agent.
 - Added `changelog_autofill` periodic agent configuration.

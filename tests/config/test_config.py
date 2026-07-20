@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import errno
 import json
+import os
 import stat
 from enum import StrEnum
 from typing import Any, Optional
@@ -125,6 +127,44 @@ def test_dump_then_load_round_trip(tmp_path):
     back = load_config(MailConfig, p)
     assert back.log_level is LogLevel.debug
     assert back.password.get_secret_value() == "s3cr3t"
+
+
+def test_dump_atomic_preserves_existing_on_failure(monkeypatch, tmp_path):
+    """If fsync fails, an existing target file is left unchanged."""
+    target = tmp_path / "config.json"
+    cfg = MailConfig(log_level=LogLevel.info)
+    dump_config(cfg, target)
+    original = target.read_text(encoding="utf-8")
+
+    def _raise(*args, **kwargs):
+        raise OSError(errno.EIO, "simulated fsync failure")
+
+    monkeypatch.setattr(os, "fsync", _raise)
+
+    cfg2 = MailConfig(log_level=LogLevel.debug)
+    with pytest.raises(OSError, match="simulated fsync failure"):
+        dump_config(cfg2, target)
+
+    # Target must be untouched — identical to what was there before the crash.
+    assert target.read_text(encoding="utf-8") == original
+    data = json.loads(target.read_text(encoding="utf-8"))
+    assert data["log_level"] == "info"
+
+
+def test_dump_atomic_no_leftover_on_new_file_failure(monkeypatch, tmp_path):
+    """If fsync fails on a new file, the target path must not exist."""
+    target = tmp_path / "sub" / "new_config.json"
+
+    def _raise(*args, **kwargs):
+        raise OSError(errno.EIO, "simulated fsync failure")
+
+    monkeypatch.setattr(os, "fsync", _raise)
+
+    cfg = MailConfig(log_level=LogLevel.debug)
+    with pytest.raises(OSError, match="simulated fsync failure"):
+        dump_config(cfg, target)
+
+    assert not target.exists()
 
 
 def test_dump_reveals_secrets_in_lists():
