@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ## 0.0.0 (unreleased)
 
+- Enable `survey` periodic workflow with competitive-analysis agent.
 - Added `changelog_autofill` periodic agent configuration.
 - Add `.robotsix-mill/periodic/docstring_coverage.yaml` to enable automated docstring-coverage enforcement on the public API.
 - Enable audit periodic scan for dependency vulnerability checking.
