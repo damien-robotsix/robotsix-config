@@ -55,13 +55,18 @@ target-version = "py314"
 line-length = 88
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "UP", "B", "S"]
+extend-select = ["D", "E", "F", "I", "UP", "B", "S"]
+ignore = ["D105", "D107", "D205", "D415"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
 
 [tool.ruff.lint.per-file-ignores]
-# Security (S) rules target production code; tests legitimately use
-# `assert` (S101) and temp paths (S108). Mirror Bandit's
-# `exclude_dirs = ["tests"]` so the S rule set stays green in CI.
-"tests/**" = ["S"]
+# Security (S) and pydocstyle (D) rules target production code; tests
+# legitimately use `assert` (S101), temp paths (S108), and test functions
+# don't need Google-style docstrings. Mirror Bandit's `exclude_dirs =
+# ["tests"]` so the S rule set stays green in CI.
+"tests/**" = ["D", "S"]
 
 [tool.bandit]
 exclude_dirs = ["tests"]
