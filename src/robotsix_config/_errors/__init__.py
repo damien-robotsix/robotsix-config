@@ -9,7 +9,8 @@ class ConfigError(Exception):
 
 class InvalidConfigError(ConfigError):
     """The config file is not valid JSON, not a JSON object, or fails to
-    validate against the model."""
+    validate against the model.
+    """
 
 
 __all__ = ["ConfigError", "InvalidConfigError"]

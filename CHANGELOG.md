@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ## 0.0.0 (unreleased)
 
+- Adopt ruff D (pydocstyle) rules with Google convention; fix docstring gaps in public API functions.
 - Add ``ConfigModel`` base class — the canonical way to define typed configuration.
   ``dump_config`` now writes the temp file with ``0600`` directly (instead of
   inheriting the target's previous mode), and directory ``0700`` permission

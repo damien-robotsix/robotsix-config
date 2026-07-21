@@ -56,6 +56,9 @@ def resolve_config_path() -> Path:
 
     This only *locates* the file (e.g. for a mounted deploy); it never carries
     config values.
+
+    Returns:
+        The resolved config file path.
     """
     env = os.environ.get(CONFIG_FILE_ENV)
     return Path(env) if env else DEFAULT_CONFIG_PATH
@@ -177,13 +180,27 @@ def config_schema(model_cls: type[BaseModel]) -> dict[str, Any]:
 
     Commit the emitted schema as ``config/config.schema.json`` and keep it in
     sync with the model in CI.
+
+    Args:
+        model_cls: The Pydantic model class to generate a schema for.
+
+    Returns:
+        The JSON Schema for *model_cls* as a Python dict.
     """
     return model_cls.model_json_schema()
 
 
 def config_schema_json(model_cls: type[BaseModel], *, indent: int = 2) -> str:
-    """:func:`config_schema` serialized to a JSON string (trailing newline),
-    suitable for writing to ``config/config.schema.json``."""
+    """Serialize :func:`config_schema` to a JSON string.
+
+    Args:
+        model_cls: The Pydantic model class to generate a schema for.
+        indent: Number of spaces per indentation level in the JSON output.
+
+    Returns:
+        The JSON Schema as a string with a trailing newline, suitable for
+        writing to ``config/config.schema.json``.
+    """
     return json.dumps(config_schema(model_cls), indent=indent) + "\n"
 
 

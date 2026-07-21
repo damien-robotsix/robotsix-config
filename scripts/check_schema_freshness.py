@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check that a committed JSON Schema file matches a Pydantic model.
+r"""Check that a committed JSON Schema file matches a Pydantic model.
 
 Regenerates the JSON Schema from the model and compares it against the
 file on disk.  If the file is missing or its content differs, the script
@@ -44,6 +44,7 @@ def _import_model(dotted_path: str) -> type[BaseModel]:
 
 
 def main(argv: list[str] | None = None) -> None:
+    """Regenerate the JSON Schema from a model and check it against disk."""
     parser = argparse.ArgumentParser(
         description="Check that a committed JSON Schema file is fresh."
     )
