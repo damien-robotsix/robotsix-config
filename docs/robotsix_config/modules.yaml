@@ -16,9 +16,9 @@ modules:
       - tests/config/__init__.py
       - tests/config/test_config.py
       - tests/config/test_config.schema.json
-      - tests/scripts/__init__.py
-      - tests/scripts/_test_models.py
-      - tests/scripts/test_check_schema_freshness.py
+      - tests/config/scripts/__init__.py
+      - tests/config/scripts/_test_models.py
+      - tests/config/scripts/test_check_schema_freshness.py
   - id: _errors
     paths:
       - src/robotsix_config/_errors/__init__.py
