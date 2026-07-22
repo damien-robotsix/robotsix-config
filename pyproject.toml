@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "robotsix-config"
-version = "0.1.0"
+version = "0.1.1"
 description = "Typed configuration for the robotsix stack: one pydantic model, one JSON file, and a JSON Schema that drives type-checking and the deploy UI."
 readme = "README.md"
 requires-python = ">=3.14"
