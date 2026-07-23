@@ -8,8 +8,13 @@ on:
 
 permissions: {}
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   scorecard:
+    name: Scorecard analysis
     runs-on: ubuntu-latest
     permissions:
       contents: read
