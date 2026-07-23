@@ -2,18 +2,17 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pytest
+pytest.importorskip("hypothesis")
+from hypothesis import given, strategies as st
 from pydantic import BaseModel, SecretStr
 
 from robotsix_config import dump_config, load_config
 from robotsix_config.config import _reveal
 
-pytest.importorskip("hypothesis")
-
-from hypothesis import given  # noqa: E402
-from hypothesis import strategies as st
 
 # -- _reveal() property tests ------------------------------------------------
 
@@ -143,17 +142,13 @@ class RoundTripModel(BaseModel):
     flag: bool = False
 
 
-def test_dump_load_round_trip(tmp_path: Path) -> None:
+@given(st.builds(RoundTripModel))
+def test_dump_load_round_trip(cfg: RoundTripModel, tmp_path: Path) -> None:
     """``dump_config`` followed by ``load_config`` yields the same config."""
-
-    @given(cfg=st.builds(RoundTripModel))
-    def check(cfg: RoundTripModel) -> None:
-        target = tmp_path / "config.json"
-        dump_config(cfg, target)
-        back = load_config(RoundTripModel, target)
-        assert back.model_dump() == cfg.model_dump()
-
-    check()
+    target = tmp_path / "config.json"
+    dump_config(cfg, target)
+    back = load_config(RoundTripModel, target)
+    assert back.model_dump() == cfg.model_dump()
 
 
 # -- Round-trip with SecretStr ------------------------------------------------
@@ -164,14 +159,10 @@ class SecretRoundTripModel(BaseModel):
     name: str = "svc"
 
 
-def test_secret_round_trip(tmp_path: Path) -> None:
+@given(st.builds(SecretRoundTripModel))
+def test_secret_round_trip(cfg: SecretRoundTripModel, tmp_path: Path) -> None:
     """Config with ``SecretStr`` fields round-trips through dump/load."""
-
-    @given(cfg=st.builds(SecretRoundTripModel))
-    def check(cfg: SecretRoundTripModel) -> None:
-        target = tmp_path / "config.json"
-        dump_config(cfg, target)
-        back = load_config(SecretRoundTripModel, target)
-        assert back.model_dump() == cfg.model_dump()
-
-    check()
+    target = tmp_path / "config.json"
+    dump_config(cfg, target)
+    back = load_config(SecretRoundTripModel, target)
+    assert back.model_dump() == cfg.model_dump()
