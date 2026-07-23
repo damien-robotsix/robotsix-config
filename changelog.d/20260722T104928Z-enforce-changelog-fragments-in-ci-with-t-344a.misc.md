@@ -1,1 +1,1 @@
-Enforce changelog fragments in CI with towncrier check
+- Enforce changelog fragments in CI with towncrier check
