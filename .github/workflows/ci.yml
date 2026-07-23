@@ -50,6 +50,9 @@ jobs:
 
   ruff:
     name: Ruff lint & format
+  changelog-check:
+    name: Changelog fragment check
+    if: github.event_name == 'pull_request'
     permissions:
       contents: read
     runs-on: ubuntu-latest
@@ -62,6 +65,12 @@ jobs:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6
         with:
           persist-credentials: false
+          fetch-depth: 0  # needed for towncrier check to compare against base branch
+
+      - uses: ./.github/actions/setup
+
+      - name: Check changelog fragment
+        run: uv run towncrier check --compare-with origin/${{ github.base_ref }}
 
       - uses: ./.github/actions/setup
 
