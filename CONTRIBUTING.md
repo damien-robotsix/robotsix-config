@@ -104,8 +104,6 @@ Releases are automated via GitHub Actions:
    - Commit messages like `feat: ...`, `fix: ...`, `BREAKING CHANGE: ...` trigger version bumps.
    - Release-please opens a PR with the new version, CHANGELOG updates, and tags.
 
-2. **Publishing:** When a release is created (via release-please or manually), the `publish` workflow:
-   - Builds source distribution (sdist) and wheel artifacts.
-   - Publishes to PyPI using [OpenID Connect (OIDC) trusted publishing](https://docs.pypi.org/trusted-publishers/), eliminating the need for API tokens.
+2. **Release creation:** The `auto-release` reusable workflow (defined in `.github/workflows/ci.yml`) handles GitHub release creation automatically when a release-please PR is merged. There is no separate publish-to-PyPI step — the stack is uv-git-source only, with no package index.
 
 Maintainers must ensure conventional commits are used so release-please correctly identifies version bumps.
