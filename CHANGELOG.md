@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ## 0.0.0 (unreleased)
 
+- Add missing docstring to ``_read_json`` private helper in ``robotsix_config.config``.
 - Update `CONTRIBUTING.md` "Releasing" section: replace stale PyPI publishing step with the actual `auto-release` workflow description (no publish-to-PyPI step exists).
 - Fix YAML structural defect in `ci.yml`: move `changelog-check` job out of `ruff` job's mapping, restore `ruff` properties, remove duplicate setup step
 - Moved `tests/scripts/` test files under `tests/config/scripts/` for per-module layout consistency.

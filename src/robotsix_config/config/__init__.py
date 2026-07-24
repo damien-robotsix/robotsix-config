@@ -65,6 +65,12 @@ def resolve_config_path() -> Path:
 
 
 def _read_json(path: Path) -> dict[str, Any]:
+    """Read and parse a JSON config file.
+
+    Returns an empty dict when *path* does not exist (so the caller
+    can fall back to model defaults). Raises :class:`InvalidConfigError`
+    on malformed JSON, unreadable files, or a non-dict top-level value.
+    """
     if not path.exists():
         return {}
     try:
