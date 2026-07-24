@@ -33,7 +33,7 @@ class TestMain:
     @staticmethod
     def _fresh_schema_text() -> str:
         """Return the canonical schema text for SimpleModel."""
-        from tests.scripts._test_models import SimpleModel
+        from tests.config.scripts._test_models import SimpleModel
 
         return json.dumps(SimpleModel.model_json_schema(), indent=2) + "\n"
 
@@ -46,7 +46,7 @@ class TestMain:
         main(
             [
                 "--model",
-                "tests.scripts._test_models.SimpleModel",
+                "tests.config.scripts._test_models.SimpleModel",
                 "--output",
                 str(output),
             ]
@@ -62,7 +62,7 @@ class TestMain:
             main(
                 [
                     "--model",
-                    "tests.scripts._test_models.SimpleModel",
+                    "tests.config.scripts._test_models.SimpleModel",
                     "--output",
                     str(output),
                 ]
@@ -84,7 +84,7 @@ class TestMain:
             main(
                 [
                     "--model",
-                    "tests.scripts._test_models.SimpleModel",
+                    "tests.config.scripts._test_models.SimpleModel",
                     "--output",
                     str(output),
                 ]
