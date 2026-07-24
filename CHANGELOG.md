@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ## 0.0.0 (unreleased)
 
 - Update `CONTRIBUTING.md` "Releasing" section: replace stale PyPI publishing step with the actual `auto-release` workflow description (no publish-to-PyPI step exists).
+- Fix YAML structural defect in `ci.yml`: move `changelog-check` job out of `ruff` job's mapping, restore `ruff` properties, remove duplicate setup step
 - Remove stale keep-a-changelog section from CHANGELOG.md left behind when towncrier was adopted for changelog management.
 - Adopt ruff D (pydocstyle) rules with Google convention; fix docstring gaps in public API functions.
 - Add ``ConfigModel`` base class — the canonical way to define typed configuration.

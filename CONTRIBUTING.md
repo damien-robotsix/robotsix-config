@@ -96,6 +96,34 @@ aborted; review and commit the mechanical fixups before committing again.
   `__all__` in `src/robotsix_config/__init__.py` need care, since
   consumers rely on these exported symbols.
 
+## Changelog entries
+
+This project uses [towncrier](https://towncrier.readthedocs.io/) to
+manage the changelog. Every pull request must include a changelog
+fragment file in `changelog.d/`.
+
+Fragments are plain text files named
+`<ticket-id>.<fragment-type>.md` (e.g.
+`20260701T120000Z-fix-login-timeout-a3f2.bugfix.md`). The file
+contains a single line describing the change, prefixed with `- `:
+
+```text
+- Fixed a timeout bug in the login flow.
+```
+
+Available fragment types: `bugfix`, `feature`, `removal`,
+`deprecation`, `misc`.
+
+To check that your fragment is valid before pushing:
+
+```sh
+uv run towncrier check --compare-with origin/main
+```
+
+This command runs in CI on every pull request, so a missing or
+malformed fragment will cause a CI failure. The fragment is
+automatically collected into the changelog at release time.
+
 ## Releasing
 
 Releases are automated via GitHub Actions:
