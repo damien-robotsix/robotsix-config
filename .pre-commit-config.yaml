@@ -40,7 +40,7 @@ repos:
       - id: detect-secrets
         args: ["--baseline", ".secrets.baseline"]
   - repo: https://github.com/zizmorcore/zizmor-pre-commit
-    rev: ea2eb407b4cbce87cf0d502f36578950494f5ac9  # v1.23.1
+    rev: e3eebf65325ccc992422292cb7a4baee967cf815  # v1.26.1
     hooks:
       - id: zizmor
   - repo: https://github.com/rhysd/actionlint
