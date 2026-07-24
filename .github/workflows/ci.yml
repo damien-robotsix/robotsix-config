@@ -320,8 +320,9 @@ jobs:
         run: uv run --with cyclonedx-py cyclonedx-py environment --output-file sbom.cyclonedx.json
 
       - name: Upload SBOM to release
-        run: gh release upload '${{ github.ref_name }}' sbom.cyclonedx.json
+        run: gh release upload "$TAG_NAME" sbom.cyclonedx.json
         env:
+          TAG_NAME: ${{ github.ref_name }}
           GITHUB_TOKEN: ${{ github.token }}
 
       - name: Attest SBOM
