@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 
 ## 0.0.0 (unreleased)
 
+- Harden ``dump_config`` for cross-platform safety: wrap ``os.chmod`` in
+  ``try/except OSError`` (``0600`` is best-effort on Windows) and retry
+  ``os.replace`` on ``PermissionError`` (antivirus / open-handle races).
+  Added a ``macos-latest`` + ``windows-latest`` matrix job to CI.
 - Add `[tool.uv] exclude-newer = "7d"` supply-chain hardening: prevents installation of packages published less than 7 days ago, closing the window before a CVE advisory can be published.
 - Removed leftover `.robotsix-mill/periodic/security_posture.yaml` periodic workflow
   definition (the name `security_posture` is no longer valid).

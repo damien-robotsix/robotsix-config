@@ -305,3 +305,24 @@ def test_config_model_secret_writeonly_in_schema():
     assert token["type"] == "string"
     assert token["format"] == "password"
     assert token["writeOnly"] is True
+
+
+# -- cross-platform: dump_config succeeds and round-trips on every OS ---------
+
+
+def test_dump_config_succeeds_on_current_platform(tmp_path):
+    """``dump_config`` must succeed and round-trip regardless of OS.
+
+    On Windows, ``os.chmod`` only toggles the read-only attribute and
+    ``os.replace`` can raise ``PermissionError`` when the target is held
+    open — this test ensures the hardening (retry loop + best-effort chmod)
+    keeps ``dump_config`` working everywhere.
+    """
+    cfg = MailConfig(password=SecretStr("cross-platform"), imap=Imap(host="mx"))
+    target = tmp_path / "config.json"
+    written = dump_config(cfg, target)
+    assert written == target
+    assert target.exists()
+    back = load_config(MailConfig, target)
+    assert back.password.get_secret_value() == "cross-platform"
+    assert back.imap.host == "mx"

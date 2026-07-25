@@ -23,6 +23,7 @@ import contextlib
 import json
 import os
 import tempfile
+import time
 from pathlib import Path
 from typing import Any
 
@@ -124,6 +125,31 @@ def _reveal(obj: Any) -> Any:
     return obj
 
 
+def _atomic_replace(
+    src: str,
+    dst: Path,
+    *,
+    attempts: int = 5,
+    delay: float = 0.05,
+) -> None:
+    """Atomically rename *src* over *dst*, retrying on PermissionError.
+
+    On Windows, ``os.replace`` can fail with ``PermissionError`` when the
+    target file is held open by another process (e.g. antivirus scanner,
+    backup agent, or a leaked handle).  This helper retries with a short
+    back-off, mirroring the pattern used by filelock, python-dotenv, and
+    tomlkit.
+    """
+    for i in range(attempts):
+        try:
+            os.replace(src, dst)
+            return
+        except PermissionError:
+            if i == attempts - 1:
+                raise
+            time.sleep(delay)
+
+
 def dump_config(
     model: BaseModel,
     path: str | os.PathLike[str] | None = None,
@@ -140,6 +166,14 @@ def dump_config(
     directory, flushed and fsynced, then atomically renamed over the target via
     ``os.replace``.  On failure the temp file is removed and the target is left
     unchanged (or absent if it didn't exist).
+
+    .. note::
+
+        The ``0600`` permission guarantee is **POSIX-only**.  On Windows,
+        ``os.chmod`` only toggles the read-only attribute bit — the file will
+        not be restricted to the owner in the POSIX sense.  The ``chmod``
+        calls are best-effort and will not raise on platforms where the mode
+        cannot be fully enforced.
 
     Returns the path written.
     """
@@ -163,8 +197,11 @@ def dump_config(
             fh.write(text)
             fh.flush()
             os.fsync(fd)
-        os.chmod(tmp_path, 0o600)
-        os.replace(tmp_path, target)
+        try:
+            os.chmod(tmp_path, 0o600)
+        except OSError:
+            pass  # best-effort: 0600 is a POSIX-only guarantee
+        _atomic_replace(tmp_path, target)
     except BaseException:
         with contextlib.suppress(OSError):
             os.unlink(tmp_path)
