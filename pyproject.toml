@@ -38,6 +38,9 @@ docs = ["mkdocs-material>=9", "mkdocstrings[python]>=0.25"]
 [tool.hatch.build.targets.wheel]
 packages = ["src/robotsix_config"]
 
+[tool.uv]
+exclude-newer = "7d"
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 
