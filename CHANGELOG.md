@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ## 0.0.0 (unreleased)
 
+- Add `[tool.uv] exclude-newer = "7d"` supply-chain hardening: prevents installation of packages published less than 7 days ago, closing the window before a CVE advisory can be published.
 - Removed leftover `.robotsix-mill/periodic/security_posture.yaml` periodic workflow
   definition (the name `security_posture` is no longer valid).
 - Add missing docstring to ``_read_json`` private helper in ``robotsix_config.config``.
