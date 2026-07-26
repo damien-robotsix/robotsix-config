@@ -47,12 +47,13 @@ repos:
     rev: 03d0035246f3e81f36aed592ffb4bebf33a03106  # v1.7.7
     hooks:
       - id: actionlint
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: a66e98df7b4aeeb3724184b332785976d062b92e  # v1.19.1
+  - repo: local
     hooks:
       - id: mypy
-        args: []
-        additional_dependencies: []
+        name: mypy
+        entry: uv run mypy src tests
+        language: system
+        pass_filenames: false
 
   - repo: local
     hooks:
