@@ -50,6 +50,8 @@ jobs:
           python-version: "3.14"
 
       - run: uv sync --extra dev
+        env:
+          UV_MALWARE_CHECK: "1"
 
       - run: uv run pytest -n auto
 
