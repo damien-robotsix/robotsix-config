@@ -309,6 +309,7 @@ jobs:
     name: Dependency audit
     permissions:
       contents: read
+      security-events: write  # needed for SARIF upload
     runs-on: ubuntu-latest
     steps:
       - name: Harden Runner
@@ -323,7 +324,14 @@ jobs:
       - uses: ./.github/actions/setup
 
       - name: Audit dependencies for known vulnerabilities
-        run: uv audit --frozen
+        run: uv audit --frozen --output-format sarif > uv-audit-results.sarif
+
+      - name: Upload uv-audit SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@8aad20d150bbac5944a9f9d289da16a4b0d87c1e  # v4
+        with:
+          sarif_file: uv-audit-results.sarif
+          category: uv-audit
 
   sbom-release:
     name: Generate and attach SBOM
