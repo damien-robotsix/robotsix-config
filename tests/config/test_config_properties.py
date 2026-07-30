@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 pytest.importorskip("hypothesis")
-from hypothesis import given
+from hypothesis import given  # type: ignore[import-not-found]
 from hypothesis import strategies as st
 from pydantic import BaseModel, SecretStr
 
@@ -36,13 +36,13 @@ def test_reveal_secretstr(text: str) -> None:
 
 
 @given(st.dictionaries(st.text(max_size=10), st.text(max_size=20)))
-def test_reveal_dict_passthrough(d: dict) -> None:
+def test_reveal_dict_passthrough(d: dict[str, str]) -> None:
     """``_reveal`` preserves plain dicts with no SecretStr values."""
     assert _reveal(d) == d
 
 
 @given(st.lists(st.text(max_size=20)))
-def test_reveal_list_passthrough(lst: list) -> None:
+def test_reveal_list_passthrough(lst: list[str]) -> None:
     """``_reveal`` preserves plain lists with no SecretStr values."""
     assert _reveal(lst) == lst
 
@@ -82,7 +82,7 @@ def test_reveal_list_of_secretstr() -> None:
 
 def test_reveal_empty_set_type() -> None:
     """``_reveal`` returns an empty set unchanged."""
-    s: set = set()
+    s: set[str] = set()
     result = _reveal(s)
     assert isinstance(result, set)
     assert len(result) == 0
@@ -90,7 +90,7 @@ def test_reveal_empty_set_type() -> None:
 
 def test_reveal_empty_frozenset_type() -> None:
     """``_reveal`` returns an empty frozenset unchanged."""
-    fs: frozenset = frozenset()
+    fs: frozenset[str] = frozenset()
     result = _reveal(fs)
     assert isinstance(result, frozenset)
     assert len(result) == 0
