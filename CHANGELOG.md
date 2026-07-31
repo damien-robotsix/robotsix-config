@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ## 0.0.0 (unreleased)
 
+- Add `doc` to the fragment type list in `CONTRIBUTING.md`, matching the five types configured in `pyproject.toml`.
 - Fixed `CONTRIBUTING.md` fragment type list: replaced nonexistent `deprecation` with `removal` to match the towncrier config in `pyproject.toml`.
 - Harden ``dump_config`` for cross-platform safety: wrap ``os.chmod`` in
   ``try/except OSError`` (``0600`` is best-effort on Windows) and retry
