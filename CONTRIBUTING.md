@@ -111,7 +111,7 @@ contains a single line describing the change, prefixed with `- `:
 - Fixed a timeout bug in the login flow.
 ```
 
-Available fragment types: `bugfix`, `feature`, `removal`, `misc`.
+Available fragment types: `bugfix`, `doc`, `feature`, `removal`, `misc`.
 
 To check that your fragment is valid before pushing:
 
