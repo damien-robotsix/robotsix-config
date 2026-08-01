@@ -48,17 +48,17 @@ def test_reveal_list_passthrough(lst: list[str]) -> None:
 
 
 def test_reveal_set_of_secretstr() -> None:
-    """``_reveal`` unwraps ``SecretStr`` inside a set (order-independent)."""
+    """``_reveal`` unwraps ``SecretStr`` inside a set, returning a list."""
     s = {SecretStr("a"), SecretStr("b"), SecretStr("c")}
     values = _reveal(s)
-    assert values == {"a", "b", "c"}
+    assert sorted(values) == ["a", "b", "c"]
 
 
 def test_reveal_frozenset_of_secretstr() -> None:
-    """``_reveal`` unwraps ``SecretStr`` inside a frozenset."""
+    """``_reveal`` unwraps ``SecretStr`` inside a frozenset, returning a list."""
     fs = frozenset({SecretStr("x"), SecretStr("y")})
     values = _reveal(fs)
-    assert values == frozenset({"x", "y"})
+    assert sorted(values) == ["x", "y"]
 
 
 def test_reveal_tuple_of_secretstr() -> None:
@@ -81,18 +81,18 @@ def test_reveal_list_of_secretstr() -> None:
 
 
 def test_reveal_empty_set_type() -> None:
-    """``_reveal`` returns an empty set unchanged."""
+    """``_reveal`` converts an empty set to an empty list."""
     s: set[str] = set()
     result = _reveal(s)
-    assert isinstance(result, set)
+    assert isinstance(result, list)
     assert len(result) == 0
 
 
 def test_reveal_empty_frozenset_type() -> None:
-    """``_reveal`` returns an empty frozenset unchanged."""
+    """``_reveal`` converts an empty frozenset to an empty list."""
     fs: frozenset[str] = frozenset()
     result = _reveal(fs)
-    assert isinstance(result, frozenset)
+    assert isinstance(result, list)
     assert len(result) == 0
 
 

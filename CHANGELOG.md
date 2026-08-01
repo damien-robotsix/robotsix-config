@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ## 0.0.0 (unreleased)
 
+- Fix four property tests in ``test_config_properties.py`` to assert list conversion for set/frozenset fields, matching the ``_reveal`` implementation introduced in #228.
 - Fix `dump_config` crash on models with `set`/`frozenset` fields: `_reveal` now converts sets/frozensets to lists for JSON serialization
 - Add `doc` to the fragment type list in `CONTRIBUTING.md`, matching the five types configured in `pyproject.toml`.
 - Fixed `CONTRIBUTING.md` fragment type list: replaced nonexistent `deprecation` with `removal` to match the towncrier config in `pyproject.toml`.
