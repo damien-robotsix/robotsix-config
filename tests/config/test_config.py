@@ -229,7 +229,55 @@ def test_dump_reveals_secrets_in_sets():
 
     model = Multi(items={SecretStr("x"), SecretStr("y")})
     revealed = _reveal(model.model_dump(mode="python"))
-    assert revealed["items"] == {"x", "y"}
+    # sets/frozensets are converted to list for JSON serialization
+    assert sorted(revealed["items"]) == ["x", "y"]
+
+
+def test_dump_reveals_secrets_in_frozensets():
+    from robotsix_config.config import _reveal
+
+    class Multi(BaseModel):
+        items: frozenset[SecretStr] = frozenset()
+
+    model = Multi(items=frozenset({SecretStr("a"), SecretStr("b")}))
+    revealed = _reveal(model.model_dump(mode="python"))
+    assert sorted(revealed["items"]) == ["a", "b"]
+
+
+# -- round-trip integration tests for collection-typed SecretStr fields ------
+
+
+def test_round_trip_list_of_secrets(tmp_path):
+    class Multi(BaseModel):
+        tokens: list[SecretStr] = []
+
+    model = Multi(tokens=[SecretStr("a"), SecretStr("b")])
+    p = tmp_path / "config.json"
+    dump_config(model, p)
+    back = load_config(Multi, p)
+    assert [t.get_secret_value() for t in back.tokens] == ["a", "b"]
+
+
+def test_round_trip_set_of_secrets(tmp_path):
+    class Multi(BaseModel):
+        tokens: set[SecretStr] = set()
+
+    model = Multi(tokens={SecretStr("x"), SecretStr("y")})
+    p = tmp_path / "config.json"
+    dump_config(model, p)
+    back = load_config(Multi, p)
+    assert {t.get_secret_value() for t in back.tokens} == {"x", "y"}
+
+
+def test_round_trip_frozenset_of_secrets(tmp_path):
+    class Multi(BaseModel):
+        tokens: frozenset[SecretStr] = frozenset()
+
+    model = Multi(tokens=frozenset({SecretStr("m"), SecretStr("n")}))
+    p = tmp_path / "config.json"
+    dump_config(model, p)
+    back = load_config(Multi, p)
+    assert {t.get_secret_value() for t in back.tokens} == {"m", "n"}
 
 
 # -- config_schema: typed schema for the deploy UI ----------------------------

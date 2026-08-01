@@ -121,7 +121,7 @@ def _reveal(obj: Any) -> Any:
     if isinstance(obj, (list, tuple)):
         return type(obj)(_reveal(v) for v in obj)
     if isinstance(obj, (set, frozenset)):
-        return type(obj)(_reveal(v) for v in obj)
+        return [_reveal(v) for v in obj]
     return obj
 
 
