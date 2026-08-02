@@ -204,6 +204,26 @@ jobs:
       - name: Check schema freshness
         run: PYTHONPATH=src:. python scripts/check_schema_freshness.py --model tests.config.test_config.MailConfig --output tests/config/test_config.schema.json
 
+  check-py-typed:
+    name: Check py.typed wheel marker
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920  # v2.20.0
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10  # v6
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup
+
+      - name: Check py.typed marker
+        run: python scripts/check_py_typed.py
+
   docs-build:
     name: Build docs
     permissions:
