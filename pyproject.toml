@@ -43,6 +43,7 @@ exclude-newer = "7d"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+filterwarnings = ["error"]
 
 [tool.coverage.run]
 source = ["robotsix_config"]
