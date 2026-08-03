@@ -251,9 +251,9 @@ __all__ = [
     "CONFIG_FILE_ENV",
     "DEFAULT_CONFIG_PATH",
     "ConfigModel",
-    "resolve_config_path",
-    "load_config",
-    "dump_config",
     "config_schema",
     "config_schema_json",
+    "dump_config",
+    "load_config",
+    "resolve_config_path",
 ]
