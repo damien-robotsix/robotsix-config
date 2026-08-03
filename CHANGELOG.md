@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ## 0.0.0 (unreleased)
 
+- robotsix-config: Enable mypy_baseline periodic workflow
 - Fix three ruff lint violations: sort ``__all__`` in ``src/robotsix_config/__init__.py`` (RUF022), sort ``__all__`` in ``src/robotsix_config/config/__init__.py`` (RUF022), and remove shebang from non-executable ``scripts/check_schema_freshness.py`` (EXE001).
 - Fix four property tests in ``test_config_properties.py`` to assert list conversion for set/frozenset fields, matching the ``_reveal`` implementation introduced in #228.
 - Fix `dump_config` crash on models with `set`/`frozenset` fields: `_reveal` now converts sets/frozensets to lists for JSON serialization
