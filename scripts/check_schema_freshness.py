@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 r"""Check that a committed JSON Schema file matches a Pydantic model.
 
 Regenerates the JSON Schema from the model and compares it against the

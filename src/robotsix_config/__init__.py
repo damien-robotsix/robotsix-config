@@ -38,14 +38,14 @@ from .config import (
 )
 
 __all__ = [
-    "ConfigError",
-    "InvalidConfigError",
-    "ConfigModel",
-    "load_config",
-    "dump_config",
-    "config_schema",
-    "config_schema_json",
-    "resolve_config_path",
     "CONFIG_FILE_ENV",
     "DEFAULT_CONFIG_PATH",
+    "ConfigError",
+    "ConfigModel",
+    "InvalidConfigError",
+    "config_schema",
+    "config_schema_json",
+    "dump_config",
+    "load_config",
+    "resolve_config_path",
 ]
