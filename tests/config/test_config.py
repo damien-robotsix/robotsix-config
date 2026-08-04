@@ -23,6 +23,7 @@ from robotsix_config import (
     load_config,
     resolve_config_path,
 )
+from robotsix_config.config import _atomic_replace
 
 
 class LogLevel(StrEnum):
@@ -374,3 +375,58 @@ def test_dump_config_succeeds_on_current_platform(tmp_path):
     back = load_config(MailConfig, target)
     assert back.password.get_secret_value() == "cross-platform"
     assert back.imap.host == "mx"
+
+
+# -- _atomic_replace: retry-on-PermissionError unit coverage ------------------
+
+
+def test_atomic_replace_retries_on_permission_error_then_succeeds(
+    tmp_path,
+    monkeypatch,
+):
+    """``_atomic_replace`` retries and ultimately succeeds when the first
+    ``os.replace`` call raises ``PermissionError``."""
+    src = tmp_path / "src"
+    dst = tmp_path / "dst"
+    src.write_text("content")
+
+    call_count = 0
+    _original_replace = os.replace
+
+    def _mock_replace(s, d):
+        nonlocal call_count
+        call_count += 1
+        if call_count == 1:
+            raise PermissionError("simulated open handle")
+        _original_replace(s, d)
+
+    monkeypatch.setattr(os, "replace", _mock_replace)
+
+    _atomic_replace(str(src), dst)
+
+    assert call_count == 2
+    assert dst.exists()
+    assert dst.read_text() == "content"
+
+
+def test_atomic_replace_raises_after_exhausting_retries(tmp_path, monkeypatch):
+    """``_atomic_replace`` re-raises ``PermissionError`` when every retry
+    attempt fails."""
+    src = tmp_path / "src"
+    dst = tmp_path / "dst"
+    src.write_text("content")
+
+    call_count = 0
+
+    def _mock_replace(s, d):
+        nonlocal call_count
+        call_count += 1
+        raise PermissionError("simulated persistent open handle")
+
+    monkeypatch.setattr(os, "replace", _mock_replace)
+
+    with pytest.raises(PermissionError):
+        _atomic_replace(str(src), dst, attempts=3, delay=0)
+
+    assert call_count == 3
+    assert not dst.exists()
