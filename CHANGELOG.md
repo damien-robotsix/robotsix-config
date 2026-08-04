@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ## 0.0.0 (unreleased)
 
+- Enable `pin_bump` periodic in robotsix-config, matching every other fleet Python repo with a `uv.lock`.
 - Adopt pytest `filterwarnings = ["error"]` to fail on warnings during test runs, matching the pydantic-ecosystem strictness baseline.
 - robotsix-config: Enable mypy_baseline periodic workflow
 - Enable `module_size` periodic scanner to detect oversized Python source files and propose split tickets.
