@@ -13,6 +13,7 @@ permissions: {}
 
 jobs:
   ci:
+    timeout-minutes: 15
     permissions:
       contents: read
       security-events: write  # needed for SARIF upload
@@ -33,6 +34,7 @@ jobs:
       matrix:
         os: [macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
     permissions:
       contents: read
     steps:
@@ -56,6 +58,7 @@ jobs:
       - run: uv run pytest -n auto
 
   security:
+    timeout-minutes: 15
     permissions:
       contents: read
     uses: damien-robotsix/robotsix-github-workflows/.github/workflows/python-security.yml@5fdc956e980cfb70ea36e33bc670a0376750dec6  # main 2026-07-03
@@ -64,6 +67,7 @@ jobs:
       install-extras: "dev"
 
   auto-release:
+    timeout-minutes: 10
     permissions:
       contents: write  # needed for creating GitHub releases
     uses: damien-robotsix/robotsix-github-workflows/.github/workflows/auto-release.yml@5fdc956e980cfb70ea36e33bc670a0376750dec6  # main 2026-07-03
@@ -72,6 +76,7 @@ jobs:
     secrets: inherit  # needed for GitHub release creation (release-token / app-private-key)  # zizmor: ignore[secrets-inherit]
 
   baseline-check:
+    timeout-minutes: 10
     permissions:
       contents: read
     uses: damien-robotsix/robotsix-github-workflows/.github/workflows/baseline-check.yml@5fdc956e980cfb70ea36e33bc670a0376750dec6  # main 2026-07-03
@@ -82,6 +87,7 @@ jobs:
     permissions:
       contents: read
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920  # v2.20.0
@@ -103,6 +109,7 @@ jobs:
   changelog-check:
     name: Changelog fragment check
     if: github.event_name == 'pull_request'
+    timeout-minutes: 5
     permissions:
       contents: read
     runs-on: ubuntu-latest
@@ -129,6 +136,7 @@ jobs:
     permissions:
       contents: read
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920  # v2.20.0
@@ -146,6 +154,7 @@ jobs:
     permissions:
       contents: read
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920  # v2.20.0
@@ -166,6 +175,7 @@ jobs:
     permissions:
       contents: read
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920  # v2.20.0
@@ -189,6 +199,7 @@ jobs:
     permissions:
       contents: read
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920  # v2.20.0
@@ -209,6 +220,7 @@ jobs:
     permissions:
       contents: read
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920  # v2.20.0
@@ -233,6 +245,7 @@ jobs:
       contents: read
       security-events: write  # needed for SARIF upload
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920  # v2.20.0
@@ -263,6 +276,7 @@ jobs:
     permissions:
       contents: read
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920  # v2.20.0
@@ -290,6 +304,7 @@ jobs:
     name: Dependency review
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     permissions:
       contents: read
     steps:
@@ -311,6 +326,7 @@ jobs:
       contents: read
       security-events: write  # needed for SARIF upload
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920  # v2.20.0
@@ -341,6 +357,7 @@ jobs:
       id-token: write       # needed for attestation
       attestations: write   # needed for attestation
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920  # v2.20.0
@@ -367,3 +384,4 @@ jobs:
         with:
           subject-path: sbom.cyclonedx.json
           predicate-type: "https://cyclonedx.org/schema"
+

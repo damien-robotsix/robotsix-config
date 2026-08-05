@@ -16,6 +16,7 @@ jobs:
   scorecard:
     name: Scorecard analysis
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: read
       id-token: write  # Required for publishing results to OpenSSF
