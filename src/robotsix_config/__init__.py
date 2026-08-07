@@ -18,6 +18,15 @@ Public API:
   one file's location (``ROBOTSIX_CONFIG_FILE`` or ``config/config.json``).
 - ``ConfigError`` / ``InvalidConfigError`` — error types.
 
+A component owns its settings **and** their history. The history lives in a
+``<config>.versions`` JSONL sidecar; see :mod:`robotsix_config.history`:
+
+- ``apply_update(model_cls, update)`` — the whole of ``PUT /config``: deep-merge,
+  preserve secrets the caller did not resubmit, validate, write, record.
+- ``rollback(model_cls, version)`` — restore an earlier version as a new one.
+- ``read_versions()`` / ``current_version()`` — inspect the history.
+- ``mask_secrets(data, model_cls)`` — mask before returning config over HTTP.
+
 Secrets are declared with :class:`pydantic.SecretStr`: masked on read, written
 in cleartext into the ``0600`` file, and marked in the JSON Schema as
 ``{"type": "string", "format": "password", "writeOnly": true}``.
@@ -36,16 +45,36 @@ from .config import (
     load_config,
     resolve_config_path,
 )
+from .history import (
+    MASKED_SECRET_SENTINEL,
+    apply_update,
+    current_version,
+    load_with_history,
+    mask_secrets,
+    read_versions,
+    rollback,
+    secret_paths,
+    versions_path,
+)
 
 __all__ = [
     "CONFIG_FILE_ENV",
     "DEFAULT_CONFIG_PATH",
+    "MASKED_SECRET_SENTINEL",
     "ConfigError",
     "ConfigModel",
     "InvalidConfigError",
+    "apply_update",
     "config_schema",
     "config_schema_json",
+    "current_version",
     "dump_config",
     "load_config",
+    "load_with_history",
+    "mask_secrets",
+    "read_versions",
     "resolve_config_path",
+    "rollback",
+    "secret_paths",
+    "versions_path",
 ]
