@@ -119,7 +119,7 @@ class TestApplyUpdate:
             Cfg, {"langfuse": {"secret_key": "sk-new"}}, cfg_path
         )
         assert merged["langfuse"]["secret_key"] == "sk-new"
-        assert changed == ["langfuse"]
+        assert changed == ["langfuse (secret)"]
 
     def test_invalid_update_leaves_the_file_untouched(self, cfg_path) -> None:
         """Validation happens before the write: a component must never persist
@@ -209,6 +209,60 @@ class TestRollback:
         )
         with pytest.raises(InvalidConfigError, match="no longer validates"):
             mod.rollback(Cfg, 99, cfg_path)
+
+
+class TestSecretsAreNeverStoredInHistory:
+    """config-ownership.md: "the key name is logged, the value is never stored
+    in version history". A long-lived append-only file must not accumulate
+    credentials that outlive every rotation of them."""
+
+    def test_history_snapshot_omits_secret_values(self, cfg_path) -> None:
+        mod.apply_update(Cfg, {"langfuse": {"secret_key": "sk-new"}}, cfg_path)
+        raw = mod.versions_path(cfg_path).read_text(encoding="utf-8")
+        assert "sk-real" not in raw
+        assert "sk-new" not in raw
+
+    def test_non_secret_values_are_still_stored(self, cfg_path) -> None:
+        """Stripping secrets must not gut the history of everything useful."""
+        mod.apply_update(Cfg, {"retries": 9}, cfg_path)
+        latest = mod.read_versions(cfg_path)[-1]
+        assert latest["data"]["retries"] == 9
+        assert latest["data"]["langfuse"]["public_key"] == "pk-real"
+        assert "secret_key" not in latest["data"]["langfuse"]
+
+    def test_secret_change_is_marked_in_changed_keys(self, cfg_path) -> None:
+        """The rotation must remain visible even though the value is not."""
+        _, changed, _ = mod.apply_update(
+            Cfg, {"langfuse": {"secret_key": "sk-new"}}, cfg_path
+        )
+        assert changed == ["langfuse (secret)"]
+
+    def test_non_secret_change_is_not_marked(self, cfg_path) -> None:
+        _, changed, _ = mod.apply_update(
+            Cfg, {"langfuse": {"host": "https://new"}}, cfg_path
+        )
+        assert changed == ["langfuse"]
+
+    def test_rollback_keeps_live_secrets(self, cfg_path) -> None:
+        """The history cannot restore secrets, so it must not erase them
+        either — a blanked credential reads as success and breaks the
+        component at its next restart."""
+        mod.apply_update(Cfg, {"retries": 9}, cfg_path)
+        restored, _, _ = mod.rollback(Cfg, 1, cfg_path)
+        assert restored["langfuse"]["secret_key"] == "sk-real"
+        assert restored["retries"] == 3
+        on_disk = json.loads(cfg_path.read_text(encoding="utf-8"))
+        assert on_disk["langfuse"]["secret_key"] == "sk-real"
+
+    def test_rollback_after_a_secret_rotation_keeps_the_new_secret(
+        self, cfg_path
+    ) -> None:
+        """Rolling back non-secret settings must not silently revert a
+        credential rotation — it cannot, and must not pretend to."""
+        mod.apply_update(Cfg, {"langfuse": {"secret_key": "sk-rotated"}}, cfg_path)
+        mod.apply_update(Cfg, {"retries": 9}, cfg_path)
+        restored, _, _ = mod.rollback(Cfg, 1, cfg_path)
+        assert restored["langfuse"]["secret_key"] == "sk-rotated"
 
 
 class TestDeepMerge:

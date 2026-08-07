@@ -12,11 +12,18 @@ line, appended, never rewritten:
 .. code-block:: json
 
     {"version": 3, "timestamp": "2026-08-07T22:03:27+00:00",
-     "changed_keys": ["langfuse"], "data": {...}}
+     "changed_keys": ["langfuse (secret)"], "data": {...}}
 
 Append-only matters: a rollback writes a *new* entry restoring older values
 rather than deleting the entries after it, so the history can always explain how
 the current file came to look the way it does.
+
+**Secret values are never written to the history** — only the fact that a
+secret-bearing key changed, via the ``" (secret)"`` suffix in ``changed_keys``.
+An append-only file accumulates forever; a credential recorded in it outlives
+every later rotation of that credential. The deliberate consequence is that
+:func:`rollback` restores everything *except* secrets, carrying the live ones
+forward instead.
 
 - :func:`read_versions` / :func:`current_version` — inspect the history.
 - :func:`apply_update` — the whole of ``PUT /config``: deep-merge, preserve
@@ -165,17 +172,57 @@ def current_version(config_path: str | os.PathLike[str] | None = None) -> int:
     return int(entries[-1]["version"])
 
 
+def strip_secrets(
+    data: dict[str, Any],
+    model_cls: type[BaseModel] | None = None,
+) -> dict[str, Any]:
+    """Return a copy of *data* with every secret value removed entirely.
+
+    Not masked — **removed**. The history is a long-lived, append-only file;
+    a credential written into it survives every later rotation of that
+    credential and is readable by anything that can read the sidecar. Storing
+    a mask instead would be almost as bad, because a rollback would then write
+    the literal mask back into the live config as if it were the secret.
+
+    The consequence, by design, is that :func:`rollback` cannot restore a
+    previous secret. It restores everything else and leaves secrets at their
+    current values.
+    """
+    known = secret_paths(model_cls) if model_cls is not None else None
+
+    def walk(node: dict[str, Any], prefix: tuple[str, ...]) -> dict[str, Any]:
+        out: dict[str, Any] = {}
+        for key, value in node.items():
+            path = (*prefix, key)
+            if isinstance(value, dict):
+                out[key] = walk(value, path)
+            elif _is_secret(path, known):
+                continue
+            else:
+                out[key] = deepcopy(value)
+        return out
+
+    return walk(data, ())
+
+
 def record_version(
     data: dict[str, Any],
     changed_keys: list[str],
     config_path: str | os.PathLike[str] | None = None,
+    model_cls: type[BaseModel] | None = None,
 ) -> int:
     """Append one entry to the history and return its version number.
 
+    Secret values are stripped from the stored snapshot (see
+    :func:`strip_secrets`). ``changed_keys`` still names a changed secret, so
+    the history records *that* a credential moved without recording what it
+    became.
+
     Args:
-        data: The full config snapshot this version represents.
+        data: The config snapshot this version represents.
         changed_keys: Top-level keys that differ from the previous version.
         config_path: The config file. Defaults to :func:`resolve_config_path`.
+        model_cls: The config model, used to identify secrets.
 
     Returns:
         The new version number.
@@ -186,7 +233,7 @@ def record_version(
         "version": version,
         "timestamp": datetime.now(UTC).isoformat(),
         "changed_keys": changed_keys,
-        "data": deepcopy(data),
+        "data": strip_secrets(data, model_cls),
     }
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("a", encoding="utf-8") as fh:
@@ -200,14 +247,52 @@ def record_version(
     return version
 
 
-def compute_changed_keys(before: dict[str, Any], after: dict[str, Any]) -> list[str]:
+def compute_changed_keys(
+    before: dict[str, Any],
+    after: dict[str, Any],
+    model_cls: type[BaseModel] | None = None,
+) -> list[str]:
     """Return the sorted top-level keys whose values differ.
 
-    Nested changes are reported as the top-level key containing them. The
-    history records the full snapshot, so this is a readable index into a
-    change rather than a complete description of it.
+    Nested changes are reported as the top-level key containing them.
+
+    A top-level key whose change is (or contains) a secret is reported as
+    ``"<key> (secret)"``. The history stores no secret values, so this suffix
+    is the only trace that a credential rotated — which is exactly what an
+    operator asking "when did this key change?" needs.
     """
-    return sorted(k for k in set(before) | set(after) if before.get(k) != after.get(k))
+    known = secret_paths(model_cls) if model_cls is not None else None
+    changed: list[str] = []
+    for key in sorted(set(before) | set(after)):
+        if before.get(key) == after.get(key):
+            continue
+        if _touches_secret(key, before.get(key), after.get(key), known):
+            changed.append(f"{key} (secret)")
+        else:
+            changed.append(key)
+    return changed
+
+
+def _touches_secret(
+    key: str,
+    before: Any,
+    after: Any,
+    known: set[tuple[str, ...]] | None,
+) -> bool:
+    """Return whether the change under *key* involves any secret field."""
+
+    def walk(b: Any, a: Any, path: tuple[str, ...]) -> bool:
+        if _is_secret(path, known) and b != a:
+            return True
+        if isinstance(a, dict) or isinstance(b, dict):
+            bd = b if isinstance(b, dict) else {}
+            ad = a if isinstance(a, dict) else {}
+            return any(
+                walk(bd.get(k), ad.get(k), (*path, k)) for k in set(bd) | set(ad)
+            )
+        return False
+
+    return walk(before, after, (key,))
 
 
 def deep_merge(existing: dict[str, Any], update: dict[str, Any]) -> dict[str, Any]:
@@ -343,6 +428,34 @@ def _preserve_secrets(
     return merged
 
 
+def _carry_secrets_forward(
+    restored: dict[str, Any],
+    live: dict[str, Any],
+    known: set[tuple[str, ...]],
+) -> dict[str, Any]:
+    """Copy live secret values into *restored*, which has none.
+
+    The history omits secrets, so a restored snapshot arrives with every
+    secret field missing. Writing it as-is would wipe live credentials.
+    """
+
+    def walk(
+        r: dict[str, Any], live_node: dict[str, Any], prefix: tuple[str, ...]
+    ) -> None:
+        for key, value in live_node.items():
+            path = (*prefix, key)
+            if _is_secret(path, known):
+                if key not in r:
+                    r[key] = deepcopy(value)
+            elif isinstance(value, dict):
+                target = r.get(key)
+                if isinstance(target, dict):
+                    walk(target, value, path)
+
+    walk(restored, live, ())
+    return restored
+
+
 def _read_raw(path: Path) -> dict[str, Any]:
     """Return the config file's raw contents, or ``{}`` when absent."""
     try:
@@ -426,16 +539,16 @@ def apply_update(
     except Exception as exc:
         raise InvalidConfigError(f"Rejected config update for {path}:\n{exc}") from exc
 
-    changed = compute_changed_keys(existing, merged)
+    changed = compute_changed_keys(existing, merged, model_cls)
     if not changed:
         return merged, [], current_version(path)
 
     if not read_versions(path, include_data=False) and existing:
         # Record where we started, so the first real change has a "before".
-        record_version(existing, ["initial"], path)
+        record_version(existing, ["initial"], path, model_cls)
 
     _write_raw(path, merged)
-    version = record_version(merged, changed, path)
+    version = record_version(merged, changed, path, model_cls)
     return merged, changed, version
 
 
@@ -449,6 +562,14 @@ def rollback(
     The history is never truncated: rolling back from version 5 to 2 produces
     version 6 whose contents equal version 2's. The intervening versions stay
     readable, which is the point of keeping a history at all.
+
+    **Secrets are not rolled back.** The history stores no secret values (see
+    :func:`strip_secrets`), so there is nothing to restore them from. Current
+    secrets are carried across unchanged, and a rollback that was meant to
+    undo a credential change must be followed by setting that credential
+    explicitly. Returning a config with secrets silently blanked would be the
+    worse failure — it reads as success and takes the component down at its
+    next restart.
 
     Args:
         model_cls: The component's config model.
@@ -472,7 +593,10 @@ def rollback(
             f"No version {target_version} in {versions_path(path)}; have {available}"
         )
 
-    restored = deepcopy(match.get("data") or {})
+    existing_now = _read_raw(path)
+    restored = _carry_secrets_forward(
+        deepcopy(match.get("data") or {}), existing_now, secret_paths(model_cls)
+    )
     try:
         model_cls.model_validate(restored)
     except Exception as exc:
@@ -481,13 +605,12 @@ def rollback(
             f"current model:\n{exc}"
         ) from exc
 
-    existing = _read_raw(path)
-    changed = compute_changed_keys(existing, restored)
+    changed = compute_changed_keys(existing_now, restored, model_cls)
     if not changed:
         return restored, [], current_version(path)
 
     _write_raw(path, restored)
-    version = record_version(restored, changed, path)
+    version = record_version(restored, changed, path, model_cls)
     return restored, changed, version
 
 
