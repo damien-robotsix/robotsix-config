@@ -1,1 +1,0 @@
-Redundant checkout in composite setup action

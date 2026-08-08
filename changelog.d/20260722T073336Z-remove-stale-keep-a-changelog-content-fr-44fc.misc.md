@@ -1,1 +1,0 @@
-Remove stale keep-a-changelog content from CHANGELOG.md (lines 80-166)

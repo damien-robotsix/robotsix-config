@@ -1,1 +1,0 @@
-Add step-security/harden-runner to all inline CI jobs in ci.yml

@@ -1,1 +1,0 @@
-Atomic safe writes for dump_config using tempfile + os.replace

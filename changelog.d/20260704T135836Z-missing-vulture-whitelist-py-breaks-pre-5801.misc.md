@@ -1,1 +1,0 @@
-Missing `vulture_whitelist.py` breaks pre-commit hook and contributing instructions

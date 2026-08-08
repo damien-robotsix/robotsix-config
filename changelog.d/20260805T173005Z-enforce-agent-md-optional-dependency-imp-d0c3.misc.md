@@ -1,1 +1,0 @@
-Align optional-dependency import enforcement with the fleet-wide deptry standard (DEP004 catches optional/dev deps imported in production code). Document test-file import-guard convention in AGENT.md; deptry does not enforce guard patterns inside test files.

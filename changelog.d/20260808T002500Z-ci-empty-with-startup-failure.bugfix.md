@@ -1,1 +1,0 @@
-Fix the `CI` workflow failing to start at all: the `baseline-check` reusable-workflow caller declared an empty `with: {}`, which GitHub rejects during workflow parsing. Combined with the invalid `timeout-minutes` keys removed separately, this had left the repository with no successful CI run since 2026-07-28.

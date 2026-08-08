@@ -1,1 +1,0 @@
-Stale references to old project name robotsix-yaml-config in CITATION.cff and issue templates

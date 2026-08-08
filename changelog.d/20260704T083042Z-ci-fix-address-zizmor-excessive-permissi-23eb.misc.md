@@ -1,1 +1,0 @@
-ci_fix: address zizmor excessive-permissions in docs.yml

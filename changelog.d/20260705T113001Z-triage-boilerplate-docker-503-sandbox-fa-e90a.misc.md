@@ -1,1 +1,0 @@
-Triage boilerplate: Docker 503 sandbox failure is an infrastructure outage, not a code bug

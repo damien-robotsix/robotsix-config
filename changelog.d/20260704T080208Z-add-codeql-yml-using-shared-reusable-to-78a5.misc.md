@@ -1,1 +1,0 @@
-Add codeql.yml using shared reusable to robotsix-config

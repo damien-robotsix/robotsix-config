@@ -1,1 +1,0 @@
-Adopt ruff D (pydocstyle) rules with Google convention

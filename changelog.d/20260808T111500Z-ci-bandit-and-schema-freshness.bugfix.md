@@ -1,1 +1,0 @@
-Fixed two CI jobs that failed on every commit: Bandit flagged the `MASKED_SECRET_SENTINEL` mask as a hardcoded password (it carried a ruff `noqa` but no bandit `nosec`), and the schema-freshness check ran under the runner's system Python instead of `uv run`, so it died with `ModuleNotFoundError: No module named 'pydantic'`.

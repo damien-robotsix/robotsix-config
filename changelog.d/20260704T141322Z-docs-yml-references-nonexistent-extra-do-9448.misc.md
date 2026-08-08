@@ -1,1 +1,0 @@
-docs.yml references nonexistent `--extra docs` optional dependency group

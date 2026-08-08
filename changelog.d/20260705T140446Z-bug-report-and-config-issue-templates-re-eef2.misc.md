@@ -1,1 +1,0 @@
-Bug report and config issue templates reference removed `robotsix-yaml-config` repo and removed YAML-cascade features
