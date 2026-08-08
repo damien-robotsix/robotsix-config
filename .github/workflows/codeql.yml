@@ -11,7 +11,6 @@ permissions:
 
 jobs:
   codeql:
-    timeout-minutes: 15
     permissions:
       contents: read
       security-events: write  # Required to upload SARIF results to the security tab

@@ -12,7 +12,6 @@ concurrency:
 
 jobs:
   docs:
-    timeout-minutes: 10
     permissions:
       contents: read
       pages: write  # needed to deploy to GitHub Pages
