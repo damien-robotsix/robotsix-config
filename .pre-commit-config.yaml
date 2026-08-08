@@ -69,5 +69,15 @@ repos:
         name: robotsix-modules-validate
         entry: robotsix-modules-validate
         language: system
-        files: ^docs/robotsix_config/modules\.yaml$
-        pass_filenames: true
+        files: ^(src|tests|scripts|docs)/
+        pass_filenames: false
+        args: [docs/robotsix_config/modules.yaml]
+
+  - repo: local
+    hooks:
+      - id: robotsix-modules-check-registration
+        name: robotsix-modules-check-registration
+        entry: uv run robotsix-modules check-registration docs/robotsix_config/modules.yaml --root .
+        language: system
+        files: ^(src|tests|scripts|docs)/
+        pass_filenames: false
