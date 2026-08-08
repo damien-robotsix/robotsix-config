@@ -65,14 +65,12 @@ jobs:
       python-version: "3.14"
       install-extras: "dev"
 
-  auto-release:
-    permissions:
-      contents: write  # needed for creating GitHub releases
-      pull-requests: write  # protected-branch PR fallback in auto-release.yml
-    uses: damien-robotsix/robotsix-github-workflows/.github/workflows/auto-release.yml@5fdc956e980cfb70ea36e33bc670a0376750dec6  # main 2026-07-03
-    with:
-      python-version: "3.14"
-    secrets: inherit  # needed for GitHub release creation (release-token / app-private-key)  # zizmor: ignore[secrets-inherit]
+# auto-release deliberately does NOT live here. changelog-driven-releases.md
+# specifies it runs "weekly (and on demand)", so it belongs in its own
+# scheduled workflow — see .github/workflows/auto-release.yml. As a per-push
+# job in CI it also failed every commit: it pinned a reusable-workflow
+# revision whose required `release-token` secret this repo does not have, and
+# a missing required secret is a startup failure that reds the whole run.
 
   baseline-check:
     permissions:
@@ -228,8 +226,12 @@ jobs:
 
       - uses: ./.github/actions/setup
 
+      # `uv run`, not bare `python`: the bare interpreter is the runner's
+      # system Python, which has none of the project dependencies, so this
+      # step failed with `ModuleNotFoundError: No module named 'pydantic'`.
+      # Every other job in this file already goes through `uv run`.
       - name: Check schema freshness
-        run: PYTHONPATH=src:. python scripts/check_schema_freshness.py --model tests.config.test_config.MailConfig --output tests/config/test_config.schema.json
+        run: PYTHONPATH=src:. uv run python scripts/check_schema_freshness.py --model tests.config.test_config.MailConfig --output tests/config/test_config.schema.json
 
   check-py-typed:
     name: Check py.typed wheel marker
