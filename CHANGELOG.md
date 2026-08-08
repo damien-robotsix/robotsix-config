@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ## 0.0.0 (unreleased)
 
+- Align optional-dependency import enforcement with the fleet-wide deptry standard: the existing CI deptry gate (DEP004) catches optional/dev dependencies imported in production code. Test-file import-guard conventions are documented in AGENT.md.
 - Add `robotsix-modules-check-registration` pre-commit hook to catch module-registration drift at commit time, mirroring the CI `check-modules` job.
 - Enable `pin_bump` periodic in robotsix-config, matching every other fleet Python repo with a `uv.lock`.
 - Adopt pytest `filterwarnings = ["error"]` to fail on warnings during test runs, matching the pydantic-ecosystem strictness baseline.
