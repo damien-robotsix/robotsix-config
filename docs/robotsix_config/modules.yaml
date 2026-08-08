@@ -8,6 +8,7 @@ modules:
       - docs/robotsix_config/index.md
       - docs/robotsix_config/modules.yaml
       - docs/robotsix_config/security.md
+      - scripts/check_py_typed.py
   - id: config
     paths:
       - src/robotsix_config/config/__init__.py
