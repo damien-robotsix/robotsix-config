@@ -29,7 +29,9 @@ def main(argv: list[str] | None = None) -> None:
         subprocess.run(  # noqa: S603
             [  # noqa: S607
                 "uvx",
+                "--from",
                 "build",
+                "pyproject-build",
                 "--wheel",
                 "--outdir",
                 tmpdir,

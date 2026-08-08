@@ -1,0 +1,1 @@
+Fix CI failures on main: update uvx build invocation for py.typed check, add uv ecosystem to dependabot, fix modules.yaml validation (IDs, descriptions, missing files), skip POSIX permission tests on Windows, fix path separator assertion.

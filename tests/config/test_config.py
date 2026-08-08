@@ -6,6 +6,7 @@ import errno
 import json
 import os
 import stat
+import sys
 from enum import StrEnum
 from typing import Any, Optional
 
@@ -48,7 +49,7 @@ class MailConfig(BaseModel):
 def test_default_path_is_json(monkeypatch):
     monkeypatch.delenv(CONFIG_FILE_ENV, raising=False)
     assert resolve_config_path() == DEFAULT_CONFIG_PATH
-    assert str(DEFAULT_CONFIG_PATH) == "config/config.json"
+    assert DEFAULT_CONFIG_PATH.parts == ("config", "config.json")
 
 
 def test_env_locates_file(monkeypatch, tmp_path):
@@ -110,6 +111,7 @@ def test_invalid_config_raises(payload_factory, error_match, tmp_path):
 # -- dump_config: JSON, 0600, secrets revealed, round-trips -------------------
 
 
+@pytest.mark.skipif(sys.platform == "win32", reason="POSIX perms")
 def test_dump_writes_0600_and_reveals_secret(tmp_path):
     cfg = MailConfig(password=SecretStr("hunter2"), imap=Imap(host="mx"))
     target = tmp_path / "sub" / "config.json"
@@ -169,6 +171,7 @@ def test_dump_atomic_no_leftover_on_new_file_failure(monkeypatch, tmp_path):
     assert not target.exists()
 
 
+@pytest.mark.skipif(sys.platform == "win32", reason="POSIX perms")
 def test_dump_creates_0700_directory(tmp_path):
     """``dump_config`` always ensures the parent directory is mode 0700."""
     target = tmp_path / "sub" / "config.json"
@@ -178,6 +181,7 @@ def test_dump_creates_0700_directory(tmp_path):
     assert dir_mode == 0o700
 
 
+@pytest.mark.skipif(sys.platform == "win32", reason="POSIX perms")
 def test_dump_corrects_directory_perms_on_rewrite(tmp_path):
     """``dump_config`` fixes a directory that already exists with wrong perms."""
     target = tmp_path / "sub" / "config.json"
@@ -189,6 +193,7 @@ def test_dump_corrects_directory_perms_on_rewrite(tmp_path):
     assert dir_mode == 0o700
 
 
+@pytest.mark.skipif(sys.platform == "win32", reason="POSIX perms")
 def test_dump_writes_0600_regardless_of_existing_perms(tmp_path, write_config):
     """``dump_config`` writes 0600 regardless of the existing file's mode."""
     target = tmp_path / "config.json"
