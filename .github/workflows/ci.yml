@@ -59,6 +59,7 @@ jobs:
   security:
     permissions:
       contents: read
+      security-events: write  # Bandit SARIF upload in python-security.yml
     uses: damien-robotsix/robotsix-github-workflows/.github/workflows/python-security.yml@5fdc956e980cfb70ea36e33bc670a0376750dec6  # main 2026-07-03
     with:
       python-version: "3.14"
@@ -67,6 +68,7 @@ jobs:
   auto-release:
     permissions:
       contents: write  # needed for creating GitHub releases
+      pull-requests: write  # protected-branch PR fallback in auto-release.yml
     uses: damien-robotsix/robotsix-github-workflows/.github/workflows/auto-release.yml@5fdc956e980cfb70ea36e33bc670a0376750dec6  # main 2026-07-03
     with:
       python-version: "3.14"
@@ -143,7 +145,7 @@ jobs:
       - name: Check changelog fragment
         env:
           BASE_REF: ${{ github.base_ref }}
-        run: uv run towncrier check --compare-with origin/$BASE_REF
+        run: uv run towncrier check --compare-with "origin/$BASE_REF"
 
   actionlint:
     name: Actionlint

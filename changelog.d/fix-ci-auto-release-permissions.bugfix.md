@@ -1,0 +1,1 @@
+Grant `pull-requests: write` to the `auto-release` caller job in ci.yml — the pinned reusable workflow's `release` job requests it for the protected-branch PR fallback, and the missing grant made every CI run fail at startup ("The nested job 'release' is requesting 'pull-requests: write', but is only allowed 'pull-requests: none'") since early July.
