@@ -76,8 +76,6 @@ jobs:
     permissions:
       contents: read
     uses: damien-robotsix/robotsix-github-workflows/.github/workflows/baseline-check.yml@5fdc956e980cfb70ea36e33bc670a0376750dec6  # main 2026-07-03
-    with: {}
-
   ruff:
     name: Ruff lint & format
     permissions:
