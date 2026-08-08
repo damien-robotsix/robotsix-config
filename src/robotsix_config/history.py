@@ -82,7 +82,7 @@ logger = logging.getLogger("robotsix_config.history")
 
 #: What a UI shows in place of a stored secret. A caller posting this value
 #: back means "unchanged", not "set the secret to these asterisks".
-MASKED_SECRET_SENTINEL = "**********"  # noqa: S105 — a mask, not a credential
+MASKED_SECRET_SENTINEL = "**********"  # noqa: S105 # nosec B105 — a mask, not a credential
 
 #: Fallback secret detection for callers that pass no model. Matched as a
 #: **suffix** of the key name. Prefer passing ``model_cls`` — the model knows.

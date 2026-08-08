@@ -228,8 +228,12 @@ jobs:
 
       - uses: ./.github/actions/setup
 
+      # `uv run`, not bare `python`: the bare interpreter is the runner's
+      # system Python, which has none of the project dependencies, so this
+      # step failed with `ModuleNotFoundError: No module named 'pydantic'`.
+      # Every other job in this file already goes through `uv run`.
       - name: Check schema freshness
-        run: PYTHONPATH=src:. python scripts/check_schema_freshness.py --model tests.config.test_config.MailConfig --output tests/config/test_config.schema.json
+        run: PYTHONPATH=src:. uv run python scripts/check_schema_freshness.py --model tests.config.test_config.MailConfig --output tests/config/test_config.schema.json
 
   check-py-typed:
     name: Check py.typed wheel marker
