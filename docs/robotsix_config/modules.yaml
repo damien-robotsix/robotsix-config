@@ -10,7 +10,11 @@ modules:
       - docs/robotsix_config/index.md
       - docs/robotsix_config/modules.yaml
       - docs/robotsix_config/security.md
-      - changelog.d/20260808T100610Z-ci-failure-ci-on-main-9d8f.bugfix.md
+      # Glob, never individual fragment filenames: towncrier deletes every
+      # fragment at release time, so a named path here breaks module
+      # registration on the next release. `.gitkeep` keeps the glob matching
+      # once the directory is emptied. Matches central-deploy and chat.
+      - changelog.d/**/*
       - scripts/check_py_typed.py
   - id: config
     description: Configuration models, schema generation, and config file loading/dumping.
