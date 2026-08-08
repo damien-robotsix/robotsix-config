@@ -209,8 +209,8 @@ def strip_secrets(
 def record_version(
     data: dict[str, Any],
     changed_keys: list[str],
+    model_cls: type[BaseModel],
     config_path: str | os.PathLike[str] | None = None,
-    model_cls: type[BaseModel] | None = None,
 ) -> int:
     """Append one entry to the history and return its version number.
 
@@ -219,11 +219,17 @@ def record_version(
     the history records *that* a credential moved without recording what it
     became.
 
+    ``model_cls`` is **required**, not optional. Without it, secret detection
+    falls back to matching key names, which misses any secret whose field name
+    is not in :data:`SECRET_KEY_SUFFIXES` — and this function writes to a
+    long-lived append-only file, so a miss is permanent. The model always
+    knows; make the caller supply it.
+
     Args:
         data: The config snapshot this version represents.
         changed_keys: Top-level keys that differ from the previous version.
+        model_cls: The config model. Identifies which fields are secret.
         config_path: The config file. Defaults to :func:`resolve_config_path`.
-        model_cls: The config model, used to identify secrets.
 
     Returns:
         The new version number.
@@ -544,10 +550,10 @@ def apply_update(
 
     if not read_versions(path, include_data=False) and existing:
         # Record where we started, so the first real change has a "before".
-        record_version(existing, ["initial"], path, model_cls)
+        record_version(existing, ["initial"], model_cls, path)
 
     _write_raw(path, merged)
-    version = record_version(merged, changed, path, model_cls)
+    version = record_version(merged, changed, model_cls, path)
     return merged, changed, version
 
 
@@ -609,7 +615,7 @@ def rollback(
         return restored, [], current_version(path)
 
     _write_raw(path, restored)
-    version = record_version(restored, changed, path, model_cls)
+    version = record_version(restored, changed, model_cls, path)
     return restored, changed, version
 
 

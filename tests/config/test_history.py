@@ -254,6 +254,32 @@ class TestSecretsAreNeverStoredInHistory:
         on_disk = json.loads(cfg_path.read_text(encoding="utf-8"))
         assert on_disk["langfuse"]["secret_key"] == "sk-real"
 
+    def test_record_version_requires_a_model(self) -> None:
+        """Without a model, secret detection degrades to name-guessing — and
+        this writes to a permanent append-only file, so a miss cannot be
+        undone. The model must be supplied."""
+        import inspect
+
+        sig = inspect.signature(mod.record_version)
+        assert sig.parameters["model_cls"].default is inspect.Parameter.empty
+
+    def test_a_secret_whose_name_looks_ordinary_is_still_stripped(
+        self, cfg_path
+    ) -> None:
+        """The case name-guessing would miss: a SecretStr field named
+        something the suffix list does not match."""
+
+        class Odd(BaseModel):
+            webhook: SecretStr = SecretStr("")
+            note: str = ""
+
+        target = cfg_path.parent / "odd.json"
+        target.write_text(
+            json.dumps({"webhook": "hunter2", "note": "x"}), encoding="utf-8"
+        )
+        mod.apply_update(Odd, {"note": "y"}, target)
+        assert "hunter2" not in mod.versions_path(target).read_text(encoding="utf-8")
+
     def test_rollback_after_a_secret_rotation_keeps_the_new_secret(
         self, cfg_path
     ) -> None:
