@@ -12,14 +12,12 @@ modules:
     paths:
       - src/robotsix_config/config/__init__.py
       - docs/config/index.md
-      - scripts/check_optional_imports.py
       - scripts/check_schema_freshness.py
       - tests/config/__init__.py
       - tests/config/test_config.py
       - tests/config/test_config.schema.json
       - tests/config/scripts/__init__.py
       - tests/config/scripts/_test_models.py
-      - tests/config/scripts/test_check_optional_imports.py
       - tests/config/scripts/test_check_schema_freshness.py
       - tests/config/test_config_properties.py
   - id: _errors
