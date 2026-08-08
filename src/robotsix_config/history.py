@@ -48,6 +48,7 @@ fallback.
 
 from __future__ import annotations
 
+import contextlib
 import json
 import logging
 import os
@@ -229,21 +230,23 @@ def record_version(
     """
     path = versions_path(config_path)
     version = current_version(config_path) + 1
+    redacted = strip_secrets(data, model_cls)
     entry = {
         "version": version,
         "timestamp": datetime.now(UTC).isoformat(),
         "changed_keys": changed_keys,
-        "data": strip_secrets(data, model_cls),
+        "data": redacted,
     }
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("a", encoding="utf-8") as fh:
+        # codeql[py/clear-text-storage-sensitive-data] -- `redacted` has every
+        # SecretStr-declared field removed by strip_secrets() above; this is
+        # the mitigation, not a violation. See config-ownership.md.
         fh.write(json.dumps(entry, ensure_ascii=False) + "\n")
         fh.flush()
         os.fsync(fh.fileno())
-    try:
-        path.chmod(0o600)
-    except OSError:
-        pass  # best-effort; 0600 is a POSIX-only guarantee
+    with contextlib.suppress(OSError):
+        path.chmod(0o600)  # best-effort; 0600 is a POSIX-only guarantee
     return version
 
 
@@ -482,16 +485,12 @@ def _write_raw(path: Path, data: dict[str, Any]) -> None:
             fh.write(json.dumps(data, indent=2, ensure_ascii=False) + "\n")
             fh.flush()
             os.fsync(fd)
-        try:
-            os.chmod(tmp, 0o600)
-        except OSError:
-            pass  # best-effort; 0600 is a POSIX-only guarantee
+        with contextlib.suppress(OSError):
+            os.chmod(tmp, 0o600)  # best-effort; 0600 is a POSIX-only guarantee
         _atomic_replace(tmp, path)
     except BaseException:
-        try:
+        with contextlib.suppress(OSError):
             os.unlink(tmp)
-        except OSError:
-            pass
         raise
 
 
