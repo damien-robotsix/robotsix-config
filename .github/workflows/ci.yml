@@ -64,6 +64,15 @@ jobs:
     with:
       python-version: "3.14"
       install-extras: "dev"
+      # TruffleHog's Lob detector matches `test_`-prefixed 40-character
+      # strings. This repo's CHANGELOG.md is full of mill ticket slugs of
+      # exactly that shape — e.g.
+      # `20260720T202339Z-test-gap-add-unit-tests-for-scripts-chec-b673` —
+      # so the whole-repo scan reports 9 "verified" Lob keys on every PR.
+      # They are ticket ids, not credentials, and the fleet does not use
+      # Lob (a print/mail API). Excluding the one detector keeps the job
+      # meaningful; leaving it on trains everyone to ignore a red check.
+      trufflehog-extra-args: "--exclude-detectors=lob"
 
 # auto-release deliberately does NOT live here. changelog-driven-releases.md
 # specifies it runs "weekly (and on demand)", so it belongs in its own
