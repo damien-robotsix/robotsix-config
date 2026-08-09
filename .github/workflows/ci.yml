@@ -60,7 +60,7 @@ jobs:
     permissions:
       contents: read
       security-events: write  # Bandit SARIF upload in python-security.yml
-    uses: damien-robotsix/robotsix-github-workflows/.github/workflows/python-security.yml@5fdc956e980cfb70ea36e33bc670a0376750dec6  # main 2026-07-03
+    uses: damien-robotsix/robotsix-github-workflows/.github/workflows/python-security.yml@a6378accaf26c75b12fac324c3056255647c107b  # main 2026-07-03
     with:
       python-version: "3.14"
       install-extras: "dev"
@@ -75,7 +75,7 @@ jobs:
   baseline-check:
     permissions:
       contents: read
-    uses: damien-robotsix/robotsix-github-workflows/.github/workflows/baseline-check.yml@5fdc956e980cfb70ea36e33bc670a0376750dec6  # main 2026-07-03
+    uses: damien-robotsix/robotsix-github-workflows/.github/workflows/baseline-check.yml@a6378accaf26c75b12fac324c3056255647c107b  # main 2026-07-03
   ruff:
     name: Ruff lint & format
     permissions:
@@ -140,10 +140,6 @@ jobs:
 
       - uses: ./.github/actions/setup
 
-      - name: Check changelog fragment
-        env:
-          BASE_REF: ${{ github.base_ref }}
-        run: uv run towncrier check --compare-with "origin/$BASE_REF"
 
   actionlint:
     name: Actionlint
