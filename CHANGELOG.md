@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 
 <!-- towncrier release notes start -->
+## [0.3.2](https://github.com/damien-robotsix/robotsix-config/compare/v0.3.1...v0.3.2) (2026-08-09)
+
+
+### Bug Fixes
+
+* **ci:** stop TruffleHog flagging ticket ids as Lob keys ([#265](https://github.com/damien-robotsix/robotsix-config/issues/265)) ([d6e4308](https://github.com/damien-robotsix/robotsix-config/commit/d6e43081af046dd7ff13f1a7516282741b1c46d7))
+* **release:** don't fail lock-sync when the release branch is gone ([#263](https://github.com/damien-robotsix/robotsix-config/issues/263)) ([9d17313](https://github.com/damien-robotsix/robotsix-config/commit/9d173138bbd9a9c7ed65f2d0acc53b5e9eb6be4c))
+
 ## [0.3.1](https://github.com/damien-robotsix/robotsix-config/compare/v0.3.0...v0.3.1) (2026-08-09)
 
 
