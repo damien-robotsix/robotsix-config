@@ -22,8 +22,12 @@ Add a CI job that runs it on every push:
 ```yaml
 check-schema:
   runs-on: ubuntu-latest
+  permissions:
+    contents: read
   steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v6
+      with:
+        persist-credentials: false
     - uses: ./.github/actions/setup
     - name: Check schema freshness
       run: >
