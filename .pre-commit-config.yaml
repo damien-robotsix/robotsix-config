@@ -24,7 +24,7 @@ repos:
       - id: validate-pyproject
         additional_dependencies: ["validate-pyproject-schema-store[all]"]
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: 586c3ea3f51230da42bab657c6a32e9e66c364f0  # v0.44.0
+    rev: 5b5dddc4fb0f83c3ea1fc5616fa63e115dce83e0  # v0.49.1
     hooks:
       - id: markdownlint
   - repo: https://github.com/PyCQA/bandit
