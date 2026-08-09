@@ -112,7 +112,7 @@ def test_invalid_config_raises(payload_factory, error_match, tmp_path):
 
 
 @pytest.mark.skipif(sys.platform == "win32", reason="POSIX perms")
-def test_dump_writes_0600_and_reveals_secret(tmp_path):
+def test_dump_writes_0600_and_reveals_the_secret(tmp_path):
     cfg = MailConfig(password=SecretStr("hunter2"), imap=Imap(host="mx"))
     target = tmp_path / "sub" / "config.json"
     written = dump_config(cfg, target)
@@ -330,7 +330,7 @@ class AppConfig(ConfigModel):
     token: SecretStr = SecretStr("")
 
 
-def test_config_model_is_base_model_subclass():
+def test_config_model_subclasses_base_model():
     """``ConfigModel`` is a drop-in replacement for ``BaseModel``."""
     assert issubclass(ConfigModel, BaseModel)
 

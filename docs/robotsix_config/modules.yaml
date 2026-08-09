@@ -14,7 +14,6 @@ modules:
       # fragment at release time, so a named path here breaks module
       # registration on the next release. `.gitkeep` keeps the glob matching
       # once the directory is emptied. Matches central-deploy and chat.
-      - changelog.d/**/*
       - scripts/check_py_typed.py
   - id: config
     description: Configuration models, schema generation, and config file loading/dumping.
