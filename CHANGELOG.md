@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 
 <!-- towncrier release notes start -->
+## [0.4.0](https://github.com/damien-robotsix/robotsix-config/compare/v0.3.2...v0.4.0) (2026-08-10)
+
+
+### Features
+
+* Config library: fleet-wide self-healing for removed/unknown legacy keys (20260810T080254Z-config-library-fleet-wide-self-healing-f-c301) ([#273](https://github.com/damien-robotsix/robotsix-config/issues/273)) ([1791d22](https://github.com/damien-robotsix/robotsix-config/commit/1791d22e99c60348c7ff1dc555edf41dde60a403))
+
+
+### Documentation
+
+* Fix docs CI example: pin `actions/checkout` to SHA, add `persist-credentials: false` and `permissions:` block (20260807T094733Z-fix-docs-ci-example-pin-actions-checkout-7c4a) ([#268](https://github.com/damien-robotsix/robotsix-config/issues/268)) ([e88bc1f](https://github.com/damien-robotsix/robotsix-config/commit/e88bc1f39a40673a1dc46f70004c4030b3252b84))
+
 ## [0.3.2](https://github.com/damien-robotsix/robotsix-config/compare/v0.3.1...v0.3.2) (2026-08-09)
 
 
