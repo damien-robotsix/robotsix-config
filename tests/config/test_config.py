@@ -435,3 +435,185 @@ def test_atomic_replace_raises_after_exhausting_retries(tmp_path, monkeypatch):
 
     assert call_count == 3
     assert not dst.exists()
+
+
+# -- Self-healing: strip unknown keys on load --------------------------------
+
+
+class SubModel(BaseModel):
+    host: str = "localhost"
+    port: int = 8080
+
+
+class HealModel(BaseModel):
+    name: str = "svc"
+    retries: int = 3
+    sub: SubModel = SubModel()
+
+
+def test_unknown_top_level_key_is_stripped(tmp_path, caplog):
+    """A persisted top-level key not on the model is stripped and logged."""
+    p = tmp_path / "config.json"
+    p.write_text(
+        json.dumps(
+            {"name": "svc", "retries": 5, "legal_guardrails": {"enabled": True}}
+        ),
+        encoding="utf-8",
+    )
+    cfg = load_config(HealModel, p)
+    assert cfg.name == "svc"
+    assert cfg.retries == 5
+    assert not hasattr(cfg, "legal_guardrails")
+    assert any("legal_guardrails" in r.message for r in caplog.records)
+    assert any(r.levelname == "WARNING" for r in caplog.records)
+
+
+def test_multiple_unknown_keys_are_all_stripped(tmp_path, caplog):
+    """Multiple unknown top-level keys are all removed."""
+    p = tmp_path / "config.json"
+    p.write_text(
+        json.dumps(
+            {
+                "name": "svc",
+                "old_feature_a": {"x": 1},
+                "old_feature_b": {"y": 2},
+            }
+        ),
+        encoding="utf-8",
+    )
+    cfg = load_config(HealModel, p)
+    assert cfg.name == "svc"
+    assert not hasattr(cfg, "old_feature_a")
+    assert not hasattr(cfg, "old_feature_b")
+    assert any("old_feature_a" in r.message for r in caplog.records)
+    assert any("old_feature_b" in r.message for r in caplog.records)
+
+
+def test_unknown_nested_key_is_stripped(tmp_path, caplog):
+    """A nested unknown key inside a declared sub-model is stripped."""
+    p = tmp_path / "config.json"
+    p.write_text(
+        json.dumps(
+            {
+                "name": "svc",
+                "sub": {
+                    "host": "mx.example",
+                    "port": 993,
+                    "removed_field": "should be stripped",
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+    cfg = load_config(HealModel, p)
+    assert cfg.name == "svc"
+    assert cfg.sub.host == "mx.example"
+    assert cfg.sub.port == 993
+    assert not hasattr(cfg.sub, "removed_field")
+    assert any("removed_field" in r.message for r in caplog.records)
+
+
+def test_no_strip_when_no_unknown_keys(tmp_path, caplog):
+    """When all keys are known, no warning is emitted and no version is written."""
+    p = tmp_path / "config.json"
+    p.write_text(
+        json.dumps({"name": "svc", "retries": 5, "sub": {"host": "mx", "port": 9090}}),
+        encoding="utf-8",
+    )
+    cfg = load_config(HealModel, p)
+    assert cfg.name == "svc"
+    assert cfg.retries == 5
+    assert cfg.sub.host == "mx"
+    # No WARNING-level records about stripping.
+    assert not any("Stripping" in r.message for r in caplog.records)
+
+
+def test_dict_typed_field_preserves_arbitrary_keys(tmp_path):
+    """A field typed as a plain dict (dict[str, Any]) keeps its arbitrary
+    keys — only $ref submodels have their unknown keys stripped."""
+
+    class DictModel(BaseModel):
+        name: str = "svc"
+        metadata: dict[str, Any] = {}
+
+    p = tmp_path / "config.json"
+    p.write_text(
+        json.dumps(
+            {"name": "svc", "metadata": {"anything": "goes", "nested": {"x": 1}}}
+        ),
+        encoding="utf-8",
+    )
+    cfg = load_config(DictModel, p)
+    assert cfg.name == "svc"
+    assert cfg.metadata == {"anything": "goes", "nested": {"x": 1}}
+
+
+def test_heal_persists_cleaned_config_and_new_version(tmp_path, caplog):
+    """After stripping, the cleaned config is written back and a version entry
+    is appended with the dropped keys listed as changed_keys."""
+    from robotsix_config import history as mod
+
+    p = tmp_path / "config.json"
+    p.write_text(
+        json.dumps(
+            {"name": "svc", "retries": 5, "legal_guardrails": {"enabled": True}}
+        ),
+        encoding="utf-8",
+    )
+    load_config(HealModel, p)
+
+    # The on-disk file should now be cleaned.
+    on_disk = json.loads(p.read_text(encoding="utf-8"))
+    assert "legal_guardrails" not in on_disk
+    assert on_disk["name"] == "svc"
+
+    # A version entry should exist with changed_keys showing the dropped key.
+    entries = mod.read_versions(p)
+    assert len(entries) >= 1
+    # The last entry records the heal.
+    heal_entry = entries[-1]
+    assert "legal_guardrails" in heal_entry["changed_keys"]
+
+
+def test_heal_preserves_prior_version_history(tmp_path, caplog):
+    """The prior (stale) version remains in history and is rollback-able."""
+    from robotsix_config import history as mod
+
+    p = tmp_path / "config.json"
+
+    # Write initial config with a now-removed key.
+    p.write_text(
+        json.dumps(
+            {
+                "name": "svc",
+                "retries": 3,
+                "legal_guardrails": {"enabled": True},
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    # Load triggers the heal.
+    load_config(HealModel, p)
+
+    entries = mod.read_versions(p)
+    # Should have at least 2 entries: initial (the stale state) and heal.
+    assert len(entries) >= 2
+
+    # The first entry should be the initial (stale) state.
+    initial = entries[0]
+    assert initial["changed_keys"] == ["initial"]
+    assert initial["data"]["retries"] == 3
+    assert "legal_guardrails" in initial["data"]
+
+    # The heal entry should list the dropped key.
+    heal_entry = entries[-1]
+    assert "legal_guardrails" in heal_entry["changed_keys"]
+
+    # The stale version should still be rollback-able.
+    # Rollback to version 1 (the initial state).
+    restored, _changed, _new_ver = mod.rollback(HealModel, 1, p)
+    assert restored["retries"] == 3
+    # The legal_guardrails key won't be in restored because the model doesn't
+    # have it, but the version entry should still be there.
+    assert "legal_guardrails" in entries[0]["data"]

@@ -626,6 +626,9 @@ def load_with_history(
     """Load the config and return it with its current version number.
 
     Convenience for a ``GET /config`` handler, which needs both.
+
+    Self-healing (key stripping) is handled by :func:`load_config` — see its
+    docstring for details.
     """
     model = load_config(model_cls, config_path)
     return model, current_version(config_path)

@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import contextlib
 import json
+import logging
 import os
 import tempfile
 import time
@@ -30,6 +31,8 @@ from typing import Any
 from pydantic import BaseModel, SecretStr, ValidationError
 
 from .._errors import InvalidConfigError
+
+logger = logging.getLogger(__name__)
 
 
 class ConfigModel(BaseModel):
@@ -89,6 +92,60 @@ def _read_json(path: Path) -> dict[str, Any]:
     return data
 
 
+def _strip_unknown_keys(
+    data: dict[str, Any],
+    model_cls: type[BaseModel],
+) -> dict[str, Any]:
+    """Return a copy of *data* with keys not declared on *model_cls* removed.
+
+    Calls itself recursively for nested dict values whose model type is
+    known from the JSON Schema ``$defs``.  Each removed key produces a
+    ``logging.WARNING`` record naming the full dotted path.
+
+    This is the self-healing mechanism: a persisted ``config.json`` that
+    carries a key the current model no longer declares (e.g. a removed
+    feature's config block) is silently cleaned before validation, so the
+    service does not crash-loop at startup.
+    """
+    schema = model_cls.model_json_schema()
+    properties = schema.get("properties") or {}
+    defs = schema.get("$defs", {})
+
+    def _walk(
+        node: dict[str, Any],
+        known_props: dict[str, Any],
+        known_defs: dict[str, Any],
+        prefix: tuple[str, ...],
+    ) -> dict[str, Any]:
+        out: dict[str, Any] = {}
+        for key, value in node.items():
+            path = (*prefix, key)
+            if key not in known_props:
+                dotted = ".".join(path)
+                logger.warning(
+                    "Stripping unknown config key %r — the field no longer "
+                    "exists on the model %s",
+                    dotted,
+                    model_cls.__name__,
+                )
+                continue
+            prop_schema = known_props.get(key, {})
+            ref = prop_schema.get("$ref")
+            if isinstance(value, dict) and ref is not None:
+                # Only recurse into submodels ($ref) to strip their unknown
+                # keys.  Plain dict-typed fields (e.g. dict[str, Any]) accept
+                # arbitrary keys and must be preserved as-is.
+                ref_name = ref.rsplit("/", 1)[-1]
+                sub_schema = known_defs.get(ref_name, {})
+                sub_props = sub_schema.get("properties") or {}
+                out[key] = _walk(value, sub_props, known_defs, path)
+            else:
+                out[key] = value
+        return out
+
+    return _walk(data, properties, defs, ())
+
+
 def load_config[ModelT: BaseModel](
     model_cls: type[ModelT],
     path: str | os.PathLike[str] | None = None,
@@ -101,9 +158,42 @@ def load_config[ModelT: BaseModel](
     missing file means "all defaults" (and errors only if a field is required and
     undefaulted). Raises :class:`InvalidConfigError` on bad JSON or a validation
     failure.
+
+    **Self-healing.** If the persisted file contains keys that the current model
+    does not declare (e.g. a removed feature's config block), those keys are
+    silently stripped before validation.  Each stripped key produces a
+    ``WARNING`` log record.  The model itself is never relaxed — the loader
+    removes the offending keys rather than expecting the model to accept them.
+
+    After stripping, the cleaned config is persisted through the versioned/
+    append-only write path (see :func:`robotsix_config.history.apply_update`) —
+    a new version entry is appended whose ``changed_keys`` lists the stripped
+    legacy keys, so the heal is auditable and rollback-able.  If no unknown keys
+    were found, no write occurs.
     """
     target = Path(path) if path is not None else resolve_config_path()
     data = _read_json(target)
+    if data:
+        cleaned = _strip_unknown_keys(data, model_cls)
+        if cleaned != data:
+            # Lazy import to avoid circular dependency: history.py imports
+            # from this module, so we import it only at call time.
+            from ..history import (
+                _write_raw,
+                compute_changed_keys,
+                read_versions,
+                record_version,
+            )
+
+            # Record the pre-heal state as an "initial" entry so the stale
+            # version is visible in history and rollback-able.
+            if not read_versions(target, include_data=False):
+                record_version(data, ["initial"], model_cls, target)
+
+            changed = compute_changed_keys(data, cleaned, model_cls)
+            _write_raw(target, cleaned)
+            record_version(cleaned, changed, model_cls, target)
+            data = cleaned
     try:
         return model_cls.model_validate(data)
     except ValidationError as exc:
