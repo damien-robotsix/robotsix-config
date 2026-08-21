@@ -32,9 +32,7 @@ def _import_model(dotted_path: str) -> type[BaseModel]:
     try:
         module = importlib.import_module(module_path)
     except ImportError as exc:
-        raise ImportError(
-            f"Could not import module {module_path!r}: {exc}"
-        ) from exc
+        raise ImportError(f"Could not import module {module_path!r}: {exc}") from exc
     try:
         cls = getattr(module, class_name)
     except AttributeError as exc:
@@ -110,9 +108,7 @@ def _config_check_keys(
         print(f"Invalid JSON in '{config_path}': {exc}", file=sys.stderr)
         sys.exit(1)
     if not isinstance(config_data, dict):
-        print(
-            f"Config in '{config_path}' must be a JSON object.", file=sys.stderr
-        )
+        print(f"Config in '{config_path}' must be a JSON object.", file=sys.stderr)
         sys.exit(1)
 
     model_fields = set(model_cls.model_fields.keys())
@@ -124,15 +120,13 @@ def _config_check_keys(
     ok = True
     if missing:
         print(
-            f"Config at '{config_path}' is missing keys: "
-            f"{_fmt_keys(missing)}",
+            f"Config at '{config_path}' is missing keys: {_fmt_keys(missing)}",
             file=sys.stderr,
         )
         ok = False
     if unknown:
         print(
-            f"Config at '{config_path}' has unknown keys: "
-            f"{_fmt_keys(unknown)}",
+            f"Config at '{config_path}' has unknown keys: {_fmt_keys(unknown)}",
             file=sys.stderr,
         )
         ok = False
