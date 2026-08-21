@@ -24,6 +24,9 @@ dependencies = [
     "pydantic>=2",
 ]
 
+[project.scripts]
+robotsix-config = "robotsix_config.cli:main"
+
 [project.urls]
 Homepage = "https://github.com/damien-robotsix/robotsix-config"
 Documentation = "https://damien-robotsix.github.io/robotsix-config"
