@@ -26,6 +26,8 @@ A component owns its settings **and** their history. The history lives in a
 - ``rollback(model_cls, version)`` — restore an earlier version as a new one.
 - ``read_versions()`` / ``current_version()`` — inspect the history.
 - ``mask_secrets(data, model_cls)`` — mask before returning config over HTTP.
+- ``secret_paths(model_cls)`` — every secret field's path; a segment named by
+  data rather than by the model (a map key, a list index) is ``PATH_WILDCARD``.
 
 Secrets are declared with :class:`pydantic.SecretStr`: masked on read, written
 in cleartext into the ``0600`` file, and marked in the JSON Schema as
@@ -47,6 +49,7 @@ from .config import (
 )
 from .history import (
     MASKED_SECRET_SENTINEL,
+    PATH_WILDCARD,
     apply_update,
     current_version,
     load_with_history,
@@ -61,6 +64,7 @@ __all__ = [
     "CONFIG_FILE_ENV",
     "DEFAULT_CONFIG_PATH",
     "MASKED_SECRET_SENTINEL",
+    "PATH_WILDCARD",
     "ConfigError",
     "ConfigModel",
     "InvalidConfigError",

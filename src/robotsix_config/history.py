@@ -84,6 +84,12 @@ logger = logging.getLogger("robotsix_config.history")
 #: back means "unchanged", not "set the secret to these asterisks".
 MASKED_SECRET_SENTINEL = "**********"  # noqa: S105 # nosec B105 — a mask, not a credential
 
+#: Stands in for one path segment whose name is data rather than schema — a
+#: key of an open-ended ``dict[str, X]`` or an index of a ``list[X]``. The
+#: model cannot name those segments, so :func:`secret_paths` emits this and
+#: :func:`_is_secret` matches any single segment against it.
+PATH_WILDCARD = "*"
+
 #: Fallback secret detection for callers that pass no model. Matched as a
 #: **suffix** of the key name. Prefer passing ``model_cls`` — the model knows.
 SECRET_KEY_SUFFIXES: tuple[str, ...] = (
@@ -330,12 +336,22 @@ def secret_paths(model_cls: type[BaseModel]) -> set[tuple[str, ...]]:
     is what :class:`pydantic.SecretStr` produces. Reading the schema rather
     than the annotations means ``$ref``-ed submodels resolve naturally.
 
+    A segment the model cannot name — the key of a ``dict[str, X]`` or the
+    index of a ``list[X]`` — is emitted as :data:`PATH_WILDCARD`. Without
+    descending past those, a secret nested inside an open-ended map is
+    invisible to every caller of :func:`_is_secret`: it is returned unmasked
+    over HTTP, and then overwritten with the mask on the next save.
+
     Returns:
-        A set of path tuples, e.g. ``{("langfuse", "secret_key")}``.
+        A set of path tuples, e.g. ``{("langfuse", "secret_key")}``, or
+        ``{("langfuse_projects", "*", "secret_key")}`` for a map of models.
     """
     schema = model_cls.model_json_schema()
     defs = schema.get("$defs", {})
     found: set[tuple[str, ...]] = set()
+
+    def is_secret_node(node: dict[str, Any]) -> bool:
+        return bool(node.get("writeOnly") or node.get("format") == "password")
 
     def walk(
         node: dict[str, Any], prefix: tuple[str, ...], seen: frozenset[str]
@@ -352,19 +368,40 @@ def secret_paths(model_cls: type[BaseModel]) -> set[tuple[str, ...]]:
         for key, sub in (node.get("properties") or {}).items():
             if not isinstance(sub, dict):
                 continue
-            if sub.get("writeOnly") or sub.get("format") == "password":
+            if is_secret_node(sub):
                 found.add((*prefix, key))
             walk(sub, (*prefix, key), seen)
+        # Data-named segments: dict keys and list indices. `additionalProperties`
+        # is `True`/`False` for a plain open dict, and a schema only when the
+        # value type is declared, which is the case that can hide a secret.
+        for child in (node.get("additionalProperties"), node.get("items")):
+            if not isinstance(child, dict):
+                continue
+            if is_secret_node(child):
+                found.add((*prefix, PATH_WILDCARD))
+            walk(child, (*prefix, PATH_WILDCARD), seen)
 
     walk(schema, (), frozenset())
     return found
 
 
 def _is_secret(path: tuple[str, ...], known: set[tuple[str, ...]] | None) -> bool:
-    """Return whether *path* names a secret field."""
-    if known is not None:
-        return path in known
-    return path[-1].endswith(SECRET_KEY_SUFFIXES)
+    """Return whether *path* names a secret field.
+
+    *path* is concrete — every segment is a real key from the config document.
+    *known* may contain :data:`PATH_WILDCARD` segments standing for a map key
+    or a list index, so membership alone is not enough.
+    """
+    if known is None:
+        return path[-1].endswith(SECRET_KEY_SUFFIXES)
+    if path in known:
+        return True
+    return any(
+        len(pattern) == len(path)
+        and all(p in (PATH_WILDCARD, seg) for seg, p in zip(path, pattern, strict=True))
+        for pattern in known
+        if PATH_WILDCARD in pattern
+    )
 
 
 def mask_secrets(

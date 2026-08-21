@@ -30,6 +30,20 @@ class Cfg(BaseModel):
     langfuse: Langfuse = Langfuse()
 
 
+class MapCfg(BaseModel):
+    """A model whose secrets sit behind segments the model cannot name.
+
+    ``projects`` keys and ``replicas`` indices are data, not schema, so a
+    secret under them has no fixed path. This is the canonical fleet shape —
+    ``langfuse.projects.<project-name>.secret_key``.
+    """
+
+    name: str = ""
+    projects: dict[str, Langfuse] = {}
+    replicas: list[Langfuse] = []
+    tokens: dict[str, SecretStr] = {}
+
+
 @pytest.fixture
 def cfg_path(tmp_path):
     p = tmp_path / "config.json"
@@ -64,6 +78,92 @@ class TestSecretPaths:
         """The model is authoritative: a public key is not secret just because
         its name ends in '_key'. The name heuristic gets this wrong."""
         assert ("langfuse", "public_key") not in mod.secret_paths(Cfg)
+
+
+class TestSecretPathsThroughDataNamedSegments:
+    """A secret under a map key or a list index must still be found.
+
+    Before the wildcard, ``secret_paths`` stopped at ``properties`` and never
+    descended into ``additionalProperties`` or ``items``. Every caller of
+    ``_is_secret`` inherited the blind spot at once: ``mask_secrets`` returned
+    the live credential in cleartext over HTTP, and the next save wrote the
+    mask the UI had shown back over it.
+    """
+
+    def test_secret_under_a_map_key_is_found_as_a_wildcard(self) -> None:
+        assert ("projects", mod.PATH_WILDCARD, "secret_key") in mod.secret_paths(MapCfg)
+
+    def test_secret_under_a_list_index_is_found_as_a_wildcard(self) -> None:
+        assert ("replicas", mod.PATH_WILDCARD, "secret_key") in mod.secret_paths(MapCfg)
+
+    def test_map_of_bare_secrets_is_found(self) -> None:
+        """dict[str, SecretStr] — the secret *is* the map value."""
+        assert ("tokens", mod.PATH_WILDCARD) in mod.secret_paths(MapCfg)
+
+    def test_non_secret_under_a_map_key_is_not_matched(self) -> None:
+        paths = mod.secret_paths(MapCfg)
+        assert ("projects", mod.PATH_WILDCARD, "public_key") not in paths
+
+    def test_wildcard_does_not_match_a_shorter_or_longer_path(self) -> None:
+        known = mod.secret_paths(MapCfg)
+        assert not mod._is_secret(("projects", "a"), known)
+        assert not mod._is_secret(("projects", "a", "secret_key", "deeper"), known)
+
+    def test_map_secret_is_masked_before_leaving_the_process(self) -> None:
+        out = mod.mask_secrets(
+            {"projects": {"prod": {"public_key": "pk", "secret_key": "sk-real"}}},
+            MapCfg,
+        )
+        assert out["projects"]["prod"]["secret_key"] == mod.MASKED_SECRET_SENTINEL
+        assert out["projects"]["prod"]["public_key"] == "pk"
+
+    def test_saving_an_edit_beside_a_map_secret_preserves_the_credential(
+        self, tmp_path
+    ) -> None:
+        """The exact UI round-trip that destroyed credentials.
+
+        A map node diffs whole, so editing the public key resubmits the masked
+        secret alongside it. The mask means "unchanged", never "set it to
+        literal asterisks".
+        """
+        cfg = tmp_path / "config.json"
+        cfg.write_text(
+            json.dumps(
+                {
+                    "projects": {
+                        "prod": {"public_key": "pk-old", "secret_key": "sk-real"}
+                    }
+                }
+            ),
+            encoding="utf-8",
+        )
+        mod.apply_update(
+            MapCfg,
+            {
+                "projects": {
+                    "prod": {
+                        "public_key": "pk-new",
+                        "secret_key": mod.MASKED_SECRET_SENTINEL,
+                    }
+                }
+            },
+            cfg,
+        )
+        on_disk = json.loads(cfg.read_text(encoding="utf-8"))
+        assert on_disk["projects"]["prod"]["secret_key"] == "sk-real"
+        assert on_disk["projects"]["prod"]["public_key"] == "pk-new"
+
+    def test_map_secret_is_never_written_to_history(self, tmp_path) -> None:
+        cfg = tmp_path / "config.json"
+        cfg.write_text(json.dumps({"projects": {}}), encoding="utf-8")
+        mod.apply_update(
+            MapCfg,
+            {"projects": {"prod": {"public_key": "pk", "secret_key": "sk-real"}}},
+            cfg,
+        )
+        recorded = mod.versions_path(cfg).read_text(encoding="utf-8")
+        assert "sk-real" not in recorded
+        assert "projects (secret)" in recorded
 
 
 class TestMaskSecrets:
