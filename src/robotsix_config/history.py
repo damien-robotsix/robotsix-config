@@ -56,7 +56,7 @@ import tempfile
 from copy import deepcopy
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from pydantic import BaseModel
 
@@ -197,19 +197,32 @@ def strip_secrets(
     """
     known = secret_paths(model_cls) if model_cls is not None else None
 
-    def walk(node: dict[str, Any], prefix: tuple[str, ...]) -> dict[str, Any]:
-        out: dict[str, Any] = {}
-        for key, value in node.items():
-            path = (*prefix, key)
-            if isinstance(value, dict):
-                out[key] = walk(value, path)
-            elif _is_secret(path, known):
-                continue
-            else:
-                out[key] = deepcopy(value)
-        return out
+    def walk(node: Any, prefix: tuple[str, ...]) -> Any:
+        if isinstance(node, dict):
+            out: dict[str, Any] = {}
+            for key, value in node.items():
+                path = (*prefix, key)
+                if isinstance(value, (dict, list, tuple)):
+                    out[key] = walk(value, path)
+                elif _is_secret(path, known):
+                    continue
+                else:
+                    out[key] = deepcopy(value)
+            return out
+        if isinstance(node, (list, tuple)):
+            kept: list[Any] = []
+            for index, item in enumerate(node):
+                path = (*prefix, str(index))
+                if isinstance(item, (dict, list, tuple)):
+                    kept.append(walk(item, path))
+                elif _is_secret(path, known):
+                    continue
+                else:
+                    kept.append(deepcopy(item))
+            return type(node)(kept)
+        return deepcopy(node)
 
-    return walk(data, ())
+    return cast("dict[str, Any]", walk(data, ()))
 
 
 def record_version(
@@ -304,6 +317,17 @@ def _touches_secret(
             ad = a if isinstance(a, dict) else {}
             return any(
                 walk(bd.get(k), ad.get(k), (*path, k)) for k in set(bd) | set(ad)
+            )
+        if isinstance(a, (list, tuple)) or isinstance(b, (list, tuple)):
+            bl = b if isinstance(b, (list, tuple)) else ()
+            al = a if isinstance(a, (list, tuple)) else ()
+            return any(
+                walk(
+                    bl[i] if i < len(bl) else None,
+                    al[i] if i < len(al) else None,
+                    (*path, str(i)),
+                )
+                for i in range(max(len(bl), len(al)))
             )
         return False
 
@@ -421,19 +445,32 @@ def mask_secrets(
     """
     known = secret_paths(model_cls) if model_cls is not None else None
 
-    def walk(node: dict[str, Any], prefix: tuple[str, ...]) -> dict[str, Any]:
-        out: dict[str, Any] = {}
-        for key, value in node.items():
-            path = (*prefix, key)
-            if isinstance(value, dict):
-                out[key] = walk(value, path)
-            elif _is_secret(path, known) and isinstance(value, str) and value:
-                out[key] = MASKED_SECRET_SENTINEL
-            else:
-                out[key] = deepcopy(value)
-        return out
+    def walk(node: Any, prefix: tuple[str, ...]) -> Any:
+        if isinstance(node, dict):
+            out: dict[str, Any] = {}
+            for key, value in node.items():
+                path = (*prefix, key)
+                if isinstance(value, (dict, list, tuple)):
+                    out[key] = walk(value, path)
+                elif _is_secret(path, known) and isinstance(value, str) and value:
+                    out[key] = MASKED_SECRET_SENTINEL
+                else:
+                    out[key] = deepcopy(value)
+            return out
+        if isinstance(node, (list, tuple)):
+            kept: list[Any] = []
+            for index, item in enumerate(node):
+                path = (*prefix, str(index))
+                if isinstance(item, (dict, list, tuple)):
+                    kept.append(walk(item, path))
+                elif _is_secret(path, known) and isinstance(item, str) and item:
+                    kept.append(MASKED_SECRET_SENTINEL)
+                else:
+                    kept.append(deepcopy(item))
+            return type(node)(kept)
+        return deepcopy(node)
 
-    return walk(data, ())
+    return cast("dict[str, Any]", walk(data, ()))
 
 
 def _preserve_secrets(
@@ -451,24 +488,54 @@ def _preserve_secrets(
     """
 
     def walk(
-        m: dict[str, Any],
-        e: dict[str, Any],
-        u: dict[str, Any],
+        m: Any,
+        e: Any,
+        u: Any,
         prefix: tuple[str, ...],
     ) -> None:
-        for key in list(m):
-            path = (*prefix, key)
-            submitted = u.get(key)
-            if _is_secret(path, known) and submitted in (MASKED_SECRET_SENTINEL, ""):
-                if key in e:
-                    m[key] = deepcopy(e[key])
-                continue
-            if (
-                isinstance(m.get(key), dict)
-                and isinstance(e.get(key), dict)
-                and isinstance(submitted, dict)
-            ):
-                walk(m[key], e[key], submitted, path)
+        if isinstance(m, dict):
+            e = e if isinstance(e, dict) else {}
+            u = u if isinstance(u, dict) else {}
+            for key in list(m):
+                path = (*prefix, key)
+                submitted = u.get(key)
+                if _is_secret(path, known) and submitted in (
+                    MASKED_SECRET_SENTINEL,
+                    "",
+                ):
+                    if key in e:
+                        m[key] = deepcopy(e[key])
+                    continue
+                mv = m.get(key)
+                ev = e.get(key)
+                if (
+                    isinstance(mv, dict)
+                    and isinstance(ev, dict)
+                    and isinstance(submitted, dict)
+                ) or isinstance(mv, (list, tuple)):
+                    walk(mv, ev, submitted, path)
+            return
+        if isinstance(m, list):
+            e = e if isinstance(e, (list, tuple)) else ()
+            u = u if isinstance(u, (list, tuple)) else ()
+            for index in range(len(m)):
+                path = (*prefix, str(index))
+                submitted = u[index] if index < len(u) else None
+                if _is_secret(path, known) and submitted in (
+                    MASKED_SECRET_SENTINEL,
+                    "",
+                ):
+                    if index < len(e):
+                        m[index] = deepcopy(e[index])
+                    continue
+                mv = m[index]
+                ev = e[index] if index < len(e) else None
+                if (
+                    isinstance(mv, dict)
+                    and isinstance(ev, dict)
+                    and isinstance(submitted, dict)
+                ) or isinstance(mv, (list, tuple)):
+                    walk(mv, ev, submitted, path)
 
     walk(merged, existing, update, ())
     return merged
@@ -485,18 +552,36 @@ def _carry_secrets_forward(
     secret field missing. Writing it as-is would wipe live credentials.
     """
 
-    def walk(
-        r: dict[str, Any], live_node: dict[str, Any], prefix: tuple[str, ...]
-    ) -> None:
-        for key, value in live_node.items():
-            path = (*prefix, key)
-            if _is_secret(path, known):
-                if key not in r:
-                    r[key] = deepcopy(value)
-            elif isinstance(value, dict):
-                target = r.get(key)
-                if isinstance(target, dict):
-                    walk(target, value, path)
+    def walk(r: Any, live_node: Any, prefix: tuple[str, ...]) -> None:
+        if isinstance(live_node, dict):
+            for key, value in live_node.items():
+                path = (*prefix, key)
+                if _is_secret(path, known):
+                    if key not in r:
+                        r[key] = deepcopy(value)
+                elif isinstance(value, dict):
+                    target = r.get(key)
+                    if isinstance(target, dict):
+                        walk(target, value, path)
+                elif isinstance(value, (list, tuple)):
+                    target = r.get(key)
+                    if isinstance(target, (list, tuple)):
+                        walk(target, value, path)
+        elif isinstance(live_node, (list, tuple)):
+            for index, value in enumerate(live_node):
+                path = (*prefix, str(index))
+                if _is_secret(path, known):
+                    if index >= len(r):
+                        r.append(deepcopy(value))
+                elif isinstance(value, dict):
+                    if index < len(r) and isinstance(r[index], dict):
+                        walk(r[index], value, path)
+                elif (
+                    isinstance(value, (list, tuple))
+                    and index < len(r)
+                    and isinstance(r[index], (list, tuple))
+                ):
+                    walk(r[index], value, path)
 
     walk(restored, live, ())
     return restored

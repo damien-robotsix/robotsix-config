@@ -44,6 +44,14 @@ class MapCfg(BaseModel):
     tokens: dict[str, SecretStr] = {}
 
 
+class ListSecretsCfg(BaseModel):
+    """A model with a bare ``list[SecretStr]`` — the list *is* the secret."""
+
+    name: str = ""
+    secrets: list[SecretStr] = []
+    names: list[str] = []
+
+
 @pytest.fixture
 def cfg_path(tmp_path):
     p = tmp_path / "config.json"
@@ -164,6 +172,124 @@ class TestSecretPathsThroughDataNamedSegments:
         recorded = mod.versions_path(cfg).read_text(encoding="utf-8")
         assert "sk-real" not in recorded
         assert "projects (secret)" in recorded
+
+
+class TestListNestedSecrets:
+    """A secret inside a list element must be treated like any other secret.
+
+    ``secret_paths`` already discovers a wildcard under ``items``, but the
+    consumers walked only ``dict`` values, so a ``list[Langfuse]`` was opaque:
+    the credential leaked over GET /config and into the append-only history.
+    """
+
+    def test_list_secret_is_masked_before_leaving_the_process(self) -> None:
+        out = mod.mask_secrets(
+            {"replicas": [{"public_key": "pk", "secret_key": "sk-real"}]},
+            MapCfg,
+        )
+        assert out["replicas"][0]["secret_key"] == mod.MASKED_SECRET_SENTINEL
+        assert out["replicas"][0]["public_key"] == "pk"
+
+    def test_list_secret_is_never_written_to_history(self, tmp_path) -> None:
+        cfg = tmp_path / "config.json"
+        cfg.write_text(json.dumps({"replicas": []}), encoding="utf-8")
+        mod.apply_update(
+            MapCfg,
+            {"replicas": [{"public_key": "pk", "secret_key": "sk-real"}]},
+            cfg,
+        )
+        recorded = mod.versions_path(cfg).read_text(encoding="utf-8")
+        assert "sk-real" not in recorded
+        assert "replicas (secret)" in recorded
+
+    def test_saving_an_edit_beside_a_list_secret_preserves_the_credential(
+        self, tmp_path
+    ) -> None:
+        cfg = tmp_path / "config.json"
+        cfg.write_text(
+            json.dumps(
+                {"replicas": [{"public_key": "pk-old", "secret_key": "sk-real"}]}
+            ),
+            encoding="utf-8",
+        )
+        mod.apply_update(
+            MapCfg,
+            {
+                "replicas": [
+                    {
+                        "public_key": "pk-new",
+                        "secret_key": mod.MASKED_SECRET_SENTINEL,
+                    }
+                ]
+            },
+            cfg,
+        )
+        on_disk = json.loads(cfg.read_text(encoding="utf-8"))
+        assert on_disk["replicas"][0]["secret_key"] == "sk-real"
+        assert on_disk["replicas"][0]["public_key"] == "pk-new"
+
+    def test_rollback_keeps_live_list_secrets(self, tmp_path) -> None:
+        cfg = tmp_path / "config.json"
+        cfg.write_text(
+            json.dumps({"replicas": [{"public_key": "pk", "secret_key": "sk-real"}]}),
+            encoding="utf-8",
+        )
+        mod.apply_update(MapCfg, {"name": "a"}, cfg)
+        mod.apply_update(MapCfg, {"name": "b"}, cfg)
+        restored, _, _ = mod.rollback(MapCfg, 1, cfg)
+        assert restored["replicas"][0]["secret_key"] == "sk-real"
+
+
+class TestBareListSecrets:
+    """A ``list[SecretStr]`` is itself secret at every index.
+
+    These cover the scalar branches of the list walkers — the nested-model
+    tests above only exercise the dict branches of those same loops.
+    """
+
+    def test_bare_list_secret_is_masked(self) -> None:
+        out = mod.mask_secrets(
+            {"secrets": ["sk-real"], "names": ["keep"]},
+            ListSecretsCfg,
+        )
+        assert out["secrets"] == [mod.MASKED_SECRET_SENTINEL]
+        assert out["names"] == ["keep"]
+
+    def test_bare_list_secret_is_stripped(self) -> None:
+        out = mod.strip_secrets(
+            {"secrets": ["sk-real"], "names": ["keep"]},
+            ListSecretsCfg,
+        )
+        assert out["secrets"] == []
+        assert out["names"] == ["keep"]
+
+    def test_saving_an_edit_beside_a_bare_list_secret_preserves_it(
+        self, tmp_path
+    ) -> None:
+        cfg = tmp_path / "config.json"
+        cfg.write_text(
+            json.dumps({"secrets": ["sk-real"], "names": ["old"]}),
+            encoding="utf-8",
+        )
+        mod.apply_update(
+            ListSecretsCfg,
+            {"secrets": [mod.MASKED_SECRET_SENTINEL], "names": ["new"]},
+            cfg,
+        )
+        on_disk = json.loads(cfg.read_text(encoding="utf-8"))
+        assert on_disk["secrets"] == ["sk-real"]
+        assert on_disk["names"] == ["new"]
+
+    def test_rollback_keeps_live_bare_list_secrets(self, tmp_path) -> None:
+        cfg = tmp_path / "config.json"
+        cfg.write_text(
+            json.dumps({"secrets": ["sk-real"], "names": ["a"]}),
+            encoding="utf-8",
+        )
+        mod.apply_update(ListSecretsCfg, {"names": ["b"]}, cfg)
+        mod.apply_update(ListSecretsCfg, {"names": ["c"]}, cfg)
+        restored, _, _ = mod.rollback(ListSecretsCfg, 1, cfg)
+        assert restored["secrets"] == ["sk-real"]
 
 
 class TestMaskSecrets:
@@ -403,3 +529,25 @@ class TestDeepMerge:
 
     def test_lists_are_replaced_wholesale(self) -> None:
         assert mod.deep_merge({"a": [1, 2, 3]}, {"a": [9]}) == {"a": [9]}
+
+
+class TestLoadWithHistoryAndInvalidConfig:
+    def test_load_with_history_returns_model_and_version(self, tmp_path) -> None:
+        cfg = tmp_path / "config.json"
+        cfg.write_text(json.dumps({"name": "svc", "retries": 5}), encoding="utf-8")
+        model, version = mod.load_with_history(Cfg, cfg)
+        assert model.name == "svc"
+        assert model.retries == 5
+        assert version == 0
+
+    def test_apply_update_rejects_invalid_json(self, tmp_path) -> None:
+        cfg = tmp_path / "config.json"
+        cfg.write_text("{not json", encoding="utf-8")
+        with pytest.raises(InvalidConfigError):
+            mod.apply_update(Cfg, {"name": "x"}, cfg)
+
+    def test_apply_update_rejects_non_object_config(self, tmp_path) -> None:
+        cfg = tmp_path / "config.json"
+        cfg.write_text("[]", encoding="utf-8")
+        with pytest.raises(InvalidConfigError):
+            mod.apply_update(Cfg, {"name": "x"}, cfg)
