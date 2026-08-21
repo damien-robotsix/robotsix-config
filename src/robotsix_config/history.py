@@ -56,7 +56,7 @@ import tempfile
 from copy import deepcopy
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from pydantic import BaseModel
 
@@ -222,7 +222,7 @@ def strip_secrets(
             return type(node)(kept)
         return deepcopy(node)
 
-    return walk(data, ())
+    return cast("dict[str, Any]", walk(data, ()))
 
 
 def record_version(
@@ -470,7 +470,7 @@ def mask_secrets(
             return type(node)(kept)
         return deepcopy(node)
 
-    return walk(data, ())
+    return cast("dict[str, Any]", walk(data, ()))
 
 
 def _preserve_secrets(
