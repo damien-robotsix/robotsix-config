@@ -166,6 +166,72 @@ class TestSecretPathsThroughDataNamedSegments:
         assert "projects (secret)" in recorded
 
 
+class TestListNestedSecrets:
+    """A secret inside a list element must be treated like any other secret.
+
+    ``secret_paths`` already discovers a wildcard under ``items``, but the
+    consumers walked only ``dict`` values, so a ``list[Langfuse]`` was opaque:
+    the credential leaked over GET /config and into the append-only history.
+    """
+
+    def test_list_secret_is_masked_before_leaving_the_process(self) -> None:
+        out = mod.mask_secrets(
+            {"replicas": [{"public_key": "pk", "secret_key": "sk-real"}]},
+            MapCfg,
+        )
+        assert out["replicas"][0]["secret_key"] == mod.MASKED_SECRET_SENTINEL
+        assert out["replicas"][0]["public_key"] == "pk"
+
+    def test_list_secret_is_never_written_to_history(self, tmp_path) -> None:
+        cfg = tmp_path / "config.json"
+        cfg.write_text(json.dumps({"replicas": []}), encoding="utf-8")
+        mod.apply_update(
+            MapCfg,
+            {"replicas": [{"public_key": "pk", "secret_key": "sk-real"}]},
+            cfg,
+        )
+        recorded = mod.versions_path(cfg).read_text(encoding="utf-8")
+        assert "sk-real" not in recorded
+        assert "replicas (secret)" in recorded
+
+    def test_saving_an_edit_beside_a_list_secret_preserves_the_credential(
+        self, tmp_path
+    ) -> None:
+        cfg = tmp_path / "config.json"
+        cfg.write_text(
+            json.dumps(
+                {"replicas": [{"public_key": "pk-old", "secret_key": "sk-real"}]}
+            ),
+            encoding="utf-8",
+        )
+        mod.apply_update(
+            MapCfg,
+            {
+                "replicas": [
+                    {
+                        "public_key": "pk-new",
+                        "secret_key": mod.MASKED_SECRET_SENTINEL,
+                    }
+                ]
+            },
+            cfg,
+        )
+        on_disk = json.loads(cfg.read_text(encoding="utf-8"))
+        assert on_disk["replicas"][0]["secret_key"] == "sk-real"
+        assert on_disk["replicas"][0]["public_key"] == "pk-new"
+
+    def test_rollback_keeps_live_list_secrets(self, tmp_path) -> None:
+        cfg = tmp_path / "config.json"
+        cfg.write_text(
+            json.dumps({"replicas": [{"public_key": "pk", "secret_key": "sk-real"}]}),
+            encoding="utf-8",
+        )
+        mod.apply_update(MapCfg, {"name": "a"}, cfg)
+        mod.apply_update(MapCfg, {"name": "b"}, cfg)
+        restored, _, _ = mod.rollback(MapCfg, 1, cfg)
+        assert restored["replicas"][0]["secret_key"] == "sk-real"
+
+
 class TestMaskSecrets:
     def test_secret_is_masked_and_other_values_survive(self) -> None:
         out = mod.mask_secrets(
