@@ -234,7 +234,7 @@ class TestMainIntegration:
     def test_schema_generate_default_output(
         self, tmp_path: Path, monkeypatch, capsys: pytest.CaptureFixture[str]
     ) -> None:
-        """``main(['schema', model])`` writes to ``config/config.schema.json`` by default."""
+        """``main(['schema', model])`` writes to ``config/config.schema.json``."""
         # Change CWD so the default output lands in tmp_path.
         monkeypatch.chdir(tmp_path)
         exit_code = main(
@@ -275,8 +275,6 @@ class TestMainIntegration:
     def test_schema_check_drift(
         self, tmp_path: Path, monkeypatch, capsys: pytest.CaptureFixture[str]
     ) -> None:
-        from tests.config.scripts._test_cli_models import AppSettings
-
         monkeypatch.chdir(tmp_path)
         output_dir = tmp_path / "config"
         output_dir.mkdir()
@@ -361,6 +359,7 @@ class TestConsoleScriptSubprocess:
             ],
             capture_output=True,
             text=True,
+            check=False,
         )
         assert result.returncode == 0, (
             f"stderr: {result.stderr}\nstdout: {result.stdout}"
@@ -391,6 +390,7 @@ class TestConsoleScriptSubprocess:
             ],
             capture_output=True,
             text=True,
+            check=False,
         )
         assert result.returncode == 0, (
             f"stderr: {result.stderr}\nstdout: {result.stdout}"
@@ -417,6 +417,7 @@ class TestConsoleScriptSubprocess:
             ],
             capture_output=True,
             text=True,
+            check=False,
         )
         assert result.returncode == 0, (
             f"stderr: {result.stderr}\nstdout: {result.stdout}"
@@ -434,6 +435,7 @@ class TestConsoleScriptSubprocess:
             ],
             capture_output=True,
             text=True,
+            check=False,
         )
         assert result.returncode == 1
         assert "Could not import" in result.stderr

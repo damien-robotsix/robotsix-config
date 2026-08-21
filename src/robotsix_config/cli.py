@@ -4,7 +4,7 @@ Usage::
 
     robotsix-config schema myapp.config:Settings
     robotsix-config schema --check myapp.config:Settings
-    robotsix-config config --check-keys myapp.config:Settings --config config/config.json
+    robotsix-config config --check-keys myapp.config:Settings --config config.json
 """
 
 from __future__ import annotations
@@ -15,7 +15,7 @@ import importlib
 import json
 import sys
 from pathlib import Path
-from typing import NoReturn, cast
+from typing import NoReturn
 
 from pydantic import BaseModel
 
@@ -46,7 +46,7 @@ def _import_model(dotted_path: str) -> type[BaseModel]:
             f"{dotted_path!r} is not a pydantic BaseModel subclass "
             f"(got {type(cls).__name__})"
         )
-    return cast(type[BaseModel], cls)
+    return cls
 
 
 def _schema_generate(
@@ -185,7 +185,7 @@ def main(argv: list[str] | None = None) -> int:
     schema_parser.add_argument(
         "--output",
         default="config/config.schema.json",
-        help="Filesystem path for the JSON Schema (default: config/config.schema.json).",
+        help="Path for the JSON Schema file (default: config/config.schema.json).",
     )
 
     # ---- config ----
