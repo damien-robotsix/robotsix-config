@@ -512,12 +512,10 @@ def _preserve_secrets(
                     isinstance(mv, dict)
                     and isinstance(ev, dict)
                     and isinstance(submitted, dict)
-                ):
-                    walk(mv, ev, submitted, path)
-                elif isinstance(mv, (list, tuple)):
+                ) or isinstance(mv, (list, tuple)):
                     walk(mv, ev, submitted, path)
             return
-        if isinstance(m, (list, tuple)):
+        if isinstance(m, list):
             e = e if isinstance(e, (list, tuple)) else ()
             u = u if isinstance(u, (list, tuple)) else ()
             for index in range(len(m)):
@@ -536,9 +534,7 @@ def _preserve_secrets(
                     isinstance(mv, dict)
                     and isinstance(ev, dict)
                     and isinstance(submitted, dict)
-                ):
-                    walk(mv, ev, submitted, path)
-                elif isinstance(mv, (list, tuple)):
+                ) or isinstance(mv, (list, tuple)):
                     walk(mv, ev, submitted, path)
 
     walk(merged, existing, update, ())
@@ -580,9 +576,12 @@ def _carry_secrets_forward(
                 elif isinstance(value, dict):
                     if index < len(r) and isinstance(r[index], dict):
                         walk(r[index], value, path)
-                elif isinstance(value, (list, tuple)):
-                    if index < len(r) and isinstance(r[index], (list, tuple)):
-                        walk(r[index], value, path)
+                elif (
+                    isinstance(value, (list, tuple))
+                    and index < len(r)
+                    and isinstance(r[index], (list, tuple))
+                ):
+                    walk(r[index], value, path)
 
     walk(restored, live, ())
     return restored
