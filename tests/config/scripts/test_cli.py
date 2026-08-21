@@ -17,7 +17,6 @@ from robotsix_config.cli import (
     main,
 )
 
-
 # -- _import_model -----------------------------------------------------------
 
 
@@ -139,9 +138,7 @@ class TestConfigCheckKeys:
     ) -> None:
         from tests.config.scripts._test_cli_models import AppSettings
 
-        config_path = write_config(
-            tmp_path / "config.json", {"api_key": "secret"}
-        )
+        config_path = write_config(tmp_path / "config.json", {"api_key": "secret"})
         with pytest.raises(SystemExit) as excinfo:
             _config_check_keys(AppSettings, config_path)
         assert excinfo.value.code == 1
@@ -343,9 +340,7 @@ class TestMainIntegration:
 class TestConsoleScriptSubprocess:
     """Invoke the installed ``robotsix-config`` binary via subprocess."""
 
-    def test_schema_generate_via_module(
-        self, tmp_path: Path, monkeypatch
-    ) -> None:
+    def test_schema_generate_via_module(self, tmp_path: Path, monkeypatch) -> None:
         output = tmp_path / "out" / "schema.json"
         result = subprocess.run(
             [
@@ -368,9 +363,7 @@ class TestConsoleScriptSubprocess:
         data = json.loads(output.read_text(encoding="utf-8"))
         assert "properties" in data
 
-    def test_schema_check_via_module(
-        self, tmp_path: Path, monkeypatch
-    ) -> None:
+    def test_schema_check_via_module(self, tmp_path: Path, monkeypatch) -> None:
         from robotsix_config.config import config_schema_json
         from tests.config.scripts._test_cli_models import AppSettings
 
