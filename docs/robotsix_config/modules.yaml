@@ -3,8 +3,11 @@ modules:
     description: Core robotsix-config package with configuration loading, dumping, and history tracking.
     paths:
       - src/robotsix_config/__init__.py
+      - src/robotsix_config/__main__.py
+      - src/robotsix_config/cli.py
       - src/robotsix_config/py.typed
       - src/robotsix_config/history.py
+      - changelog.d/*.md
       - docs/robotsix_config/api.md
       - docs/robotsix_config/contributing.md
       - docs/robotsix_config/index.md
@@ -27,8 +30,10 @@ modules:
       - tests/config/test_config_properties.py
       - tests/config/test_history.py
       - tests/config/scripts/__init__.py
+      - tests/config/scripts/_test_cli_models.py
       - tests/config/scripts/_test_models.py
       - tests/config/scripts/test_check_schema_freshness.py
+      - tests/config/scripts/test_cli.py
   - id: errors
     description: Error types for configuration validation failures.
     paths:
