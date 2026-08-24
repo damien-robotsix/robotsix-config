@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 
 <!-- towncrier release notes start -->
+## [0.5.0](https://github.com/damien-robotsix/robotsix-config/compare/v0.4.0...v0.5.0) (2026-08-22)
+
+
+### Features
+
+* Add config-schema sync/check CLI to robotsix-config (20260821T052258Z-add-config-schema-sync-check-cli-to-robo-00b5) ([#281](https://github.com/damien-robotsix/robotsix-config/issues/281)) ([48e736b](https://github.com/damien-robotsix/robotsix-config/commit/48e736bad05ff514360f93092a5f486a6aee1fe1))
+
+
+### Bug Fixes
+
+* **history:** find secrets behind map keys and list indices ([#282](https://github.com/damien-robotsix/robotsix-config/issues/282)) ([45c0920](https://github.com/damien-robotsix/robotsix-config/commit/45c0920d8c0ce49a7eec8ae36c4d6a36fcd6b821))
+* Secrets inside list[...] fields leak: walkers only recurse into dicts, not lists (20260821T102052Z-secrets-inside-list-fields-leak-walkers-62cc) ([#284](https://github.com/damien-robotsix/robotsix-config/issues/284)) ([bed0a5b](https://github.com/damien-robotsix/robotsix-config/commit/bed0a5b3a7b77f01bd4a16a4e6753dc92982e8f9))
+
 ## [0.4.0](https://github.com/damien-robotsix/robotsix-config/compare/v0.3.2...v0.4.0) (2026-08-10)
 
 
