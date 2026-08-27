@@ -146,6 +146,43 @@ def _strip_unknown_keys(
     return _walk(data, properties, defs, ())
 
 
+def _run_legacy_migration(
+    data: dict[str, Any], model_cls: type[BaseModel]
+) -> dict[str, Any]:
+    """Apply *model_cls*'s optional pre-strip legacy migration to *data*.
+
+    Consumers declare ``migrate_legacy_config(cls, data) -> dict`` to move a
+    removed key's value somewhere the current model still accepts.  It runs
+    before :func:`_strip_unknown_keys` — that ordering is the whole point, see
+    :func:`load_config`.
+
+    Best-effort by design: a raising or non-conforming hook must not stop a
+    config from loading, since the alternative is a component that cannot
+    start.  The failure is logged at ``WARNING`` and the original data is used.
+    """
+    migrate = getattr(model_cls, "migrate_legacy_config", None)
+    if not callable(migrate):
+        return data
+    try:
+        migrated = migrate(data)
+    except Exception:
+        logger.warning(
+            "%s.migrate_legacy_config raised — loading the unmigrated config",
+            model_cls.__name__,
+            exc_info=True,
+        )
+        return data
+    if not isinstance(migrated, dict):
+        logger.warning(
+            "%s.migrate_legacy_config returned %s, expected dict — "
+            "loading the unmigrated config",
+            model_cls.__name__,
+            type(migrated).__name__,
+        )
+        return data
+    return migrated
+
+
 def load_config[ModelT: BaseModel](
     model_cls: type[ModelT],
     path: str | os.PathLike[str] | None = None,
@@ -165,6 +202,17 @@ def load_config[ModelT: BaseModel](
     ``WARNING`` log record.  The model itself is never relaxed — the loader
     removes the offending keys rather than expecting the model to accept them.
 
+    **Legacy migration.** A model may declare a
+    ``migrate_legacy_config(data) -> dict`` classmethod; when present it is
+    called on the raw file contents **before** stripping, so a consumer can
+    move a removed key's *value* to its canonical home instead of losing it.
+    Without this hook the ordering defeats consumer migrations written as
+    pydantic ``@model_validator(mode="before")``: those run inside
+    ``model_validate``, which the loader reaches only after the unknown key has
+    already been stripped — so the value is gone before the migration can read
+    it, silently.  Migrations must be idempotent: the loader persists the
+    cleaned result, so the hook sees already-migrated data on the next load.
+
     After stripping, the cleaned config is persisted through the versioned/
     append-only write path (see :func:`robotsix_config.history.apply_update`) —
     a new version entry is appended whose ``changed_keys`` lists the stripped
@@ -174,6 +222,7 @@ def load_config[ModelT: BaseModel](
     target = Path(path) if path is not None else resolve_config_path()
     data = _read_json(target)
     if data:
+        data = _run_legacy_migration(data, model_cls)
         cleaned = _strip_unknown_keys(data, model_cls)
         if cleaned != data:
             # Lazy import to avoid circular dependency: history.py imports

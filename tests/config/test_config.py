@@ -468,6 +468,120 @@ def test_unknown_top_level_key_is_stripped(tmp_path, caplog):
     assert any(r.levelname == "WARNING" for r in caplog.records)
 
 
+# -- Legacy migration: runs BEFORE the strip ---------------------------------
+
+
+class MigratingModel(BaseModel):
+    """A model that rescues a removed key's value before it is stripped."""
+
+    name: str = "svc"
+    new_home: str = ""
+
+    @classmethod
+    def migrate_legacy_config(cls, data: dict[str, Any]) -> dict[str, Any]:
+        legacy = data.pop("old_home", None)
+        if legacy and not data.get("new_home"):
+            data["new_home"] = legacy
+        return data
+
+
+def test_legacy_migration_runs_before_the_strip(tmp_path):
+    """A removed key's VALUE survives, moved to its canonical home.
+
+    Without the pre-strip hook the value is unrecoverable: the loader strips
+    `old_home` from the raw dict, and a consumer migration written as a
+    pydantic `@model_validator(mode="before")` only runs inside
+    `model_validate` — after the strip. The value is gone before the migration
+    can read it, with nothing but a WARNING to show for it.
+    """
+    p = tmp_path / "config.json"
+    p.write_text(json.dumps({"name": "svc", "old_home": "carried-over"}))
+
+    cfg = load_config(MigratingModel, p)
+
+    assert cfg.new_home == "carried-over"
+    assert not hasattr(cfg, "old_home")
+
+
+def test_legacy_migration_is_idempotent_across_loads(tmp_path):
+    """A second load sees already-migrated data and leaves it alone.
+
+    The loader persists the cleaned config, so the hook is re-run against its
+    own output on every subsequent start — it must be a no-op there.
+    """
+    p = tmp_path / "config.json"
+    p.write_text(json.dumps({"name": "svc", "old_home": "carried-over"}))
+
+    first = load_config(MigratingModel, p)
+    second = load_config(MigratingModel, p)
+
+    assert first.new_home == second.new_home == "carried-over"
+
+
+def test_explicit_canonical_value_wins_over_legacy(tmp_path):
+    """The hook must not clobber a value the operator set deliberately."""
+    p = tmp_path / "config.json"
+    p.write_text(json.dumps({"old_home": "stale", "new_home": "explicit"}))
+
+    cfg = load_config(MigratingModel, p)
+
+    assert cfg.new_home == "explicit"
+
+
+class RaisingMigrationModel(BaseModel):
+    name: str = "svc"
+
+    @classmethod
+    def migrate_legacy_config(cls, data: dict[str, Any]) -> dict[str, Any]:
+        raise RuntimeError("boom")
+
+
+def test_raising_migration_does_not_block_the_load(tmp_path, caplog):
+    """A broken hook must not stop a component from starting.
+
+    Refusing to load would turn a bad migration into an unbootable service,
+    which is strictly worse than loading the unmigrated config.
+    """
+    p = tmp_path / "config.json"
+    p.write_text(json.dumps({"name": "from-file"}))
+
+    cfg = load_config(RaisingMigrationModel, p)
+
+    assert cfg.name == "from-file"
+    assert any("migrate_legacy_config raised" in r.message for r in caplog.records)
+
+
+class BadReturnMigrationModel(BaseModel):
+    name: str = "svc"
+
+    @classmethod
+    def migrate_legacy_config(cls, data: dict[str, Any]) -> dict[str, Any]:
+        return "not a dict"  # type: ignore[return-value]
+
+
+def test_non_dict_migration_return_is_ignored(tmp_path, caplog):
+    """A hook that returns the wrong type is discarded, not propagated."""
+    p = tmp_path / "config.json"
+    p.write_text(json.dumps({"name": "from-file"}))
+
+    cfg = load_config(BadReturnMigrationModel, p)
+
+    assert cfg.name == "from-file"
+    assert any("expected dict" in r.message for r in caplog.records)
+
+
+def test_model_without_the_hook_is_unaffected(tmp_path, caplog):
+    """The hook is opt-in: HealModel declares none and still strips as before."""
+    p = tmp_path / "config.json"
+    p.write_text(json.dumps({"name": "svc", "legal_guardrails": {"enabled": True}}))
+
+    cfg = load_config(HealModel, p)
+
+    assert cfg.name == "svc"
+    assert not hasattr(cfg, "legal_guardrails")
+    assert any("legal_guardrails" in r.message for r in caplog.records)
+
+
 def test_multiple_unknown_keys_are_all_stripped(tmp_path, caplog):
     """Multiple unknown top-level keys are all removed."""
     p = tmp_path / "config.json"

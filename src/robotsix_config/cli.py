@@ -1,10 +1,15 @@
 """CLI for robotsix-config — generate and check config JSON Schemas.
 
+The model is addressed by a fully dot-separated path (``module.Class``).  A
+``module:Class`` form does NOT work — :func:`_import_model` splits on the last
+dot, so the colon ends up inside the attribute name and the import fails with
+``Module 'myapp' has no attribute 'config:Settings'``.
+
 Usage::
 
-    robotsix-config schema myapp.config:Settings
-    robotsix-config schema --check myapp.config:Settings
-    robotsix-config config --check-keys myapp.config:Settings --config config.json
+    robotsix-config schema myapp.config.Settings
+    robotsix-config schema --check myapp.config.Settings
+    robotsix-config config --check-keys myapp.config.Settings --config config.json
 """
 
 from __future__ import annotations
