@@ -7,6 +7,8 @@ modules:
       - src/robotsix_config/cli.py
       - src/robotsix_config/py.typed
       - src/robotsix_config/history.py
+      - tests/robotsix_config/__init__.py
+      - tests/robotsix_config/test_history.py
       - changelog.d/*.md
       - docs/robotsix_config/api.md
       - docs/robotsix_config/contributing.md
@@ -28,7 +30,6 @@ modules:
       - tests/config/test_config.py
       - tests/config/test_config.schema.json
       - tests/config/test_config_properties.py
-      - tests/config/test_history.py
       - tests/config/scripts/__init__.py
       - tests/config/scripts/_test_cli_models.py
       - tests/config/scripts/_test_models.py
