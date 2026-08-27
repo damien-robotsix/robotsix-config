@@ -9,6 +9,7 @@ modules:
       - src/robotsix_config/history.py
       - tests/robotsix_config/__init__.py
       - tests/robotsix_config/test_history.py
+      - tests/robotsix_config/test_docs_examples.py
       - changelog.d/*.md
       - docs/robotsix_config/api.md
       - docs/robotsix_config/contributing.md
