@@ -71,6 +71,7 @@ def test_docs_python_examples_execute() -> None:
         module = types.ModuleType(name)
         sys.modules[name] = module
         try:
-            exec(compiled, module.__dict__)  # noqa: S102 — the "code" is our own docs
+            # The "untrusted code" here is this repo's own documentation.
+            exec(compiled, module.__dict__)
         finally:
             sys.modules.pop(name, None)
