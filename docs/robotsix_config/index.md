@@ -30,6 +30,47 @@ schema = config_schema_json(Config)
 dump_config(cfg)
 ```
 
+## Legacy key migration
+
+`load_config` strips config keys the model no longer declares (self-healing) and
+logs a `WARNING` for each. That protects a component from crash-looping on a
+config written for an older schema — but on its own it *discards the value*.
+
+To carry a removed key's value to its canonical home, declare a
+`migrate_legacy_config` classmethod on the model:
+
+```python
+from robotsix_config import ConfigModel
+
+
+class Settings(ConfigModel):
+    new_home: str = ""
+
+    @classmethod
+    def migrate_legacy_config(cls, data: dict) -> dict:
+        legacy = data.pop("old_home", None)
+        if legacy and not data.get("new_home"):
+            data["new_home"] = legacy
+        return data
+```
+
+It is called on the raw file contents **before** stripping. That ordering is the
+whole point: a migration written as a pydantic `@model_validator(mode="before")`
+runs inside `model_validate`, which `load_config` only reaches *after* the
+unknown key has already been stripped — so the value is gone before the
+migration can read it, with only a `WARNING` to show for it.
+
+Two requirements:
+
+- **Be idempotent.** `load_config` persists the cleaned config, so the hook is
+  re-run against its own output on every later start.
+- **Let an explicit value win.** Guard with `if not data.get("new_home")` so a
+  value the operator set deliberately is never clobbered by a stale legacy one.
+
+A hook that raises, or returns something other than a `dict`, is ignored with a
+`WARNING` and the unmigrated config is loaded — refusing to load would turn a
+bad migration into an unbootable component.
+
 ## Model
 
 - **Subclass `ConfigModel`.** The canonical base class for configuration models —
