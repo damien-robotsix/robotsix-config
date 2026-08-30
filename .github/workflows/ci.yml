@@ -129,27 +129,6 @@ jobs:
       - name: mypy src and tests
         run: uv run mypy src
 
-  changelog-check:
-    name: Changelog fragment check
-    if: github.event_name == 'pull_request'
-    timeout-minutes: 5
-    permissions:
-      contents: read
-    runs-on: ubuntu-latest
-    steps:
-      - name: Harden Runner
-        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c  # v2.21.0
-        with:
-          egress-policy: audit
-
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v6
-        with:
-          persist-credentials: false
-          fetch-depth: 0  # needed for towncrier check to compare against base branch
-
-      - uses: ./.github/actions/setup
-
-
   actionlint:
     name: Actionlint
     permissions:

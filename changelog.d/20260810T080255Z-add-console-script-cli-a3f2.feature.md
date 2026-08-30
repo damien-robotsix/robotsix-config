@@ -1,1 +1,0 @@
-- Add console-script CLI (`robotsix-config`) with `schema` (generate/check) and `config --check-keys` subcommands.

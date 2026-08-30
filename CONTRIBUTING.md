@@ -96,32 +96,23 @@ aborted; review and commit the mechanical fixups before committing again.
   `__all__` in `src/robotsix_config/__init__.py` need care, since
   consumers rely on these exported symbols.
 
-## Changelog entries
+## Commit messages and changelog
 
-This project uses [towncrier](https://towncrier.readthedocs.io/) to
-manage the changelog. Every pull request must include a changelog
-fragment file in `changelog.d/`.
+This project uses [release-please](https://github.com/googleapis/release-please-action) to automate releases and generate `CHANGELOG.md`. Release-please relies on [conventional commits](https://www.conventionalcommits.org/) to determine version bumps.
 
-Fragments are plain text files named
-`<ticket-id>.<fragment-type>.md` (e.g.
-`20260701T120000Z-fix-login-timeout-a3f2.bugfix.md`). The file
-contains a single line describing the change, prefixed with `- `:
+**Commit subjects and PR titles must follow the conventional commits format:**
 
-```text
-- Fixed a timeout bug in the login flow.
-```
+- `feat: <description>` — new feature (triggers a minor version bump)
+- `fix: <description>` — bug fix (triggers a patch version bump)
+- `chore: <description>` — maintenance task
+- `docs: <description>` — documentation only
+- `refactor: <description>` — code refactoring
+- `test: <description>` — test changes
+- `ci: <description>` — CI/CD changes
 
-Available fragment types: `bugfix`, `doc`, `feature`, `removal`, `misc`.
+A `BREAKING CHANGE:` footer in the commit body triggers a major version bump.
 
-To check that your fragment is valid before pushing:
-
-```sh
-uv run towncrier check --compare-with origin/main
-```
-
-This command runs in CI on every pull request, so a missing or
-malformed fragment will cause a CI failure. The fragment is
-automatically collected into the changelog at release time.
+**Do not add changelog fragment files.** The changelog is generated automatically from commit messages at release time.
 
 ## Releasing
 
