@@ -10,16 +10,11 @@ modules:
       - tests/robotsix_config/__init__.py
       - tests/robotsix_config/test_history.py
       - tests/robotsix_config/test_docs_examples.py
-      - changelog.d/*.md
       - docs/robotsix_config/api.md
       - docs/robotsix_config/contributing.md
       - docs/robotsix_config/index.md
       - docs/robotsix_config/modules.yaml
       - docs/robotsix_config/security.md
-      # Glob, never individual fragment filenames: towncrier deletes every
-      # fragment at release time, so a named path here breaks module
-      # registration on the next release. `.gitkeep` keeps the glob matching
-      # once the directory is emptied. Matches central-deploy and chat.
       - scripts/check_py_typed.py
   - id: config
     description: Configuration models, schema generation, and config file loading/dumping.
