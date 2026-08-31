@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 
 <!-- towncrier release notes start -->
+## [0.6.0](https://github.com/damien-robotsix/robotsix-config/compare/v0.5.0...v0.6.0) (2026-08-30)
+
+
+### Features
+
+* **config:** run consumer legacy migrations BEFORE stripping unknown keys ([#294](https://github.com/damien-robotsix/robotsix-config/issues/294)) ([884a452](https://github.com/damien-robotsix/robotsix-config/commit/884a452062a04f569fb63a9d103c29eafbf3c056))
+* robotsix-config: Enable agent_check periodic workflow (20260828T112229Z-robotsix-config-enable-agent-check-perio-8543) ([#296](https://github.com/damien-robotsix/robotsix-config/issues/296)) ([446e3d9](https://github.com/damien-robotsix/robotsix-config/commit/446e3d9378723f0b264385a51aba3f5d9c32dbb1))
+* robotsix-config: Enable trace_review periodic workflow (20260828T164926Z-robotsix-config-enable-trace-review-peri-2b14) ([#298](https://github.com/damien-robotsix/robotsix-config/issues/298)) ([68884f6](https://github.com/damien-robotsix/robotsix-config/commit/68884f64775b67db3689b5795d2a3eeffa48c52c))
+
 ## [0.5.0](https://github.com/damien-robotsix/robotsix-config/compare/v0.4.0...v0.5.0) (2026-08-22)
 
 
