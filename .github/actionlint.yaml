@@ -1,0 +1,7 @@
+# actionlint (>=1.7) per-path error suppressions.
+paths:
+  .github/workflows/ci.yml:
+    ignore:
+      # `$/` is the GA (2026-07-30) self-repository action syntax required
+      # by zizmor >=1.30; actionlint 1.7.x does not parse it yet.
+      - 'specifying action "\$/.+" in invalid format because ref is missing'
