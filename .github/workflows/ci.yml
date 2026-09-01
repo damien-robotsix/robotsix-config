@@ -101,7 +101,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: ./.github/actions/setup  # zizmor: ignore[self-repository]
+      - uses: $/.github/actions/setup
 
       - name: ruff check
         run: uv run ruff check .
@@ -124,7 +124,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: ./.github/actions/setup  # zizmor: ignore[self-repository]
+      - uses: $/.github/actions/setup
 
       - name: mypy src and tests
         run: uv run mypy src
@@ -163,7 +163,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: ./.github/actions/setup  # zizmor: ignore[self-repository]
+      - uses: $/.github/actions/setup
 
       - name: vulture
         run: uv run vulture src/
@@ -184,7 +184,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: ./.github/actions/setup  # zizmor: ignore[self-repository]
+      - uses: $/.github/actions/setup
 
       - name: Validate module taxonomy
         run: uv run robotsix-modules validate docs/robotsix_config/modules.yaml
@@ -208,7 +208,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: ./.github/actions/setup  # zizmor: ignore[self-repository]
+      - uses: $/.github/actions/setup
 
       # `uv run`, not bare `python`: the bare interpreter is the runner's
       # system Python, which has none of the project dependencies, so this
@@ -232,7 +232,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: ./.github/actions/setup  # zizmor: ignore[self-repository]
+      - uses: $/.github/actions/setup
 
       - name: Check py.typed marker
         run: python scripts/check_py_typed.py
@@ -253,7 +253,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: ./.github/actions/setup  # zizmor: ignore[self-repository]
+      - uses: $/.github/actions/setup
 
       - name: Build docs (strict mode)
         run: PYTHONPATH=src uv run mkdocs build --strict
@@ -278,7 +278,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: ./.github/actions/setup  # zizmor: ignore[self-repository]
+      - uses: $/.github/actions/setup
 
       - name: bandit
         run: uvx --from 'bandit[sarif]' bandit -c pyproject.toml -r src/ -f sarif -o bandit-results.sarif
@@ -309,7 +309,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: ./.github/actions/setup  # zizmor: ignore[self-repository]
+      - uses: $/.github/actions/setup
 
       - name: pytest
         run: uv run pytest -n auto --cov=src --cov-report=xml --cov-report=term-missing
@@ -359,7 +359,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: ./.github/actions/setup  # zizmor: ignore[self-repository]
+      - uses: $/.github/actions/setup
 
       - name: Audit dependencies for known vulnerabilities
         run: uv audit --frozen --output-format sarif > uv-audit-results.sarif
@@ -390,7 +390,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: ./.github/actions/setup  # zizmor: ignore[self-repository]
+      - uses: $/.github/actions/setup
 
       - name: Generate CycloneDX SBOM
         run: uv run --with cyclonedx-py cyclonedx-py environment --output-file sbom.cyclonedx.json
