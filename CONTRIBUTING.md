@@ -161,6 +161,32 @@ def old_function():
 it does not escalate to an error. See
 `tests/robotsix_config/test_deprecations.py` for examples.
 
+**How to review deprecation PRs:** when reviewing a PR that introduces a
+deprecation, maintainers should verify:
+
+- The change genuinely needs a deprecation — it alters a public, exported
+  symbol (see `__all__` in `src/robotsix_config/__init__.py`), a public
+  function signature, or a public code path. Internal helpers
+  (underscore-prefixed modules and names) may change freely and need no
+  deprecation.
+- The deprecated symbol emits a `DeprecationWarning` at runtime via the
+  `deprecated` decorator from `robotsix_config._deprecation`.
+- The `version` argument names the release in which the change ships (N), and
+  `removed_in` names the next major release (N+1) per the lifecycle policy
+  above — no removal scheduled within the same minor/major cycle as the
+  deprecation.
+- The callable's docstring carries a Google-style `Deprecated:` block naming
+  the deprecation version and the replacement.
+- Tests capture the warning with `pytest.warns(...)` and assert the message
+  includes the deprecation/removal versions and any migration guidance.
+- The deprecation itself is not a breaking change: the deprecated symbol's
+  behavior is unchanged, and consumers have a working replacement path to
+  migrate to.
+
+A PR that **removes** a symbol deprecated in a previous release is only
+acceptable in a major release, and only once the deprecation window (one
+release cycle) has elapsed.
+
 ## Releasing
 
 Releases are automated via GitHub Actions:
