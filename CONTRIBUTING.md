@@ -114,6 +114,53 @@ A `BREAKING CHANGE:` footer in the commit body triggers a major version bump.
 
 **Do not add changelog fragment files.** The changelog is generated automatically from commit messages at release time.
 
+### Deprecation
+
+The public API surface is backward-compatibility sensitive, so an API that
+external consumers may depend on is never removed without advance warning.
+
+**Lifecycle policy:** deprecate in release *N*, then remove in the next major
+version bump (*N+1* major). This gives fleet consumers at least one release
+cycle to migrate before a symbol disappears.
+
+**When to deprecate:** any API change that affects external consumers —
+renaming or removing an exported symbol (see `__all__` in
+`src/robotsix_config/__init__.py`), changing a public function's signature, or
+retiring a public code path. Internal helpers (underscore-prefixed modules and
+names) may change freely.
+
+**How to deprecate at runtime:** wrap the callable with the
+`deprecated` decorator from `robotsix_config._deprecation`. It emits a
+`DeprecationWarning` — naming the deprecation version, the planned removal
+version, and optional migration guidance — every time the callable is invoked:
+
+```python
+from robotsix_config._deprecation import deprecated
+
+
+@deprecated("0.7.0", "1.0.0", "Use new_function instead")
+def old_function(): ...
+```
+
+**How to document deprecations:** add a Google-style `Deprecated:` block to the
+callable's docstring (compatible with the repo's ruff `D` rules):
+
+```python
+def old_function():
+    """Do the old thing.
+
+    Deprecated:
+        version 0.7.0: Use new_function instead. Will be removed in 1.0.0.
+    """
+```
+
+**How to test deprecations:** add a test that asserts the
+`DeprecationWarning` is emitted and that its message matches the decorator's
+`message` argument. Because `pyproject.toml` sets
+`filterwarnings = ["error"]`, capture the warning with `pytest.warns(...)` so
+it does not escalate to an error. See
+`tests/robotsix_config/test_deprecations.py` for examples.
+
 ## Releasing
 
 Releases are automated via GitHub Actions:
