@@ -61,6 +61,14 @@ robotsix-modules = { git = "https://github.com/damien-robotsix/robotsix-modules.
 testpaths = ["tests"]
 filterwarnings = ["error"]
 
+[tool.vulture]
+# `deprecated` (robotsix_config/_deprecation.py) is an intentionally-exposed
+# decorator that downstream robotsix consumers import directly:
+# `from robotsix_config._deprecation import deprecated`. Nothing within src/
+# invokes it yet, so static dead-code analysis cannot see the use — whitelist
+# the exact name via vulture's documented `ignore_names` mechanism.
+ignore_names = ["deprecated"]
+
 [tool.coverage.run]
 source = ["robotsix_config"]
 branch = true

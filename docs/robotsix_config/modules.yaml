@@ -7,8 +7,10 @@ modules:
       - src/robotsix_config/cli.py
       - src/robotsix_config/py.typed
       - src/robotsix_config/history.py
+      - src/robotsix_config/_deprecation.py
       - tests/robotsix_config/__init__.py
       - tests/robotsix_config/test_history.py
+      - tests/robotsix_config/test_deprecations.py
       - tests/robotsix_config/test_docs_examples.py
       - docs/robotsix_config/api.md
       - docs/robotsix_config/contributing.md
