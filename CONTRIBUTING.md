@@ -116,6 +116,14 @@ A `BREAKING CHANGE:` footer in the commit body triggers a major version bump.
 
 ### Deprecation
 
+**Rule:** Any API change affecting external consumers must be deprecated via
+the `deprecated(version, removed_in, message=None)` decorator from
+`robotsix_config._deprecation` — never hand-rolled `warnings.warn` calls — and
+documented with a Google-style `Deprecated:` docstring block. Follow the
+lifecycle policy below: deprecate in release *N*, remove in the next major.
+Add a test asserting the `DeprecationWarning` is emitted with the expected
+message.
+
 The public API surface is backward-compatibility sensitive, so an API that
 external consumers may depend on is never removed without advance warning.
 
