@@ -95,5 +95,5 @@ class TestMain:
         assert output.read_text(encoding="utf-8") == self._fresh_schema_text()
 
         captured = capsys.readouterr()
-        assert "stale" in captured.out
+        assert "out of sync" in captured.out
         assert "Diff:" in captured.out

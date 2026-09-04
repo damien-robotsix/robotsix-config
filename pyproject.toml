@@ -104,6 +104,10 @@ exclude_dirs = ["tests"]
 # generator) is invoked as CLI commands and not imported from src/, so deptry's
 # DEP002 ("defined but not used") is expected and intentional.
 DEP002 = ["pytest", "pytest-cov", "pytest-xdist", "ruff", "mypy", "mkdocs-material", "mkdocstrings", "vulture", "robotsix-modules", "hypothesis"]
+# The dev-only check_schema_freshness script imports the project's own
+# package (robotsix_config) as a CLI tool, not as a src/ module, so deptry
+# reports it as a transitive dependency (DEP003) — expected and intentional.
+DEP003 = ["robotsix_config"]
 
 [tool.mypy]
 warn_unused_ignores = true

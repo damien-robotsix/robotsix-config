@@ -12,9 +12,9 @@ import pytest
 from robotsix_config.cli import (
     _config_check_keys,
     _import_model,
-    _schema_check,
     _schema_generate,
     main,
+    schema_check,
 )
 
 # -- _import_model -----------------------------------------------------------
@@ -81,7 +81,7 @@ class TestSchemaCheck:
         output.write_text(config_schema_json(AppSettings), encoding="utf-8")
 
         # Should not raise SystemExit
-        _schema_check(AppSettings, output)
+        schema_check(AppSettings, output)
 
     def test_missing_file_exits_nonzero(
         self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
@@ -91,7 +91,7 @@ class TestSchemaCheck:
         output = tmp_path / "missing.json"
 
         with pytest.raises(SystemExit) as excinfo:
-            _schema_check(AppSettings, output)
+            schema_check(AppSettings, output)
         assert excinfo.value.code == 1
         captured = capsys.readouterr()
         assert "missing" in captured.out
@@ -105,7 +105,7 @@ class TestSchemaCheck:
         output.write_text('{"stale": true}\n', encoding="utf-8")
 
         with pytest.raises(SystemExit) as excinfo:
-            _schema_check(AppSettings, output)
+            schema_check(AppSettings, output)
         assert excinfo.value.code == 1
 
         captured = capsys.readouterr()
@@ -113,6 +113,22 @@ class TestSchemaCheck:
         assert "Diff:" in captured.out
         # The file must NOT be overwritten in check mode.
         assert output.read_text(encoding="utf-8") == '{"stale": true}\n'
+
+    def test_write_on_drift_rewrites_file(
+        self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        from robotsix_config.config import config_schema_json
+        from tests.config.scripts._test_cli_models import AppSettings
+
+        output = tmp_path / "stale.json"
+        output.write_text('{"stale": true}\n', encoding="utf-8")
+
+        with pytest.raises(SystemExit) as excinfo:
+            schema_check(AppSettings, output, write_on_drift=True)
+        assert excinfo.value.code == 1
+
+        # With write_on_drift the file is rewritten to the fresh schema.
+        assert output.read_text(encoding="utf-8") == config_schema_json(AppSettings)
 
 
 # -- config check-keys -------------------------------------------------------
