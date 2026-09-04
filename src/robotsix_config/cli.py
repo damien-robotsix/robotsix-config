@@ -63,11 +63,19 @@ def _schema_generate(
     print(f"Wrote schema to '{output_path}'")
 
 
-def _schema_check(
+def schema_check(
     model_cls: type[BaseModel],
     output_path: Path,
+    *,
+    write_on_drift: bool = False,
 ) -> None:
-    """Compare the committed file against freshly generated schema."""
+    """Compare the committed file against freshly generated schema.
+
+    Exits 1 when the file is missing or its content differs.  When
+    *write_on_drift* is True the fresh schema is written to *output_path*
+    first so the caller can commit it; otherwise the file is left untouched
+    and the caller is expected to regenerate it separately.
+    """
     new_content = config_schema_json(model_cls)
     old_content = (
         output_path.read_text(encoding="utf-8") if output_path.is_file() else ""
@@ -76,6 +84,10 @@ def _schema_check(
     if new_content == old_content:
         print(f"Schema file '{output_path}' is in sync with the model.")
         return
+
+    if write_on_drift:
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(new_content, encoding="utf-8")
 
     old_lines = old_content.splitlines(keepends=True)
     new_lines = new_content.splitlines(keepends=True)
@@ -91,7 +103,7 @@ def _schema_check(
     reason = "missing" if not old_content else "out of sync"
     print(
         f"Schema file '{output_path}' is {reason} with the model."
-        "\nRe-run without --check to regenerate, then commit the updated file."
+        "\nRegenerate the schema and commit the updated file."
         "\n\nDiff:"
     )
     print(diff)
@@ -218,7 +230,7 @@ def main(argv: list[str] | None = None) -> int:
 
             output_path = Path(args.output)
             if args.check:
-                _schema_check(model_cls, output_path)
+                schema_check(model_cls, output_path)
             else:
                 _schema_generate(model_cls, output_path)
 
