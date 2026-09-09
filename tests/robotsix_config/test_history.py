@@ -10,6 +10,7 @@ fleet live credentials more than once, so it is tested here from several angles.
 from __future__ import annotations
 
 import json
+import os
 
 import pytest
 from pydantic import BaseModel, SecretStr
@@ -597,6 +598,7 @@ class TestRotation:
         monkeypatch.setenv(mod.MAX_VERSIONS_ENV, " 25 ")
         assert mod.max_versions() == 25
 
+    @pytest.mark.skipif(os.name != "posix", reason="0600 is a POSIX-only guarantee")
     def test_rotation_keeps_file_private(self, tmp_path, monkeypatch) -> None:
         monkeypatch.setenv(mod.MAX_VERSIONS_ENV, "2")
         cfg = self._record_n(tmp_path, 4)
