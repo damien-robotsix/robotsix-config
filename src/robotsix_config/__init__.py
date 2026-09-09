@@ -19,7 +19,9 @@ Public API:
 - ``ConfigError`` / ``InvalidConfigError`` — error types.
 
 A component owns its settings **and** their history. The history lives in a
-``<config>.versions`` JSONL sidecar; see :mod:`robotsix_config.history`:
+``<config>.versions`` JSONL sidecar trimmed to its newest ``max_versions()``
+entries (default 10, ``ROBOTSIX_CONFIG_MAX_VERSIONS``); see
+:mod:`robotsix_config.history`:
 
 - ``apply_update(model_cls, update)`` — the whole of ``PUT /config``: deep-merge,
   preserve secrets the caller did not resubmit, validate, write, record.

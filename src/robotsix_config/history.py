@@ -7,20 +7,24 @@ has to live next to the config file itself, and every component has to keep it
 the same way. This module is that one way.
 
 The history is a JSONL sidecar at ``<config>.versions`` — one JSON object per
-line, appended, never rewritten:
+line, appended; only the newest :func:`max_versions` entries are kept (default
+10, ``ROBOTSIX_CONFIG_MAX_VERSIONS``; ``0`` keeps everything):
 
 .. code-block:: json
 
     {"version": 3, "timestamp": "2026-08-07T22:03:27+00:00",
      "changed_keys": ["langfuse (secret)"], "data": {...}}
 
-Append-only matters: a rollback writes a *new* entry restoring older values
-rather than deleting the entries after it, so the history can always explain how
-the current file came to look the way it does.
+Append matters: a rollback writes a *new* entry restoring older values rather
+than deleting the entries after it, so the retained history always explains how
+the current file came to look the way it does. Rotation only drops the OLDEST
+entries — version numbers keep increasing, and a version that has rotated out
+can no longer be rolled back to (2026-09-09: unbounded sidecars grew to 50+
+full config snapshots per component; the operator default is 10).
 
 **Secret values are never written to the history** — only the fact that a
 secret-bearing key changed, via the ``" (secret)"`` suffix in ``changed_keys``.
-An append-only file accumulates forever; a credential recorded in it outlives
+A history file outlives the moment it was written; a credential recorded in it outlives
 every later rotation of that credential. The deliberate consequence is that
 :func:`rollback` restores everything *except* secrets, carrying the live ones
 forward instead.
@@ -64,13 +68,16 @@ from ._errors import InvalidConfigError
 from .config import _atomic_replace, load_config, resolve_config_path
 
 __all__ = [
+    "DEFAULT_MAX_VERSIONS",
     "MASKED_SECRET_SENTINEL",
+    "MAX_VERSIONS_ENV",
     "SECRET_KEY_SUFFIXES",
     "apply_update",
     "compute_changed_keys",
     "current_version",
     "deep_merge",
     "mask_secrets",
+    "max_versions",
     "read_versions",
     "record_version",
     "rollback",
@@ -225,6 +232,79 @@ def strip_secrets(
     return cast("dict[str, Any]", walk(data, ()))
 
 
+#: Environment variable that overrides :data:`DEFAULT_MAX_VERSIONS`.
+MAX_VERSIONS_ENV = "ROBOTSIX_CONFIG_MAX_VERSIONS"
+#: How many history entries the sidecar keeps by default.
+DEFAULT_MAX_VERSIONS = 10
+
+
+def max_versions() -> int:
+    """How many entries the history keeps: :data:`MAX_VERSIONS_ENV` when it is
+    a non-negative integer, else :data:`DEFAULT_MAX_VERSIONS`. ``0`` = unbounded.
+    """
+    raw = os.environ.get(MAX_VERSIONS_ENV)
+    if raw is None or not raw.strip():
+        return DEFAULT_MAX_VERSIONS
+    try:
+        value = int(raw.strip())
+    except ValueError:
+        logger.warning(
+            "%s=%r is not an integer; keeping the default of %d versions",
+            MAX_VERSIONS_ENV,
+            raw,
+            DEFAULT_MAX_VERSIONS,
+        )
+        return DEFAULT_MAX_VERSIONS
+    if value < 0:
+        logger.warning(
+            "%s=%d is negative; keeping the default of %d versions",
+            MAX_VERSIONS_ENV,
+            value,
+            DEFAULT_MAX_VERSIONS,
+        )
+        return DEFAULT_MAX_VERSIONS
+    return value
+
+
+def _trim_history(path: Path, keep: int) -> None:
+    """Rewrite *path* so it holds only its newest *keep* lines (no-op when
+    ``keep`` is 0 or the file already fits). Atomic: written to a sibling
+    temp file and renamed over the sidecar, mode 0600 preserved best-effort.
+    """
+    if keep <= 0:
+        return
+    try:
+        lines = [
+            ln for ln in path.read_text(encoding="utf-8").splitlines() if ln.strip()
+        ]
+    except FileNotFoundError:
+        return
+    if len(lines) <= keep:
+        return
+    kept = lines[-keep:]
+    fd, tmp_name = tempfile.mkstemp(
+        dir=str(path.parent), prefix=path.name, suffix=".tmp"
+    )
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as fh:
+            fh.write("\n".join(kept) + "\n")
+            fh.flush()
+            os.fsync(fh.fileno())
+        os.replace(tmp_name, path)
+    except BaseException:
+        with contextlib.suppress(OSError):
+            os.unlink(tmp_name)
+        raise
+    with contextlib.suppress(OSError):
+        path.chmod(0o600)
+    logger.info(
+        "trimmed %s to its newest %d version(s) (dropped %d)",
+        path,
+        keep,
+        len(lines) - keep,
+    )
+
+
 def record_version(
     data: dict[str, Any],
     changed_keys: list[str],
@@ -232,6 +312,9 @@ def record_version(
     config_path: str | os.PathLike[str] | None = None,
 ) -> int:
     """Append one entry to the history and return its version number.
+
+    After appending, the sidecar is trimmed to its newest :func:`max_versions`
+    entries (oldest dropped; numbering continues).
 
     Secret values are stripped from the stored snapshot (see
     :func:`strip_secrets`). ``changed_keys`` still names a changed secret, so
@@ -272,6 +355,7 @@ def record_version(
         os.fsync(fh.fileno())
     with contextlib.suppress(OSError):
         path.chmod(0o600)  # best-effort; 0600 is a POSIX-only guarantee
+    _trim_history(path, max_versions())
     return version
 
 
@@ -686,7 +770,7 @@ def rollback(
 ) -> tuple[dict[str, Any], list[str], int]:
     """Restore *target_version*'s values as a **new** version.
 
-    The history is never truncated: rolling back from version 5 to 2 produces
+    A rollback never deletes later entries: rolling back from version 5 to 2 produces
     version 6 whose contents equal version 2's. The intervening versions stay
     readable, which is the point of keeping a history at all.
 
