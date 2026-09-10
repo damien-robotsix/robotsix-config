@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 
 <!-- towncrier release notes start -->
+## [0.7.0](https://github.com/damien-robotsix/robotsix-config/compare/v0.6.0...v0.7.0) (2026-09-09)
+
+
+### Features
+
+* **history:** rotate the config version sidecar to the newest N entries (default 10) ([#317](https://github.com/damien-robotsix/robotsix-config/issues/317)) ([735fd85](https://github.com/damien-robotsix/robotsix-config/commit/735fd85506b7dad2c72b080beadfcbd8bc8686f5))
+
 ## [0.6.0](https://github.com/damien-robotsix/robotsix-config/compare/v0.5.0...v0.6.0) (2026-08-30)
 
 
