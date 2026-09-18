@@ -12,6 +12,7 @@ modules:
       - tests/robotsix_config/test_history.py
       - tests/robotsix_config/test_deprecations.py
       - tests/robotsix_config/test_docs_examples.py
+      - tests/robotsix_config/test_readme_cli_examples.py
       - docs/robotsix_config/api.md
       - docs/robotsix_config/contributing.md
       - docs/robotsix_config/index.md
