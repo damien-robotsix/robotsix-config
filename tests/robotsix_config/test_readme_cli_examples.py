@@ -99,9 +99,7 @@ def test_documented_cli_examples_execute() -> None:
             _seed_config(args)
 
         exit_code = main(args)
-        assert exit_code == 0, (
-            f"README CLI example exited {exit_code}: {invocation!r}"
-        )
+        assert exit_code == 0, f"README CLI example exited {exit_code}: {invocation!r}"
 
 
 def _seed_schema(args: list[str]) -> None:
