@@ -21,18 +21,18 @@ Requires Python 3.14+.
 
 ```bash
 # Generate or check a config JSON Schema
-robotsix-config schema myapp.config:Settings
-robotsix-config schema --check myapp.config:Settings
-robotsix-config schema --output path/to/schema.json myapp.config:Settings
+robotsix-config schema myapp.config.Settings
+robotsix-config schema --check myapp.config.Settings
+robotsix-config schema --output path/to/schema.json myapp.config.Settings
 
 # Validate config JSON keys against model fields
-robotsix-config config --check-keys myapp.config:Settings --config config/config.json
+robotsix-config config --check-keys myapp.config.Settings --config config/config.json
 ```
 
 Or via ``python -m robotsix_config`` (same behaviour):
 
 ```bash
-python -m robotsix_config schema myapp.config:Settings
+python -m robotsix_config schema myapp.config.Settings
 ```
 
 ## Standards
