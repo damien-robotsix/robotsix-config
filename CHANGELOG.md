@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 
 <!-- towncrier release notes start -->
+## [0.7.1](https://github.com/damien-robotsix/robotsix-config/compare/v0.7.0...v0.7.1) (2026-09-18)
+
+
+### Bug Fixes
+
+* Fix incorrect CLI syntax in README.md and docs (20260918T134801Z-fix-incorrect-cli-syntax-in-readme-md-an-ee29) ([#329](https://github.com/damien-robotsix/robotsix-config/issues/329)) ([418c4e8](https://github.com/damien-robotsix/robotsix-config/commit/418c4e85f8e26c5b76e0649845825c4a9d298bd3))
+
 ## [0.7.0](https://github.com/damien-robotsix/robotsix-config/compare/v0.6.0...v0.7.0) (2026-09-09)
 
 
