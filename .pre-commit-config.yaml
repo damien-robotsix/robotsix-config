@@ -13,7 +13,7 @@ repos:
       - id: detect-private-key
       - id: debug-statements
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: 2eeb5678de71a00c0902cbda7105d328432f72cb  # frozen: v0.16.8  # pragma: allowlist secret
+    rev: a56c0b927e6465d37cae3e97d35d4d18ab2b96cd  # frozen: v0.16.9  # pragma: allowlist secret
     hooks:
       - id: ruff
         args: [--fix]
