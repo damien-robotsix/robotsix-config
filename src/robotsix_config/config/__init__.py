@@ -51,7 +51,10 @@ class ConfigModel(BaseModel):
     """
 
 
+#: Environment variable name for the config file path (overrides DEFAULT_CONFIG_PATH).
 CONFIG_FILE_ENV = "ROBOTSIX_CONFIG_FILE"
+
+#: Default config file path when not overridden by CONFIG_FILE_ENV.
 DEFAULT_CONFIG_PATH = Path("config/config.json")
 
 
