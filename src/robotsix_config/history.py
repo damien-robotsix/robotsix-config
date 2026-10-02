@@ -825,10 +825,10 @@ def rollback(
     return restored, changed, version
 
 
-def load_with_history(
-    model_cls: type[BaseModel],
+def load_with_history[ModelT: BaseModel](
+    model_cls: type[ModelT],
     config_path: str | os.PathLike[str] | None = None,
-) -> tuple[BaseModel, int]:
+) -> tuple[ModelT, int]:
     """Load the config and return it with its current version number.
 
     Convenience for a ``GET /config`` handler, which needs both.

@@ -127,7 +127,7 @@ jobs:
       - uses: $/.github/actions/setup
 
       - name: mypy src and tests
-        run: uv run mypy src
+        run: uv run mypy src tests
 
   actionlint:
     name: Actionlint
