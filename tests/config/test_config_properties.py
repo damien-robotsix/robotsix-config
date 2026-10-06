@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 pytest.importorskip("hypothesis")
-from hypothesis import given  # type: ignore[import-not-found]
+from hypothesis import given
 from hypothesis import strategies as st
 from pydantic import BaseModel, SecretStr
 

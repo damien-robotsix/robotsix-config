@@ -7,7 +7,8 @@ from pathlib import Path
 
 import pytest
 
-from scripts.check_schema_freshness import _import_model, main
+from robotsix_config.cli import _import_model
+from scripts.check_schema_freshness import main
 
 
 class TestImportModel:
