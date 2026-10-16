@@ -48,4 +48,5 @@ modules:
       - conftest.py
       - tests/__init__.py
       - tests/conftest.py
+      - tests/test_perf_edge_cases.py
       - tests/test_perf_load.py
