@@ -48,7 +48,7 @@ CI test runs stay fast. Enable and run them with:
 uv run pytest --benchmark-enable tests/test_perf_*.py
 ```
 
-See the [benchmarking guide](docs/robotsix_config/benchmarking.md) for how to
+See the [benchmarking guide](benchmarking.md) for how to
 interpret results, save and compare baselines, add new benchmarks, and how CI
 treats benchmarks.
 
