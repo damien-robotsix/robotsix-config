@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 
 <!-- towncrier release notes start -->
+## [0.7.2](https://github.com/damien-robotsix/robotsix-config/compare/v0.7.1...v0.7.2) (2026-10-16)
+
+
+### Documentation
+
+* Document benchmark execution, interpretation, and baseline management (20261016T162328Z-document-benchmark-execution-interpretat-19d3) ([#368](https://github.com/damien-robotsix/robotsix-config/issues/368)) ([93250b6](https://github.com/damien-robotsix/robotsix-config/commit/93250b6954de7d2b32c71323cdfe7ac646756bbc))
+
 ## [0.7.1](https://github.com/damien-robotsix/robotsix-config/compare/v0.7.0...v0.7.1) (2026-09-18)
 
 
