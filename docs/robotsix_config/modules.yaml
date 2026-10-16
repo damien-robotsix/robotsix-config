@@ -43,7 +43,9 @@ modules:
       - tests/_errors/__init__.py
       - tests/_errors/test_errors.py
   - id: tests
-    description: Test infrastructure and shared fixtures.
+    description: Test infrastructure, shared fixtures, and performance benchmarks.
     paths:
+      - conftest.py
       - tests/__init__.py
       - tests/conftest.py
+      - tests/test_perf_load.py
