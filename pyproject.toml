@@ -35,7 +35,7 @@ Issues = "https://github.com/damien-robotsix/robotsix-config/issues"
 Changelog = "https://github.com/damien-robotsix/robotsix-config/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "pytest-cov>=5", "pytest-xdist>=3.6", "ruff>=0.16.3", "mypy>=1.11", "vulture>=2.16", "deptry>=0.22.0", "mkdocs-material>=9", "mkdocstrings[python]>=1.0.6", "robotsix-modules>=0.2.0", "hypothesis>=6.165.7"]
+dev = ["pytest>=8", "pytest-benchmark>=4", "pytest-cov>=5", "pytest-xdist>=3.6", "ruff>=0.16.3", "mypy>=1.11", "vulture>=2.16", "deptry>=0.22.0", "mkdocs-material>=9", "mkdocstrings[python]>=1.0.6", "robotsix-modules>=0.2.0", "hypothesis>=6.165.7"]
 docs = ["mkdocs-material>=9", "mkdocstrings[python]>=1.0.6"]
 
 [tool.hatch.build.targets.wheel]
@@ -60,6 +60,12 @@ robotsix-modules = { git = "https://github.com/damien-robotsix/robotsix-modules.
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 filterwarnings = ["error"]
+# Benchmarks (tests/test_perf_*.py) are disabled by default so CI test runs
+# stay fast; enable them with `--benchmark-enable`. The `--benchmark-disable`
+# default is applied conditionally in the root conftest.py rather than via
+# `addopts` here, because pytest-benchmark is an optional dev dependency: a
+# static `addopts` entry would make pytest reject the unknown flag (breaking
+# collection) whenever the plugin is not installed. See CONTRIBUTING.md.
 
 [tool.vulture]
 # `deprecated` (robotsix_config/_deprecation.py) is an intentionally-exposed
@@ -103,7 +109,7 @@ exclude_dirs = ["tests"]
 # Dev-only tooling (formatter/linter/type-checker/test framework + docs site
 # generator) is invoked as CLI commands and not imported from src/, so deptry's
 # DEP002 ("defined but not used") is expected and intentional.
-DEP002 = ["pytest", "pytest-cov", "pytest-xdist", "ruff", "mypy", "mkdocs-material", "mkdocstrings", "vulture", "deptry", "robotsix-modules", "hypothesis"]
+DEP002 = ["pytest", "pytest-benchmark", "pytest-cov", "pytest-xdist", "ruff", "mypy", "mkdocs-material", "mkdocstrings", "vulture", "deptry", "robotsix-modules", "hypothesis"]
 # The dev-only check_schema_freshness script imports the project's own
 # package (robotsix_config) as a CLI tool, not as a src/ module, so deptry
 # reports it as a transitive dependency (DEP003) — expected and intentional.

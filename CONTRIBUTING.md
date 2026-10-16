@@ -37,6 +37,17 @@ To reproduce the coverage report CI produces:
 uv run pytest --cov=src --cov-report=term-missing
 ```
 
+## Performance benchmarking
+
+Performance benchmarks live in `tests/test_perf_*.py` and cover config
+loading, dumping, and JSON Schema generation. They are disabled by default
+(via a conditional `--benchmark-disable` applied in the root `conftest.py`) so
+CI test runs stay fast. Enable and run them with:
+
+```sh
+uv run pytest --benchmark-enable tests/test_perf_*.py
+```
+
 ## Code quality
 
 CI runs the following checks; run them locally before pushing.
