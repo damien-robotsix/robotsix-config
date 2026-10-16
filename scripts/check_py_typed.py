@@ -20,6 +20,40 @@ import tempfile
 import zipfile
 from pathlib import Path
 
+EXPECTED_MARKER = "robotsix_config/py.typed"
+
+
+def _verify_marker(wheels: list[Path]) -> None:
+    """Verify the first wheel in ``wheels`` contains the ``py.typed`` marker.
+
+    Prints a diagnostic to stderr and calls :func:`sys.exit` with a
+    non-zero status when no wheel was produced or the marker is missing.
+    Factored out of :func:`main` so the zip-inspection branches can be
+    exercised without running a full PEP 517 build.
+    """
+    if not wheels:
+        print(
+            "No wheel produced by build — check pyproject.toml",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    wheel = wheels[0]
+    with zipfile.ZipFile(wheel) as zf:
+        namelist = zf.namelist()
+
+    if EXPECTED_MARKER not in namelist:
+        print(
+            f"py.typed marker ({EXPECTED_MARKER!r}) not found in wheel {wheel.name}",
+            file=sys.stderr,
+        )
+        print("Wheel contents:", file=sys.stderr)
+        for name in sorted(namelist):
+            print(f"  {name}", file=sys.stderr)
+        sys.exit(1)
+
+    print(f"py.typed marker confirmed in wheel {wheel.name}")
+
 
 def main(argv: list[str] | None = None) -> None:
     """Build the wheel and verify ``py.typed`` is included."""
@@ -40,29 +74,7 @@ def main(argv: list[str] | None = None) -> None:
             check=True,
         )
         wheels = list(Path(tmpdir).glob("*.whl"))
-        if not wheels:
-            print(
-                "No wheel produced by build — check pyproject.toml",
-                file=sys.stderr,
-            )
-            sys.exit(1)
-
-        wheel = wheels[0]
-        with zipfile.ZipFile(wheel) as zf:
-            namelist = zf.namelist()
-
-        expected = "robotsix_config/py.typed"
-        if expected not in namelist:
-            print(
-                f"py.typed marker ({expected!r}) not found in wheel {wheel.name}",
-                file=sys.stderr,
-            )
-            print("Wheel contents:", file=sys.stderr)
-            for name in sorted(namelist):
-                print(f"  {name}", file=sys.stderr)
-            sys.exit(1)
-
-        print(f"py.typed marker confirmed in wheel {wheel.name}")
+        _verify_marker(wheels)
 
 
 if __name__ == "__main__":
