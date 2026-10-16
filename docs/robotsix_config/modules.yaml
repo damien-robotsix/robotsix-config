@@ -19,6 +19,7 @@ modules:
       - docs/robotsix_config/modules.yaml
       - docs/robotsix_config/security.md
       - scripts/check_py_typed.py
+      - tests/config/scripts/test_check_py_typed.py
   - id: config
     description: Configuration models, schema generation, and config file loading/dumping.
     paths:
