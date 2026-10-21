@@ -46,7 +46,7 @@ modules:
     description: Test infrastructure, shared fixtures, and performance benchmarks.
     paths:
       - conftest.py
-      - docs/robotsix_config/benchmarking.md
+      - docs/tests/benchmarking.md
       - tests/__init__.py
       - tests/conftest.py
       - tests/test_perf_edge_cases.py

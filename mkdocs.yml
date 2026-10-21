@@ -12,7 +12,7 @@ nav:
       - Config: config/index.md
       - Errors: _errors/index.md
   - Contributing: robotsix_config/contributing.md
-  - Benchmarking: robotsix_config/benchmarking.md
+  - Benchmarking: tests/benchmarking.md
   - Security: robotsix_config/security.md
 
 theme:
