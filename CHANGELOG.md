@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 
 <!-- towncrier release notes start -->
+## [0.7.3](https://github.com/damien-robotsix/robotsix-config/compare/v0.7.2...v0.7.3) (2026-10-21)
+
+
+### Bug Fixes
+
+* **deps:** bump certifi to 2026.10.19 (GHSA-6q48-6c7w-9gw2) ([#377](https://github.com/damien-robotsix/robotsix-config/issues/377)) ([3b29fd2](https://github.com/damien-robotsix/robotsix-config/commit/3b29fd2758e37d017c29c75bcfb41ab4a221b108))
+
+
+### Documentation
+
+* Reorganize module tests: align to per-module layout (src/docs/tests) (20261021T181646Z-reorganize-module-tests-align-to-per-mod-02a6) ([#380](https://github.com/damien-robotsix/robotsix-config/issues/380)) ([c948713](https://github.com/damien-robotsix/robotsix-config/commit/c94871352f9f97678d5944cb8f58f10d4ef9851c))
+
 ## [0.7.2](https://github.com/damien-robotsix/robotsix-config/compare/v0.7.1...v0.7.2) (2026-10-16)
 
 
