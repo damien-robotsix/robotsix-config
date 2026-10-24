@@ -131,6 +131,25 @@ non-mill PR that has no mill ticket. Triage by PR author **and** branch:
 PRs from any other author (or a listed author on a different branch) stay
 in the normal triage flow.
 
+### `CI failure: <workflow> on main` tickets (`source: ci`)
+
+A workflow file path in the ticket header (for example
+`.github/workflows/ci.yml`) does **not** mean the fix touches that file.
+Before sending a `source: ci` ticket to human approval, check whether the
+same workflow has run green on the same branch at or after the failing
+commit. Then apply the first row that matches:
+
+| Situation | Triage decision | Response text |
+|---|---|---|
+| Same workflow is green on the same branch at or after the failing commit | close (no change needed) | `Transient CI failure: workflow '<name>' is green on <branch> at-or-after failing commit <sha>; green run(s): <links>. No change needed.` |
+| Not green, and the failure is a dependency/CVE finding (e.g. `pip-audit` / `uv audit`) or a test/lint regression | approve to ready | `Routine CI-fix follow-up — approving to ready so the CI-fix pipeline can diagnose and remediate. Fix PR will re-gate before merge.` |
+| Not green, and the fix needs to edit workflow YAML | keep `NEEDS_APPROVAL` | Name the specific planned edit, e.g. `NEEDS_APPROVAL: fix requires editing .github/workflows/ci.yml — bump actions/setup-python pin to <sha> in the test job`. |
+
+The `NEEDS_APPROVAL` reason must cite the workflow change actually planned
+(file, job/step, and what changes). A reason that only repeats the workflow
+path from the ticket header, such as "changes to CI pipeline configuration
+(.github/workflows/ci.yml on main) require human review", is not enough.
+
 ## Commit messages and changelog
 
 This project uses [release-please](https://github.com/googleapis/release-please-action) to automate releases and generate `CHANGELOG.md`. Release-please relies on [conventional commits](https://www.conventionalcommits.org/) to determine version bumps.

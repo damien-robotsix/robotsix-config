@@ -8,6 +8,9 @@
 # - triage-boilerplate-orphaned-pr-dependabot-pinbump: "Track external PR"
 #   tickets for dependabot / first-party pin-bump PRs.
 #   Operator-facing copy: CONTRIBUTING.md, "Triage boilerplate" section.
+# - triage-boilerplate-ci-failure-green-recheck: "CI failure: <workflow> on
+#   main" tickets (source: ci) — green-recheck before human approval.
+#   Operator-facing copy: CONTRIBUTING.md, "Triage boilerplate" section.
 name: triage_boilerplate
 prompt_overlay: |
   ## Known Pattern: orphaned_pr_check on dependabot / pin-bump PRs (triage-boilerplate-orphaned-pr-dependabot-pinbump)
@@ -28,5 +31,28 @@ prompt_overlay: |
 
   Both author AND branch prefix must match for the "mark done" rows; any other
   combination stays in the normal triage flow.
+
+  **Do NOT re-file this pattern.** It has a documented boilerplate response.
+
+  ## Known Pattern: CI-failure tickets green-recheck (triage-boilerplate-ci-failure-green-recheck)
+
+  **Gap ID:** `triage-boilerplate-ci-failure-green-recheck`
+
+  **Trigger:** a `source: ci` ticket titled `CI failure: <workflow> on main`.
+  The workflow file path in the ticket header (e.g.
+  `.github/workflows/ci.yml`) does NOT by itself mean the fix edits that file.
+
+  **Boilerplate responses for triagers.** Before requesting human approval,
+  check whether the same workflow has run green on the same branch at or
+  after the failing commit, then apply the first matching row:
+
+  | Situation | Triage decision | Response text |
+  |---|---|---|
+  | Same workflow green on the same branch at-or-after the failing commit | close (no change needed) | `Transient CI failure: workflow '<name>' is green on <branch> at-or-after failing commit <sha>; green run(s): <links>. No change needed.` |
+  | Not green; dependency/CVE finding or test/lint regression | approve to ready | `Routine CI-fix follow-up — approving to ready so the CI-fix pipeline can diagnose and remediate. Fix PR will re-gate before merge.` |
+  | Not green; fix needs to edit workflow YAML | keep NEEDS_APPROVAL | name the specific planned workflow edit (file, job/step, what changes) |
+
+  The NEEDS_APPROVAL reason must cite the workflow change actually planned,
+  not merely the workflow path from the ticket header.
 
   **Do NOT re-file this pattern.** It has a documented boilerplate response.
