@@ -1,1 +1,32 @@
+# Per-repo periodic workflow: presence enables triage_boilerplate for this repo.
+# Scans recent triage tickets for recurring patterns and proposes boilerplate
+# response templates.  This file partial-merges over the built-in
+# triage_boilerplate definition (lives in robotsix-mill:
+# agent_definitions/periodic/triage_boilerplate.yaml).
+#
+# Known patterns (do not re-file):
+# - triage-boilerplate-orphaned-pr-dependabot-pinbump: "Track external PR"
+#   tickets for dependabot / first-party pin-bump PRs.
+#   Operator-facing copy: CONTRIBUTING.md, "Triage boilerplate" section.
 name: triage_boilerplate
+prompt_overlay: |
+  ## Known Pattern: orphaned_pr_check on dependabot / pin-bump PRs (triage-boilerplate-orphaned-pr-dependabot-pinbump)
+
+  **Gap ID:** `triage-boilerplate-orphaned-pr-dependabot-pinbump`
+
+  **Trigger:** the `orphaned_pr_check` source opens a
+  `Track external PR: <repo>#<N>` ticket for an open non-mill PR that has no
+  mill ticket.
+
+  **Boilerplate responses for triagers:**
+
+  | PR author / branch | Triage decision | Response text |
+  |---|---|---|
+  | `dependabot[bot]`, branch `dependabot/*` | mark done | `operator triage: dependabot PR — dependency PRs are merged by the weekly repo-hygiene chat periodic on impact judgment, not tracked by mill` |
+  | `robotsix-mill[bot]`, branch `pin-bump/*` | mark done | `operator triage: first-party pin-bump PR — owned by the pin-bump runner and the weekly repo-hygiene periodic, not tracked by mill` |
+  | any other author | normal triage | review and merge if appropriate, or close if obsolete |
+
+  Both author AND branch prefix must match for the "mark done" rows; any other
+  combination stays in the normal triage flow.
+
+  **Do NOT re-file this pattern.** It has a documented boilerplate response.
