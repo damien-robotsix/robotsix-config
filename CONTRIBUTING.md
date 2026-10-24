@@ -111,6 +111,26 @@ aborted; review and commit the mechanical fixups before committing again.
   `__all__` in `src/robotsix_config/__init__.py` need care, since
   consumers rely on these exported symbols.
 
+## Triage boilerplate
+
+Recurring triage patterns with a standard response. The same patterns are
+also recorded for the `triage_boilerplate` periodic in
+`.robotsix-mill/periodic/triage_boilerplate.yaml`.
+
+### `Track external PR: <repo>#<N>` tickets (`orphaned_pr_check`)
+
+The `orphaned_pr_check` source opens one of these tickets for every open
+non-mill PR that has no mill ticket. Triage by PR author **and** branch:
+
+| PR author / branch | Triage decision | Response text |
+|---|---|---|
+| `dependabot[bot]`, branch `dependabot/*` | mark done | `operator triage: dependabot PR — dependency PRs are merged by the weekly repo-hygiene chat periodic on impact judgment, not tracked by mill` |
+| `robotsix-mill[bot]`, branch `pin-bump/*` | mark done | `operator triage: first-party pin-bump PR — owned by the pin-bump runner and the weekly repo-hygiene periodic, not tracked by mill` |
+| any other author | normal triage | review and merge if appropriate, or close if obsolete |
+
+PRs from any other author (or a listed author on a different branch) stay
+in the normal triage flow.
+
 ## Commit messages and changelog
 
 This project uses [release-please](https://github.com/googleapis/release-please-action) to automate releases and generate `CHANGELOG.md`. Release-please relies on [conventional commits](https://www.conventionalcommits.org/) to determine version bumps.
