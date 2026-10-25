@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 
 <!-- towncrier release notes start -->
+## [0.7.4](https://github.com/damien-robotsix/robotsix-config/compare/v0.7.3...v0.7.4) (2026-10-24)
+
+
+### Documentation
+
+* Triage boilerplate: check CI-failure-on-main tickets for a later green run before routing to human approval (20261024T164750Z-triage-boilerplate-check-ci-failure-on-m-aeac) ([#383](https://github.com/damien-robotsix/robotsix-config/issues/383)) ([778749f](https://github.com/damien-robotsix/robotsix-config/commit/778749fa4a3437606905fd11e1628c6f450dde63))
+* Triage boilerplate: close 'Track external PR' tickets for dependabot and first-party pin-bump PRs (20261024T164750Z-triage-boilerplate-close-track-external-d20d) ([#381](https://github.com/damien-robotsix/robotsix-config/issues/381)) ([422acc8](https://github.com/damien-robotsix/robotsix-config/commit/422acc8d48599c13bd7a1ff70f1fba734824fe5f))
+
 ## [0.7.3](https://github.com/damien-robotsix/robotsix-config/compare/v0.7.2...v0.7.3) (2026-10-21)
 
 
