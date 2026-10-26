@@ -55,7 +55,7 @@ packages = ["src/robotsix_config"]
 # lockfile unverifiable.
 
 [tool.uv.sources]
-robotsix-modules = { git = "https://github.com/damien-robotsix/robotsix-modules.git", rev = "d556070d715ac83904e0629b4643f7f8d489f13d" }
+robotsix-modules = { git = "https://github.com/damien-robotsix/robotsix-modules.git", rev = "1c7d01f4ed264524857838fad78b5a3d05d3d774" }
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
