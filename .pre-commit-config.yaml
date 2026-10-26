@@ -12,12 +12,22 @@ repos:
       - id: check-merge-conflict
       - id: detect-private-key
       - id: debug-statements
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: f368fb366ff7f2f808dd324b83a6d32267799e19  # frozen: v0.17.2  # pragma: allowlist secret
+  # ruff runs from uv.lock (same as CI's `uv run ruff ...`) so pre-commit
+  # and CI cannot drift onto different ruff versions.
+  - repo: local
     hooks:
       - id: ruff
-        args: [--fix]
+        name: ruff
+        entry: uv run ruff check --fix
+        language: system
+        types_or: [python, pyi]
+        require_serial: true
       - id: ruff-format
+        name: ruff-format
+        entry: uv run ruff format
+        language: system
+        types_or: [python, pyi]
+        require_serial: true
   - repo: https://github.com/abravalheri/validate-pyproject
     rev: 17e12779811926f000bdfa1795f9e3735dd71ac3  # frozen: 0.26  # pragma: allowlist secret
     hooks:
