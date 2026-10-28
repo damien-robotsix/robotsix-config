@@ -327,22 +327,12 @@ jobs:
   dependency-review:
     name: Dependency review
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
     permissions:
       contents: read
-    steps:
-      - name: Harden Runner
-        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1  # v2.21.1
-        with:
-          egress-policy: audit
-
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v6
-        with:
-          persist-credentials: false
-      - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294  # v5.0.0
-        with:
-          fail-on-severity: moderate
+      pull-requests: write  # shared workflow posts the review summary as a PR comment
+    uses: damien-robotsix/robotsix-github-workflows/.github/workflows/dependency-review.yml@47523e8aa2d34d41da060d29b57f75ab262cb840  # v1.4.0
+    with:
+      fail-on-severity: moderate
 
   dependency-audit:
     name: Dependency audit
