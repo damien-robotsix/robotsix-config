@@ -211,9 +211,10 @@ def record_version(
     }
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("a", encoding="utf-8") as fh:
-        # codeql[py/clear-text-storage-sensitive-data] -- `redacted` has every
-        # SecretStr-declared field removed by strip_secrets() above; this is
-        # the mitigation, not a violation. See config-ownership.md.
+        # `redacted` has every SecretStr-declared field removed by
+        # strip_secrets() above; this is the mitigation, not a violation.
+        # See config-ownership.md.
+        # codeql[py/clear-text-storage-sensitive-data]
         fh.write(json.dumps(entry, ensure_ascii=False) + "\n")
         fh.flush()
         os.fsync(fh.fileno())

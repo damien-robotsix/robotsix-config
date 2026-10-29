@@ -66,17 +66,13 @@ from ._errors import InvalidConfigError
 from ._history_merge import compute_changed_keys, deep_merge
 from ._history_secrets import (
     MASKED_SECRET_SENTINEL,
+    PATH_WILDCARD,
     SECRET_KEY_SUFFIXES,
     _carry_secrets_forward,
     _preserve_secrets,
     mask_secrets,
     secret_paths,
-)
-from ._history_secrets import (
-    PATH_WILDCARD as PATH_WILDCARD,  # noqa: PLC0414 -- explicit re-export
-)
-from ._history_secrets import (
-    strip_secrets as strip_secrets,  # noqa: PLC0414 -- explicit re-export
+    strip_secrets,
 )
 from ._history_store import (
     DEFAULT_MAX_VERSIONS,
@@ -93,6 +89,7 @@ __all__ = [
     "DEFAULT_MAX_VERSIONS",
     "MASKED_SECRET_SENTINEL",
     "MAX_VERSIONS_ENV",
+    "PATH_WILDCARD",
     "SECRET_KEY_SUFFIXES",
     "apply_update",
     "compute_changed_keys",
@@ -104,6 +101,7 @@ __all__ = [
     "record_version",
     "rollback",
     "secret_paths",
+    "strip_secrets",
     "versions_path",
 ]
 
