@@ -35,6 +35,15 @@ Or via ``python -m robotsix_config`` (same behaviour):
 python -m robotsix_config schema myapp.config.Settings
 ```
 
+## Logging
+
+The library logs through the `robotsix_config` logger, which carries a
+`logging.NullHandler`: it stays silent unless your application configures
+logging. To see its warnings, call `logging.basicConfig()` or attach your own
+handler to `logging.getLogger("robotsix_config")`. See
+[Logging](https://damien-robotsix.github.io/robotsix-config/robotsix_config/#logging)
+in the docs.
+
 ## Standards
 
 This repo follows the [robotsix stack standards](https://github.com/damien-robotsix/robotsix-standards).
