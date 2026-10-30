@@ -38,8 +38,16 @@ in cleartext into the ``0600`` file, and marked in the JSON Schema as
 
 from __future__ import annotations
 
-from ._errors import ConfigError, InvalidConfigError
-from .config import (
+import logging
+
+# Library logging convention: attach a NullHandler to the package logger so
+# apps that do not configure logging see no output (the lastResort stderr
+# fallback is not used). Apps wanting the self-heal/history warnings attach a
+# handler to the ``robotsix_config`` logger.
+logging.getLogger(__name__).addHandler(logging.NullHandler())
+
+from ._errors import ConfigError, InvalidConfigError  # noqa: E402
+from .config import (  # noqa: E402
     CONFIG_FILE_ENV,
     DEFAULT_CONFIG_PATH,
     ConfigModel,
@@ -49,7 +57,7 @@ from .config import (
     load_config,
     resolve_config_path,
 )
-from .history import (
+from .history import (  # noqa: E402
     MASKED_SECRET_SENTINEL,
     PATH_WILDCARD,
     apply_update,
