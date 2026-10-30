@@ -71,6 +71,24 @@ A hook that raises, or returns something other than a `dict`, is ignored with a
 `WARNING` and the unmigrated config is loaded — refusing to load would turn a
 bad migration into an unbootable component.
 
+## Logging
+
+The package attaches a `logging.NullHandler` to its `robotsix_config` logger, so
+an application that does not configure logging sees no library output on stderr.
+That includes the self-heal and history `WARNING`s, which would otherwise fall
+back to Python's `lastResort` stderr handler.
+
+To see those warnings, configure a handler on the `robotsix_config` logger (or
+on the root logger):
+
+```python
+import logging
+
+logging.basicConfig(level=logging.WARNING)
+```
+
+The module loggers are `robotsix_config.config` and `robotsix_config.history`.
+
 ## Model
 
 - **Subclass `ConfigModel`.** The canonical base class for configuration models —
