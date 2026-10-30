@@ -87,6 +87,16 @@ import logging
 logging.basicConfig(level=logging.WARNING)
 ```
 
+or, to enable only this library's output without touching the root logger:
+
+```python
+import logging
+
+logger = logging.getLogger("robotsix_config")
+logger.addHandler(logging.StreamHandler())
+logger.setLevel(logging.WARNING)
+```
+
 The module loggers are `robotsix_config.config` and `robotsix_config.history`.
 
 ## Model
