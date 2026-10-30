@@ -28,6 +28,7 @@ modules:
       - docs/robotsix_config/security.md
       - scripts/check_py_typed.py
       - tests/robotsix_config/test_check_py_typed.py
+      - tests/robotsix_config/test_null_handler.py
   - id: config
     description: Configuration models, schema generation, and config file loading/dumping.
     paths:
