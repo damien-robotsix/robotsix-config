@@ -292,6 +292,37 @@ def _atomic_replace(
             time.sleep(delay)
 
 
+def _atomic_write_text(path: Path, text: str) -> None:
+    """Atomically write *text* to *path* with best-effort ``0600`` permissions.
+
+    The content is written to a temporary file in the same directory, flushed
+    and fsynced, chmod-ed ``0600`` (best-effort; POSIX-only guarantee), then
+    renamed over *path* via :func:`_atomic_replace` (which retries on Windows
+    ``PermissionError``).  On failure the temp file is removed and *path* is
+    left unchanged.  The parent directory must already exist.
+    """
+    fd, tmp_path = tempfile.mkstemp(
+        suffix=".tmp",
+        prefix=path.name + ".",
+        dir=str(path.parent),
+    )
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as fh:
+            fh.write(text)
+            fh.flush()
+            os.fsync(fh.fileno())
+        with contextlib.suppress(OSError):
+            os.chmod(tmp_path, 0o600)  # best-effort: 0600 is a POSIX-only guarantee
+        _atomic_replace(tmp_path, path)
+    except BaseException:
+        with contextlib.suppress(OSError):
+            os.unlink(tmp_path)
+        raise
+
+    with contextlib.suppress(OSError):
+        path.chmod(0o600)
+
+
 def dump_config(
     model: BaseModel,
     path: str | os.PathLike[str] | None = None,
@@ -329,28 +360,7 @@ def dump_config(
     with contextlib.suppress(OSError):
         parent.chmod(0o700)
 
-    fd, tmp_path = tempfile.mkstemp(
-        suffix=".tmp",
-        prefix=target.name + ".",
-        dir=str(parent),
-    )
-    try:
-        with os.fdopen(fd, "w", encoding="utf-8") as fh:
-            fh.write(text)
-            fh.flush()
-            os.fsync(fd)
-        try:
-            os.chmod(tmp_path, 0o600)
-        except OSError:
-            pass  # best-effort: 0600 is a POSIX-only guarantee
-        _atomic_replace(tmp_path, target)
-    except BaseException:
-        with contextlib.suppress(OSError):
-            os.unlink(tmp_path)
-        raise
-
-    with contextlib.suppress(OSError):
-        target.chmod(0o600)
+    _atomic_write_text(target, text)
     return target
 
 
