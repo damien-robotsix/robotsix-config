@@ -9,7 +9,6 @@ import contextlib
 import json
 import logging
 import os
-import tempfile
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -17,7 +16,7 @@ from typing import Any
 from pydantic import BaseModel
 
 from ._history_secrets import strip_secrets
-from .config import resolve_config_path
+from .config import _atomic_write_text, resolve_config_path
 
 # Same logger name as before the split, so log filters keep matching.
 logger = logging.getLogger("robotsix_config.history")
@@ -146,21 +145,7 @@ def _trim_history(path: Path, keep: int) -> None:
     if len(lines) <= keep:
         return
     kept = lines[-keep:]
-    fd, tmp_name = tempfile.mkstemp(
-        dir=str(path.parent), prefix=path.name, suffix=".tmp"
-    )
-    try:
-        with os.fdopen(fd, "w", encoding="utf-8") as fh:
-            fh.write("\n".join(kept) + "\n")
-            fh.flush()
-            os.fsync(fh.fileno())
-        os.replace(tmp_name, path)
-    except BaseException:
-        with contextlib.suppress(OSError):
-            os.unlink(tmp_name)
-        raise
-    with contextlib.suppress(OSError):
-        path.chmod(0o600)
+    _atomic_write_text(path, "\n".join(kept) + "\n")
     logger.info(
         "trimmed %s to its newest %d version(s) (dropped %d)",
         path,

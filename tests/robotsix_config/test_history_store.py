@@ -83,3 +83,34 @@ class TestRotation:
         cfg = self._record_n(tmp_path, 4)
         mode = mod.versions_path(cfg).stat().st_mode & 0o777
         assert mode == 0o600
+
+    def test_trim_retries_on_transient_permission_error(
+        self, tmp_path, monkeypatch
+    ) -> None:
+        """A Windows-style ``PermissionError`` on the first ``os.replace``
+        (antivirus/backup handle) is retried instead of failing the trim."""
+        import time
+
+        from robotsix_config import _history_store
+
+        monkeypatch.setattr(time, "sleep", lambda _s: None)
+        path = tmp_path / "config.json.versions"
+        path.write_text("".join(f'{{"version": {i}}}\n' for i in range(1, 6)))
+
+        calls = 0
+        original_replace = os.replace
+
+        def flaky_replace(src, dst):
+            nonlocal calls
+            calls += 1
+            if calls == 1:
+                raise PermissionError("simulated open handle")
+            original_replace(src, dst)
+
+        monkeypatch.setattr(os, "replace", flaky_replace)
+
+        _history_store._trim_history(path, 2)
+
+        assert calls == 2
+        assert path.read_text().splitlines() == ['{"version": 4}', '{"version": 5}']
+        assert [p.name for p in tmp_path.iterdir()] == [path.name]

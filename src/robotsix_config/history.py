@@ -52,10 +52,8 @@ fallback.
 
 from __future__ import annotations
 
-import contextlib
 import json
 import os
-import tempfile
 from copy import deepcopy
 from pathlib import Path
 from typing import Any
@@ -83,7 +81,7 @@ from ._history_store import (
     record_version,
     versions_path,
 )
-from .config import _atomic_replace, load_config, resolve_config_path
+from .config import _atomic_write_text, load_config, resolve_config_path
 
 __all__ = [
     "DEFAULT_MAX_VERSIONS",
@@ -124,21 +122,7 @@ def _read_raw(path: Path) -> dict[str, Any]:
 def _write_raw(path: Path, data: dict[str, Any]) -> None:
     """Atomically write *data* to *path* with ``0600`` permissions."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    fd, tmp = tempfile.mkstemp(
-        suffix=".tmp", prefix=path.name + ".", dir=str(path.parent)
-    )
-    try:
-        with os.fdopen(fd, "w", encoding="utf-8") as fh:
-            fh.write(json.dumps(data, indent=2, ensure_ascii=False) + "\n")
-            fh.flush()
-            os.fsync(fd)
-        with contextlib.suppress(OSError):
-            os.chmod(tmp, 0o600)  # best-effort; 0600 is a POSIX-only guarantee
-        _atomic_replace(tmp, path)
-    except BaseException:
-        with contextlib.suppress(OSError):
-            os.unlink(tmp)
-        raise
+    _atomic_write_text(path, json.dumps(data, indent=2, ensure_ascii=False) + "\n")
 
 
 def apply_update(
