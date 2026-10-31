@@ -16,14 +16,22 @@ jobs:
     permissions:
       contents: read
       security-events: write  # needed for SARIF upload
-    uses: damien-robotsix/robotsix-github-workflows/.github/workflows/python-ci.yml@d2a2353830cf211a9f18f3585085016766294dff
+    uses: damien-robotsix/robotsix-github-workflows/.github/workflows/python-ci.yml@86a722f2938c1dda343bbf8d3c5989613cbf1794  # v1.5.0
     with:
       python-version: "3.14"
       install-extras: "dev"
       cov-package: robotsix_config
       coverage-threshold: "90"
       run-deptry: true
-      run-bandit: true
+      # bandit runs once, in the `bandit-sarif` job below, which also feeds
+      # code scanning (the spine's bandit step emits no SARIF).
+      run-bandit: false
+      run-vulture: true
+      vulture-args: "src/"
+      # Replaces the former inline `dependency-audit` job: uv audit with a
+      # SARIF upload to code scanning (needs the security-events grant above).
+      audit-sarif: true
+      check-lock: true
       mypy-advisory: false
 
   cross-platform-tests:
@@ -60,7 +68,7 @@ jobs:
     permissions:
       contents: read
       security-events: write  # Bandit SARIF upload in python-security.yml
-    uses: damien-robotsix/robotsix-github-workflows/.github/workflows/python-security.yml@a6378accaf26c75b12fac324c3056255647c107b  # main 2026-07-03
+    uses: damien-robotsix/robotsix-github-workflows/.github/workflows/python-security.yml@86a722f2938c1dda343bbf8d3c5989613cbf1794  # v1.5.0
     with:
       python-version: "3.14"
       install-extras: "dev"
@@ -84,31 +92,12 @@ jobs:
   baseline-check:
     permissions:
       contents: read
-    uses: damien-robotsix/robotsix-github-workflows/.github/workflows/baseline-check.yml@188518bece972d7d5f1c4e2a0f2226d2526dc0fa  # main 2026-07-03
-  ruff:
-    name: Ruff lint & format
-    permissions:
-      contents: read
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - name: Harden Runner
-        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1  # v2.21.1
-        with:
-          egress-policy: audit
+    uses: damien-robotsix/robotsix-github-workflows/.github/workflows/baseline-check.yml@86a722f2938c1dda343bbf8d3c5989613cbf1794  # v1.5.0
 
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v6
-        with:
-          persist-credentials: false
-
-      - uses: $/.github/actions/setup
-
-      - name: ruff check
-        run: uv run ruff check .
-
-      - name: ruff format check
-        run: uv run ruff format --check .
-
+  # ruff check / ruff format --check run inside the `ci` job (python-ci.yml),
+  # and actionlint + zizmor run in lint-workflows.yml, so neither is repeated
+  # here. This job stays because it also type-checks tests/ (the spine runs
+  # mypy on src/ only).
   mypy:
     name: Mypy type check
     permissions:
@@ -129,45 +118,6 @@ jobs:
 
       - name: mypy src and tests
         run: uv run mypy src tests
-
-  actionlint:
-    name: Actionlint
-    permissions:
-      contents: read
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - name: Harden Runner
-        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1  # v2.21.1
-        with:
-          egress-policy: audit
-
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v6
-        with:
-          persist-credentials: false
-      - name: Run actionlint
-        uses: rhysd/actionlint@914e7df21a07ef503a81201c76d2b11c789d3fca  # v1.7.12
-
-  vulture:
-    name: Vulture dead code check
-    permissions:
-      contents: read
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - name: Harden Runner
-        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1  # v2.21.1
-        with:
-          egress-policy: audit
-
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v6
-        with:
-          persist-credentials: false
-
-      - uses: $/.github/actions/setup
-
-      - name: vulture
-        run: uv run vulture src/
 
   check-modules:
     name: Check module registration
@@ -260,9 +210,10 @@ jobs:
       - name: Build docs (strict mode)
         run: PYTHONPATH=src uv run mkdocs build --strict
 
-  # The reusable spine runs bandit as a gate but does not emit a SARIF file or
-  # upload it, so the code-scanning integration is preserved as a dedicated job
-  # that regenerates the SARIF report and uploads it.
+  # The reusable spine's bandit step does not emit a SARIF file or upload it,
+  # so bandit runs here instead (the `ci` job sets run-bandit: false to avoid
+  # running it twice): this job is both the bandit gate and the code-scanning
+  # integration.
   bandit-sarif:
     name: Bandit SARIF upload
     permissions:
@@ -292,11 +243,12 @@ jobs:
           sarif_file: bandit-results.sarif
           category: bandit
 
-  # The reusable spine runs pytest with coverage but only emits term-missing
-  # output (no coverage.xml artifact), so the Codecov integration is preserved
-  # as a dedicated job that regenerates the XML report and uploads it.
+  # The reusable spine (python-ci.yml v1.5.0) writes coverage.xml and uploads
+  # it as the `coverage-data` artifact, so this job only forwards that report
+  # to Codecov instead of re-running the test suite.
   coverage:
     name: Coverage & Codecov upload
+    needs: ci
     permissions:
       contents: read
     runs-on: ubuntu-latest
@@ -311,10 +263,10 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: $/.github/actions/setup
-
-      - name: pytest
-        run: uv run pytest -n auto --cov=src --cov-report=xml --cov-report=term-missing
+      - name: Download coverage report
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333  # v8.0.2
+        with:
+          name: coverage-data
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5  # v7
@@ -333,35 +285,6 @@ jobs:
     uses: damien-robotsix/robotsix-github-workflows/.github/workflows/dependency-review.yml@47523e8aa2d34d41da060d29b57f75ab262cb840  # v1.4.0
     with:
       fail-on-severity: moderate
-
-  dependency-audit:
-    name: Dependency audit
-    permissions:
-      contents: read
-      security-events: write  # needed for SARIF upload
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - name: Harden Runner
-        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1  # v2.21.1
-        with:
-          egress-policy: audit
-
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v6
-        with:
-          persist-credentials: false
-
-      - uses: $/.github/actions/setup
-
-      - name: Audit dependencies for known vulnerabilities
-        run: uv audit --frozen --output-format sarif > uv-audit-results.sarif
-
-      - name: Upload uv-audit SARIF
-        if: always()
-        uses: github/codeql-action/upload-sarif@db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28  # v4
-        with:
-          sarif_file: uv-audit-results.sarif
-          category: uv-audit
 
   sbom-release:
     name: Generate and attach SBOM
