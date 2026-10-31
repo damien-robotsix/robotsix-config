@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 
 <!-- towncrier release notes start -->
+## [0.7.5](https://github.com/damien-robotsix/robotsix-config/compare/v0.7.4...v0.7.5) (2026-10-30)
+
+
+### Bug Fixes
+
+* Add logging.NullHandler to robotsix_config package logger (20261030T155913Z-add-logging-nullhandler-to-robotsix-conf-cf7a) ([#395](https://github.com/damien-robotsix/robotsix-config/issues/395)) ([d23cbad](https://github.com/damien-robotsix/robotsix-config/commit/d23cbad91215e4f93c53db1815069fdbf992b58c))
+
+
+### Documentation
+
+* Document library logging behavior for robotsix_config consumers (20261030T161455Z-document-library-logging-behavior-for-ro-1987) ([#398](https://github.com/damien-robotsix/robotsix-config/issues/398)) ([dda1f1e](https://github.com/damien-robotsix/robotsix-config/commit/dda1f1e729b9a7f5590285515e686569b5cdf6e8))
+
 ## [0.7.4](https://github.com/damien-robotsix/robotsix-config/compare/v0.7.3...v0.7.4) (2026-10-24)
 
 
