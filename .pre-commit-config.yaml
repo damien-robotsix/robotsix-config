@@ -58,7 +58,7 @@ repos:
     hooks:
       - id: actionlint
   - repo: https://github.com/damien-robotsix/robotsix-standards
-    rev: v0.10.0
+    rev: v0.11.0
     hooks:
       - id: check-secret-str
   - repo: local
