@@ -8,6 +8,7 @@ import os
 import stat
 import sys
 from enum import StrEnum
+from pathlib import Path
 from typing import Any, Optional
 
 import pytest
@@ -85,7 +86,7 @@ def test_env_is_not_a_config_source(monkeypatch, tmp_path, write_config):
     assert cfg.imap.host == "file"
 
 
-def _write(path, data):
+def _write(path: Path, data: Any) -> None:
     path.write_text(json.dumps(data), encoding="utf-8")
 
 

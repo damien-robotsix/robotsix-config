@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import pytest
+
 from robotsix_config import ConfigError, InvalidConfigError
 
 
@@ -11,7 +13,6 @@ def test_hierarchy():
 
 def test_catchable_as_base():
     exc = InvalidConfigError("y")
-    try:
+    with pytest.raises(ConfigError) as caught:
         raise exc
-    except ConfigError as caught:
-        assert caught is exc
+    assert caught.value is exc

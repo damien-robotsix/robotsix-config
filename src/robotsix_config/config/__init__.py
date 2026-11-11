@@ -255,7 +255,7 @@ def load_config[ModelT: BaseModel](
 def _reveal(obj: Any) -> Any:
     """Recursively replace :class:`SecretStr` with its cleartext value."""
     if isinstance(obj, SecretStr):
-        # codeql[py/clear-text-storage-sensitive-data]
+        # codeql[py/clear-text-storage-sensitive-data]  # noqa: ERA001
         # ^^ intentional per config-standard §3
         return obj.get_secret_value()
     if isinstance(obj, dict):
