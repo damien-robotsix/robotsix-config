@@ -29,7 +29,8 @@ class TestHistory:
     def test_include_data_false_omits_payloads(self, cfg_path) -> None:
         mod.apply_update(Cfg, {"retries": 9}, cfg_path)
         entries = mod.read_versions(cfg_path, include_data=False)
-        assert entries and all("data" not in e for e in entries)
+        assert entries
+        assert all("data" not in e for e in entries)
         assert all("changed_keys" in e for e in entries)
 
 

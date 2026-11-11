@@ -18,7 +18,7 @@ def test_deprecated_emits_warning_on_call():
     def old_function() -> int:
         return 42
 
-    with pytest.warns(DeprecationWarning):
+    with pytest.warns(DeprecationWarning, match="is deprecated"):
         result = old_function()
 
     assert result == 42
@@ -38,7 +38,7 @@ def test_deprecated_warning_reports_versions():
     def old_function() -> None:
         pass
 
-    with pytest.warns(DeprecationWarning) as record:
+    with pytest.warns(DeprecationWarning, match="is deprecated") as record:
         old_function()
 
     text = str(record[0].message)

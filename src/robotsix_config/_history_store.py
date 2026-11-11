@@ -199,7 +199,7 @@ def record_version(
         # `redacted` has every SecretStr-declared field removed by
         # strip_secrets() above; this is the mitigation, not a violation.
         # See config-ownership.md.
-        # codeql[py/clear-text-storage-sensitive-data]
+        # codeql[py/clear-text-storage-sensitive-data]  # noqa: ERA001
         fh.write(json.dumps(entry, ensure_ascii=False) + "\n")
         fh.flush()
         os.fsync(fh.fileno())

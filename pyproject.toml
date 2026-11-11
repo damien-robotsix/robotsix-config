@@ -89,8 +89,11 @@ target-version = "py314"
 line-length = 88
 
 [tool.ruff.lint]
-extend-select = ["D", "E", "F", "I", "UP", "B", "S"]
-ignore = ["D105", "D107", "D205", "D415"]
+extend-select = [
+    "D", "E", "F", "I", "W", "UP", "B", "S",
+    "SIM", "C4", "LOG", "G", "ERA", "PGH", "RUF", "PT",
+]
+ignore = ["D105", "D107", "D205", "D415", "PT006"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
@@ -116,12 +119,8 @@ DEP002 = ["pytest", "pytest-benchmark", "pytest-cov", "pytest-xdist", "ruff", "m
 DEP003 = ["robotsix_config"]
 
 [tool.mypy]
-warn_unused_ignores = true
-warn_redundant_casts = true
-disallow_any_generics = true
-no_implicit_reexport = true
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
+strict = true
+python_version = "3.14"
 
 [[tool.mypy.overrides]]
 module = "tests.*"
