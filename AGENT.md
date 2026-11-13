@@ -8,6 +8,12 @@ Type-aware packages must include a `py.typed` marker per PEP 561 to
 enable downstream consumers to type-check imports without `# type:
 ignore` suppressions.
 
+## Project layout
+
+- Every new source or test file must be listed under its module in
+  `docs/robotsix_config/modules.yaml`; CI's 'Check module
+  registration' check fails otherwise.
+
 ## Testing conventions
 
 When adding an optional dev dependency to
