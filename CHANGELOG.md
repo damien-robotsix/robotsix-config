@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 
 <!-- towncrier release notes start -->
+## [0.7.6](https://github.com/damien-robotsix/robotsix-config/compare/v0.7.5...v0.7.6) (2026-11-13)
+
+
+### Documentation
+
+* AGENT.md: Project layout — Every new source or test file must be listed under its module in `docs/robotsix… (20261113T170738Z-agent-md-project-layout-every-new-source-8ec7) ([#421](https://github.com/damien-robotsix/robotsix-config/issues/421)) ([4f5eac0](https://github.com/damien-robotsix/robotsix-config/commit/4f5eac0336a4c42f48691fcc059f73cb9c0ed0f6))
+
 ## [0.7.5](https://github.com/damien-robotsix/robotsix-config/compare/v0.7.4...v0.7.5) (2026-10-30)
 
 
