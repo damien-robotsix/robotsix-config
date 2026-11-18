@@ -8,38 +8,6 @@ on:
 
 permissions: {}
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: false
-
 jobs:
   scorecard:
-    name: Scorecard analysis
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    permissions:
-      contents: read
-      id-token: write  # Required for publishing results to OpenSSF
-      security-events: write  # Required to upload SARIF results
-
-    steps:
-      - name: Harden Runner
-        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1  # v2.21.1
-        with:
-          egress-policy: audit
-
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v6
-        with:
-          persist-credentials: false
-
-      - name: "Run OpenSSF Scorecard analysis"
-        uses: ossf/scorecard-action@2d1146689b8cda280b9bc96326124645441f03bc  # v2.4.4
-        with:
-          results_file: results.sarif
-          results_format: sarif
-          publish_results: true
-
-      - name: "Upload SARIF results"
-        uses: github/codeql-action/upload-sarif@db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28  # v4
-        with:
-          sarif_file: results.sarif
+    uses: damien-robotsix/robotsix-github-workflows/.github/workflows/scorecard.yml@86a722f2938c1dda343bbf8d3c5989613cbf1794  # v1.5.0
