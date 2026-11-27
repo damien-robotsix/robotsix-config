@@ -30,3 +30,10 @@ tests skip cleanly rather than failing the whole run.
 For example, an unguarded module-level `import hypothesis` in a test
 file caused CI collection to fail with `ModuleNotFoundError` when the
 optional dependency was absent.
+
+- **Rule:** When adding a dev dependency that is imported only by tests
+  (not `src/`), also add its `types-<pkg>` mypy stub package to
+  `[project.optional-dependencies].dev` and regenerate `uv.lock`. This
+  repo runs `mypy --strict`, which rejects untyped third-party imports
+  with `[import-untyped]`; the stub must be present before the test can
+  type-check.
