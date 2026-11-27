@@ -40,6 +40,7 @@ modules:
       - tests/config/test_config.py
       - tests/config/test_config.schema.json
       - tests/config/test_config_properties.py
+      - tests/config/test_schema_validation.py
       - tests/config/scripts/__init__.py
       - tests/config/scripts/_test_cli_models.py
       - tests/config/scripts/_test_models.py

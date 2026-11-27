@@ -1025,6 +1025,7 @@ dependencies = [
 dev = [
     { name = "deptry" },
     { name = "hypothesis" },
+    { name = "jsonschema" },
     { name = "mkdocs-material" },
     { name = "mkdocstrings", extra = ["python"] },
     { name = "mypy" },
@@ -1045,6 +1046,7 @@ docs = [
 requires-dist = [
     { name = "deptry", marker = "extra == 'dev'", specifier = ">=0.22.0" },
     { name = "hypothesis", marker = "extra == 'dev'", specifier = ">=6.165.7" },
+    { name = "jsonschema", marker = "extra == 'dev'", specifier = ">=4" },
     { name = "mkdocs-material", marker = "extra == 'dev'", specifier = ">=9" },
     { name = "mkdocs-material", marker = "extra == 'docs'", specifier = ">=9" },
     { name = "mkdocstrings", extras = ["python"], marker = "extra == 'dev'", specifier = ">=1.0.6" },
