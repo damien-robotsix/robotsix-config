@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 
 <!-- towncrier release notes start -->
+## [0.7.7](https://github.com/damien-robotsix/robotsix-config/compare/v0.7.6...v0.7.7) (2026-11-27)
+
+
+### Documentation
+
+* AGENT.md: Testing conventions — When adding a dev dependency that is imported only by tests (not `src/`), also… (20261127T182319Z-agent-md-testing-conventions-when-adding-da28) ([#425](https://github.com/damien-robotsix/robotsix-config/issues/425)) ([4c5e3e4](https://github.com/damien-robotsix/robotsix-config/commit/4c5e3e40f1cb500405f9ed57690849325bc10453))
+
 ## [0.7.6](https://github.com/damien-robotsix/robotsix-config/compare/v0.7.5...v0.7.6) (2026-11-13)
 
 
